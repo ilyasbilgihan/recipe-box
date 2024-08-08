@@ -1,0 +1,9 @@
+{
+  "button": {
+    "french": "Dili Fransızcaya Çevir",
+    "english": "Dili Ingilizceye Çevir",
+    "turkish": "Dili Türkçeyle Çevir"
+  },
+  "getStarted": "Bu sayfa için aşağıdaki dosyayı aç",
+  "changeCode": "İstediğin yazıyı değiştir ve kaydet. Uygulama otomatik yenilenir."
+}

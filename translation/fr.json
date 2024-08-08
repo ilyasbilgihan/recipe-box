@@ -1,0 +1,9 @@
+{
+  "button": {
+    "french": "Changer la langue en français",
+    "english": "Changer la langue en anglais",
+    "turkish": "Changer la langue en turc"
+  },
+  "getStarted": "Ouvrez le code de cet écran :",
+  "changeCode": "Modifiez n'importe quel texte, enregistrez le fichier et votre application sera automatiquement mise à jour."
+}
