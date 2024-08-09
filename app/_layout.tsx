@@ -3,21 +3,20 @@ import '../global.css';
 import '../translation';
 
 import { Stack, SplashScreen } from 'expo-router';
-import { Session } from '@supabase/supabase-js';
-import { supabase } from '~/utils/supabase';
 
-export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
-};
 import { useFonts } from 'expo-font';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { GlobalProvider } from '~/context/GlobalProvider';
+import { GluestackUIProvider } from '~/components/ui/gluestack-ui-provider';
 
 SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    'Publica Play': require('../assets/fonts/PublicaPlay.otf'),
+    'Quicksand Light': require('../assets/fonts/Quicksand-Light.ttf'),
+    'Quicksand Bold': require('../assets/fonts/Quicksand-Bold.ttf'),
+    'Quicksand Medium': require('../assets/fonts/Quicksand-Medium.ttf'),
+    Quicksand: require('../assets/fonts/Quicksand-Regular.ttf'),
+    'Quicksand SemiBold': require('../assets/fonts/Quicksand-SemiBold.ttf'),
   });
 
   useEffect(() => {
@@ -29,10 +28,12 @@ export default function RootLayout() {
 
   return (
     <GlobalProvider>
-      <Stack>
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
+      <GluestackUIProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        </Stack>
+      </GluestackUIProvider>
     </GlobalProvider>
   );
 }
