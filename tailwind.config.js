@@ -184,6 +184,7 @@ module.exports = {
         roboto: ['Roboto', 'sans-serif'],
         qs: ['Quicksand', 'sans-serif'],
         'qs-light': ['Quicksand Light', 'sans-serif'],
+        'qs-medium': ['Quicksand Medium', 'sans-serif'],
         'qs-semibold': ['Quicksand SemiBold', 'sans-serif'],
         'qs-bold': ['Quicksand Bold', 'sans-serif'],
       },

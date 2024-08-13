@@ -31,7 +31,7 @@ export default function RootLayout() {
       <GluestackUIProvider>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(stack)" options={{ headerShown: false }} />
         </Stack>
       </GluestackUIProvider>
     </GlobalProvider>

@@ -14,9 +14,15 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
+    "@gluestack-ui/button": "^1.0.7",
+    "@gluestack-ui/form-control": "^0.1.18",
+    "@gluestack-ui/input": "^0.1.31",
     "@gluestack-ui/nativewind-utils": "^1.0.23",
     "@gluestack-ui/overlay": "^0.1.15",
+    "@gluestack-ui/textarea": "^0.1.23",
     "@gluestack-ui/toast": "^1.0.7",
+    "@hookform/resolvers": "^3.9.0",
+    "@legendapp/motion": "^2.3.0",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-navigation/native": "^6.1.7",
     "@supabase/supabase-js": "^2.38.4",
@@ -33,6 +39,7 @@
     "nativewind": "^4.0.36",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.52.2",
     "react-i18next": "^14.0.1",
     "react-native": "0.74.3",
     "react-native-gesture-handler": "~2.16.1",
@@ -41,7 +48,8 @@
     "react-native-screens": "3.31.1",
     "react-native-svg": "^13.4.0",
     "react-native-url-polyfill": "^2.0.0",
-    "react-native-web": "~0.19.10"
+    "react-native-web": "~0.19.10",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
