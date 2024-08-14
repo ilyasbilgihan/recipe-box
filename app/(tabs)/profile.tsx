@@ -1,6 +1,14 @@
-import { View, Alert, Image, ScrollView, RefreshControl } from 'react-native';
+import {
+  View,
+  Alert,
+  Image,
+  ScrollView,
+  RefreshControl,
+  TouchableOpacity,
+  Text,
+} from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { supabase } from '~/utils/supabase';
+import { supabase, uploadImageToSupabaseBucket } from '~/utils/supabase';
 import { router } from 'expo-router';
 import { useGlobalContext } from '~/context/GlobalProvider';
 import {
@@ -15,13 +23,17 @@ import { Box } from '~/components/ui/box';
 import { ButtonSpinner, ButtonText, Button } from '~/components/ui/button';
 import { Textarea, TextareaInput } from '~/components/ui/textarea';
 
+import * as ImagePicker from 'expo-image-picker';
+
 const Profile = () => {
   const { session } = useGlobalContext();
+  const [image, setImage] = useState<ImagePicker.ImagePickerAsset>();
   const [formData, setFormData] = useState({
     name: '',
     location: '',
     profession: '',
     bio: '',
+    profile_image: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -31,6 +43,8 @@ const Profile = () => {
     setRefreshing(true);
     setTimeout(() => {
       fetchProfile();
+      setLoading(false);
+      setImage(undefined);
       setRefreshing(false);
     }, 1000);
   }, []);
@@ -53,6 +67,9 @@ const Profile = () => {
         location: data.location,
         profession: data.profession,
         bio: data.bio,
+        profile_image: data.profile_image
+          ? data.profile_image + '?time=' + new Date().getTime() // Add timestamp to prevent caching
+          : '',
       });
     }
   };
@@ -67,6 +84,12 @@ const Profile = () => {
   const handleProfileUpdate = async () => {
     setLoading(true);
 
+    let uploadedImageUrl = null;
+    if (image !== undefined) {
+      const url = await uploadImageToSupabaseBucket(session?.user.id, image);
+      uploadedImageUrl = url;
+    }
+
     const { error } = await supabase
       .from('profile')
       .update({
@@ -74,6 +97,7 @@ const Profile = () => {
         location: formData.location,
         profession: formData.profession,
         bio: formData.bio,
+        profile_image: uploadedImageUrl ? uploadedImageUrl : formData.profile_image,
       })
       .eq('id', session?.user.id);
 
@@ -88,10 +112,56 @@ const Profile = () => {
     router.replace('/profile');
   };
 
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== 'granted') {
+      // If permission is denied, show an alert
+      Alert.alert('Permission Denied', `Sorry, we need camera roll permission to upload images.`);
+    } else {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+        base64: true,
+      });
+
+      if (!result.canceled && result.assets[0].fileSize) {
+        if (result.assets[0].fileSize <= 2000000) {
+          setImage(result.assets[0]);
+          setField('profile_image', result.assets[0].uri);
+        } else {
+          Alert.alert('Error', 'Image size should be less than 2MB');
+        }
+      }
+    }
+  };
+
   return (
     <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       <View className="flex w-full flex-1 items-center justify-between px-12 font-qs-medium ">
-        <Image source={require('~/assets/images/user.png')} className="my-12 h-32 w-32" />
+        <View className="my-12 flex flex-col gap-3">
+          <TouchableOpacity onPress={pickImage}>
+            <Image
+              source={
+                formData.profile_image
+                  ? { uri: formData.profile_image }
+                  : require('~/assets/images/no-image.png')
+              }
+              className="h-32 w-32 rounded-full"
+            />
+          </TouchableOpacity>
+          {formData.profile_image ? (
+            <TouchableOpacity
+              onPress={() => {
+                setField('profile_image', '');
+                setImage(undefined);
+              }}>
+              <Text className="font-qs-medium font-semibold text-red-700">Remove Image</Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
         <Box className="flex w-full gap-3 pb-12">
           <FormControl>
             <FormControlLabel className="mb-1">
