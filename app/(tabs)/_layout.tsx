@@ -36,11 +36,18 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="bookmark"
+        name="create-recipe"
         options={{
-          title: 'Bookmark',
-          tabBarIcon: ({ color }) => <TabBarIcon name="bookmark-o" color={color} />,
-          headerShown: false,
+          title: 'Create Recipe',
+          tabBarIcon: ({ color }) => <TabBarIcon name="edit" color={color} />,
+          headerShadowVisible: false,
+          headerStyle: {
+            backgroundColor: '#FAF9FB',
+          },
+          headerTitleStyle: {
+            fontFamily: 'Quicksand SemiBold',
+          },
+          headerTitleAlign: 'center',
         }}
       />
       <Tabs.Screen

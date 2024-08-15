@@ -6,6 +6,7 @@ import {
   RefreshControl,
   TouchableOpacity,
   Text,
+  TextInput,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { supabase, uploadImageToSupabaseBucket } from '~/utils/supabase';
@@ -24,16 +25,16 @@ import { ButtonSpinner, ButtonText, Button } from '~/components/ui/button';
 import { Textarea, TextareaInput } from '~/components/ui/textarea';
 
 import * as ImagePicker from 'expo-image-picker';
+import { TabBarIcon } from '~/components/TabBarIcon';
 
 const Profile = () => {
   const { session } = useGlobalContext();
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset>();
   const [formData, setFormData] = useState({
     name: '',
-    location: '',
-    profession: '',
-    bio: '',
-    profile_image: '',
+    duration: '',
+    instructions: '',
+    thumbnail: '',
   });
   const [loading, setLoading] = useState(false);
 
@@ -42,39 +43,14 @@ const Profile = () => {
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setTimeout(() => {
-      fetchProfile();
       setLoading(false);
-      setImage(undefined);
+      resetFields();
       setRefreshing(false);
     }, 1000);
   }, []);
 
-  const fetchProfile = async () => {
-    const { data, error } = await supabase
-      .from('profile')
-      .select('*')
-      .eq('id', session?.user.id)
-      .single();
-
-    if (error) {
-      console.log('error', error);
-      return;
-    }
-
-    if (data) {
-      setFormData({
-        name: data.name,
-        location: data.location,
-        profession: data.profession,
-        bio: data.bio,
-        profile_image: data.profile_image
-          ? data.profile_image + '?time=' + new Date().getTime() // Add timestamp to prevent caching
-          : '',
-      });
-    }
-  };
   useEffect(() => {
-    fetchProfile();
+    // fetch ingredients
   }, []);
 
   const setField = (field: string, value: string) => {
@@ -86,21 +62,17 @@ const Profile = () => {
 
     let uploadedImageUrl = null;
     if (image !== undefined) {
-      const url = await uploadImageToSupabaseBucket('profile_images', image);
+      const url = await uploadImageToSupabaseBucket('recipe_images', image);
       uploadedImageUrl = url;
     }
 
-    const { error } = await supabase
-      .from('profile')
-      .update({
-        name: formData.name,
-        location: formData.location,
-        profession: formData.profession,
-        bio: formData.bio,
-        profile_image: uploadedImageUrl ? uploadedImageUrl : formData.profile_image,
-      })
-      .eq('id', session?.user.id);
-
+    const { error } = await supabase.from('recipe').insert({
+      name: formData.name,
+      duration: formData.duration,
+      instructions: formData.instructions,
+      thumbnail: uploadedImageUrl ? uploadedImageUrl : formData.thumbnail,
+      owner_id: session?.user.id,
+    });
     if (error) {
       Alert.alert('Error', error.message);
       setLoading(false);
@@ -108,8 +80,20 @@ const Profile = () => {
     }
 
     setLoading(false);
-    Alert.alert('Success', 'Profile updated successfully');
+    Alert.alert('Success', 'Recipe Created Successfully');
+    resetFields();
     router.replace('/profile');
+  };
+
+  const resetFields = () => {
+    setFormData({
+      name: '',
+      duration: '',
+      instructions: '',
+      thumbnail: '',
+    });
+
+    setImage(undefined);
   };
 
   const pickImage = async () => {
@@ -122,7 +106,7 @@ const Profile = () => {
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
-        aspect: [1, 1],
+        aspect: [16, 9],
         quality: 1,
         base64: true,
       });
@@ -130,7 +114,7 @@ const Profile = () => {
       if (!result.canceled && result.assets[0].fileSize) {
         if (result.assets[0].fileSize <= 2000000) {
           setImage(result.assets[0]);
-          setField('profile_image', result.assets[0].uri);
+          setField('thumbnail', result.assets[0].uri);
         } else {
           Alert.alert('Error', 'Image size should be less than 2MB');
         }
@@ -140,39 +124,18 @@ const Profile = () => {
 
   return (
     <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-      <View className="flex w-full flex-1 items-center justify-between px-12 font-qs-medium ">
-        <View className="my-12 flex flex-col gap-3">
-          <TouchableOpacity onPress={pickImage}>
-            <Image
-              source={
-                formData.profile_image
-                  ? { uri: formData.profile_image }
-                  : require('~/assets/images/no-image.png')
-              }
-              className="h-32 w-32 rounded-full"
-            />
-          </TouchableOpacity>
-          {formData.profile_image ? (
-            <TouchableOpacity
-              onPress={() => {
-                setField('profile_image', '');
-                setImage(undefined);
-              }}>
-              <Text className="font-qs-medium font-semibold text-red-700">Remove Image</Text>
-            </TouchableOpacity>
-          ) : null}
-        </View>
+      <View className="flex w-full flex-1 items-center justify-between px-8">
         <Box className="flex w-full gap-3 pb-12">
           <FormControl>
             <FormControlLabel className="mb-1">
-              <FormControlLabelText>Name</FormControlLabelText>
+              <FormControlLabelText>Recipe Name</FormControlLabelText>
             </FormControlLabel>
             <Input>
               <InputField
                 type="text"
                 defaultValue={formData.name}
                 onChange={(e) => setField('name', e.nativeEvent.text)}
-                placeholder="Jane Doe"
+                placeholder="Spicy Ramen Noodle"
               />
             </Input>
             <FormControlError>
@@ -181,31 +144,39 @@ const Profile = () => {
           </FormControl>
           <FormControl>
             <FormControlLabel className="mb-1">
-              <FormControlLabelText>Location</FormControlLabelText>
+              <FormControlLabelText>Thumbnail</FormControlLabelText>
             </FormControlLabel>
-            <Input>
-              <InputField
-                type="text"
-                defaultValue={formData.location}
-                onChange={(e) => setField('location', e.nativeEvent.text)}
-                placeholder="İstanbul, Türkiye"
-              />
-            </Input>
+            <TouchableOpacity
+              onPress={pickImage}
+              activeOpacity={0.75}
+              className="flex aspect-video w-full border-spacing-2 items-center justify-center overflow-hidden rounded border border-dashed border-outline-300">
+              {image ? (
+                <Image
+                  source={{ uri: image.uri }}
+                  className="h-full w-full"
+                  style={{ resizeMode: 'cover' }}
+                />
+              ) : (
+                <TabBarIcon name="image" size={32} color="rgb(115 115 115)" />
+              )}
+            </TouchableOpacity>
             <FormControlError>
               <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
             </FormControlError>
           </FormControl>
           <FormControl>
             <FormControlLabel className="mb-1">
-              <FormControlLabelText>Profession</FormControlLabelText>
+              <FormControlLabelText>Duration</FormControlLabelText>
             </FormControlLabel>
-            <Input>
-              <InputField
-                type="text"
-                defaultValue={formData.profession}
-                onChange={(e) => setField('profession', e.nativeEvent.text)}
-                placeholder="Cook"
+            <Input className="flex flex-row items-center justify-between px-3">
+              <TextInput
+                className="flex-1"
+                keyboardType="numeric"
+                defaultValue={formData.duration}
+                onChange={(e) => setField('duration', e.nativeEvent.text)}
+                placeholder="0"
               />
+              <Text className="font-qs-medium text-sm text-dark">minute(s)</Text>
             </Input>
             <FormControlError>
               <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
@@ -213,13 +184,15 @@ const Profile = () => {
           </FormControl>
           <FormControl>
             <FormControlLabel>
-              <FormControlLabelText>Bio</FormControlLabelText>
+              <FormControlLabelText>Instructions</FormControlLabelText>
             </FormControlLabel>
             <Textarea>
               <TextareaInput
                 numberOfLines={5}
+                defaultValue={formData.instructions}
+                onChange={(e) => setField('instructions', e.nativeEvent.text)}
                 textAlignVertical="top"
-                placeholder="Once upon a time..."
+                placeholder="Todo: rich text editor"
                 className="p-3"
               />
             </Textarea>

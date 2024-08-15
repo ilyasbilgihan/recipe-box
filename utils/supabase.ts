@@ -1,3 +1,4 @@
+import 'react-native-get-random-values';
 import { Alert, AppState } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
@@ -22,16 +23,14 @@ AppState.addEventListener('change', (state) => {
     supabase.auth.stopAutoRefresh();
   }
 });
-
 import { decode } from 'base64-arraybuffer';
+import { nanoid } from 'nanoid';
 
-export const uploadImageToSupabaseBucket = async (
-  id: string | undefined,
-  uploaded: ImagePickerAsset
-) => {
+export const uploadImageToSupabaseBucket = async (location: string, uploaded: ImagePickerAsset) => {
   const bucket = 'recipe-box';
   const base64 = uploaded.base64;
-  const filePath = `profile_images/${id}.${uploaded.uri.split('.').pop()}`;
+  const unique = nanoid();
+  const filePath = `${location}/${unique}.${uploaded.uri.split('.').pop()}`;
 
   const { data, error: uploadError } = await supabase.storage
     .from(bucket)
