@@ -140,7 +140,7 @@ const Profile = () => {
 
   return (
     <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-      <View className="flex w-full flex-1 items-center justify-between px-12 font-qs-medium ">
+      <View className="flex w-full flex-1 items-center justify-between px-7 font-qs-medium ">
         <View className="my-12 flex flex-col gap-3">
           <TouchableOpacity onPress={pickImage}>
             <Image
@@ -218,6 +218,8 @@ const Profile = () => {
             <Textarea>
               <TextareaInput
                 numberOfLines={5}
+                defaultValue={formData.bio}
+                onChange={(e) => setField('bio', e.nativeEvent.text)}
                 textAlignVertical="top"
                 placeholder="Once upon a time..."
                 className="p-3"

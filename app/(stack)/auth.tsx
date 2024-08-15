@@ -139,7 +139,7 @@ const SignIn = () => {
 
   return (
     <ScrollView>
-      <View className="flex w-full flex-1 items-center justify-between px-12 font-qs-medium ">
+      <View className="flex w-full flex-1 items-center justify-between px-7 font-qs-medium ">
         <Image source={require('~/assets/images/splash.webp')} className="my-12 h-64 w-64" />
         <Box className="flex w-full gap-3 pb-12">
           <FormControl>
