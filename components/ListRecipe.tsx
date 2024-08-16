@@ -12,6 +12,10 @@ const recipeQuery = supabase.from('recipe').select(`
   thumbnail,
   created_at,
   duration,
+  recipe_category!inner(
+    id,
+    category!inner(name)
+  ),
   recipe_reaction (
     rating
   )

@@ -22,7 +22,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { TabBarIcon } from '~/components/TabBarIcon';
 import ListRecipe from '~/components/ListRecipe';
 const windowWidth = Dimensions.get('window').width;
-
+import { router } from 'expo-router';
 const userQuery = supabase.from('profile').select(`
   name,
   username,
@@ -32,59 +32,44 @@ const userQuery = supabase.from('profile').select(`
 `);
 type userData = QueryData<typeof userQuery>[0];
 
-const recipeQuery = supabase.from('recipe').select(`
-  id,
-  name,
-  thumbnail,
-  created_at,
-  duration,
-  recipe_reaction (
-    rating
-  )
-`);
-type recipeData = QueryData<typeof recipeQuery>;
-
 type CategoryData = {
   id: number;
   name: string;
 };
 
-const categories: CategoryData[] = [
-  {
-    id: 0,
-    name: 'Recommended',
-  },
-  {
-    id: 1,
-    name: 'Lunch',
-  },
-  {
-    id: 2,
-    name: 'Breakfast',
-  },
-  {
-    id: 3,
-    name: 'Dessert',
-  },
-  {
-    id: 4,
-    name: 'High Protein',
-  },
-];
-
 export default function Home() {
   const isFocused = useIsFocused();
   const [user, setUser] = useState<userData | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState(0);
-  const [recipes, setRecipes] = useState<recipeData | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState(1);
+  const [recipes, setRecipes] = useState<any>(null);
+  const [categories, setCategories] = useState<CategoryData[]>([]);
 
-  const insets = useSafeAreaInsets();
   const { session } = useGlobalContext();
 
   useEffect(() => {
     fetchUserDetails();
-    fetchRecipes();
+    fetchCategories();
   }, []);
+
+  useEffect(() => {
+    fetchRecipes();
+  }, [selectedCategory]);
+
+  const fetchCategories = async () => {
+    const { data, error } = await supabase
+      .from('category')
+      .select('*')
+      .order('id', { ascending: true });
+
+    if (error) {
+      console.log('error', error);
+      return;
+    }
+
+    if (data) {
+      setCategories(data);
+    }
+  };
 
   const fetchUserDetails = async () => {
     const { data, error } = await userQuery.eq('id', session?.user.id).single();
@@ -103,13 +88,33 @@ export default function Home() {
       fetchRecipes();
       setRefreshing(false);
     }, 1000);
-  }, []);
+  }, [selectedCategory]);
 
   const fetchRecipes = async () => {
-    const { data, error } = await recipeQuery
+    console.log('CAT', selectedCategory);
+    const { data, error } = await supabase
+      .from('recipe')
+      .select(
+        `
+      id,
+      name,
+      thumbnail,
+      created_at,
+      duration,
+      recipe_category!inner(
+        id,
+        category!inner(name)
+      ),
+      recipe_reaction (
+        rating
+      )
+    `
+      )
       .eq('confirmed', true)
+      .eq('recipe_category.category_id', selectedCategory)
       .order('created_at', { ascending: false })
-      .limit(4);
+      .limit(2);
+
     setRecipes(data);
   };
 
@@ -125,7 +130,11 @@ export default function Home() {
               </Text>
               <Text className="font-qs text-light">{user?.profession}</Text>
             </View>
-            <TouchableOpacity onPress={() => {}}>
+            <TouchableOpacity
+              activeOpacity={0.75}
+              onPress={() => {
+                router.replace('/profile');
+              }}>
               <Image
                 source={
                   user?.profile_image

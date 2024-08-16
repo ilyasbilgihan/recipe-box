@@ -22,12 +22,12 @@ import { Input, InputField } from '~/components/ui/input';
 import { Box } from '~/components/ui/box';
 import { ButtonSpinner, ButtonText, Button } from '~/components/ui/button';
 import { Textarea, TextareaInput } from '~/components/ui/textarea';
+import useImagePicker from '~/utils/useImagePicker';
 
 import * as ImagePicker from 'expo-image-picker';
 
 const Profile = () => {
   const { session } = useGlobalContext();
-  const [image, setImage] = useState<ImagePicker.ImagePickerAsset>();
   const [formData, setFormData] = useState({
     name: '',
     location: '',
@@ -35,6 +35,8 @@ const Profile = () => {
     bio: '',
     profile_image: '',
   });
+
+  const { image, setImage, pickImage } = useImagePicker();
   const [loading, setLoading] = useState(false);
 
   const [refreshing, setRefreshing] = React.useState(false);
@@ -112,32 +114,6 @@ const Profile = () => {
     router.replace('/profile');
   };
 
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (status !== 'granted') {
-      // If permission is denied, show an alert
-      Alert.alert('Permission Denied', `Sorry, we need camera roll permission to upload images.`);
-    } else {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-        base64: true,
-      });
-
-      if (!result.canceled && result.assets[0].fileSize) {
-        if (result.assets[0].fileSize <= 2000000) {
-          setImage(result.assets[0]);
-          setField('profile_image', result.assets[0].uri);
-        } else {
-          Alert.alert('Error', 'Image size should be less than 2MB');
-        }
-      }
-    }
-  };
-
   return (
     <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
       <View className="flex w-full flex-1 items-center justify-between px-7 font-qs-medium ">
@@ -145,9 +121,11 @@ const Profile = () => {
           <TouchableOpacity onPress={pickImage}>
             <Image
               source={
-                formData.profile_image
-                  ? { uri: formData.profile_image }
-                  : require('~/assets/images/no-image.png')
+                image
+                  ? { uri: image.uri }
+                  : formData.profile_image
+                    ? { uri: formData.profile_image }
+                    : require('~/assets/images/no-image.png')
               }
               className="h-32 w-32 rounded-full"
             />
