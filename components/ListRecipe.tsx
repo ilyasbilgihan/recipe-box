@@ -17,12 +17,12 @@ const recipeQuery = supabase.from('recipe').select(`
     category!inner(name)
   ),
   recipe_reaction (
-    rating
+    rating.avg()
   )
 `);
 type recipeData = QueryData<typeof recipeQuery>;
 
-const ListRecipe = ({ recipes }: { recipes: recipeData }) => {
+const ListRecipe = ({ recipes }: { recipes: any[] }) => {
   return (
     <View className="flex flex-row flex-wrap items-stretch gap-4 px-7 pb-7">
       {recipes?.map((recipe, index) => (
@@ -44,14 +44,7 @@ const ListRecipe = ({ recipes }: { recipes: recipeData }) => {
             <View className="flex flex-row items-center justify-between">
               <View className="flex flex-row items-center gap-1 ">
                 <TabBarIcon name="star" size={20} color={'#FB954B'} />
-                <Text className="font-qs-medium text-dark">
-                  {(
-                    recipe.recipe_reaction?.reduce(
-                      (accumulator, currentValue) => accumulator + currentValue.rating,
-                      0
-                    ) / recipe.recipe_reaction.length || 0
-                  ).toFixed(1)}
-                </Text>
+                <Text className="font-qs-medium text-dark">{(recipe.rating || 0).toFixed(2)}</Text>
               </View>
               <View className="flex flex-row items-center gap-1 ">
                 <TabBarIcon name="clock-o" size={20} color={'rgb(159 161 175)'} />

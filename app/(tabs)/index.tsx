@@ -93,28 +93,15 @@ export default function Home() {
   const fetchRecipes = async () => {
     console.log('CAT', selectedCategory);
     const { data, error } = await supabase
-      .from('recipe')
-      .select(
-        `
-      id,
-      name,
-      thumbnail,
-      created_at,
-      duration,
-      recipe_category!inner(
-        id,
-        category!inner(name)
-      ),
-      recipe_reaction (
-        rating
-      )
-    `
-      )
+      .from('sorted_recipe')
+      .select('*')
       .eq('confirmed', true)
-      .eq('recipe_category.category_id', selectedCategory)
+      .eq('category_id', selectedCategory)
+      .order('rating', { ascending: true })
       .order('created_at', { ascending: false })
-      .limit(2);
+      .limit(5);
 
+    console.log(data);
     setRecipes(data);
   };
 
@@ -175,7 +162,7 @@ recipe `}
             keyExtractor={(item) => 'category-' + item.id}
             /* extraData={selectedId}  // rerender when selectedId changes */
           />
-          {recipes ? <ListRecipe recipes={recipes} /> : null}
+          {recipes?.length > 0 ? <ListRecipe recipes={recipes} /> : null}
         </ScrollView>
       </SafeAreaView>
       {isFocused ? <StatusBar backgroundColor="#FB954B" barStyle={'light-content'} /> : null}

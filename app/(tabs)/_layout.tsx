@@ -69,7 +69,7 @@ export default function TabLayout() {
                 onPress={() => {
                   supabase.auth.signOut();
                 }}
-                className="mr-6">
+                className="mr-7">
                 <TabBarIcon name="sign-out" color={'rgb(220 38 38)'} />
               </TouchableOpacity>
             );
