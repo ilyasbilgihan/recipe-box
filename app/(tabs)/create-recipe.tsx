@@ -1,5 +1,15 @@
-import { View, Alert, ScrollView, RefreshControl, Text, TextInput } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Alert,
+  ScrollView,
+  RefreshControl,
+  Text,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  BackHandler,
+} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
 import { supabase, uploadImageToSupabaseBucket } from '~/utils/supabase';
 import { router } from 'expo-router';
 import { useGlobalContext } from '~/context/GlobalProvider';
@@ -13,10 +23,10 @@ import {
 import { Input, InputField } from '~/components/ui/input';
 import { Box } from '~/components/ui/box';
 import { ButtonSpinner, ButtonText, Button } from '~/components/ui/button';
-import { Textarea, TextareaInput } from '~/components/ui/textarea';
 
 import ImagePickerInput from '~/components/ImagePickerInput';
 import useImagePicker from '~/utils/useImagePicker';
+import { RichText, TenTapStartKit, Toolbar, useEditorBridge } from '@10play/tentap-editor';
 
 type Ingredient = {
   id: string;
@@ -32,10 +42,22 @@ type RecipeIngredient = {
   unit: string;
 };
 
+type Category = {
+  id: number;
+  name: string;
+};
+
 import IngredientPicker from '~/components/IngredientPicker';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useNavigation } from 'expo-router';
+import { TabBarIcon } from '~/components/TabBarIcon';
+import { editorCSS } from '~/utils/editorCSS';
+
+import CategoryPicker from '~/components/CategoryPicker';
 
 const CreateRecipe = () => {
   const { session } = useGlobalContext();
+  const navigation = useNavigation();
   const [formData, setFormData] = useState({
     name: '',
     duration: '',
@@ -47,6 +69,9 @@ const CreateRecipe = () => {
   const [refreshing, setRefreshing] = React.useState(false);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [selectedIngredients, setSelectedIngredients] = useState<RecipeIngredient[]>([]);
+  const [openRichText, setOpenRichText] = React.useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const timeout = useRef<any>(null);
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
@@ -59,11 +84,80 @@ const CreateRecipe = () => {
     }, 1000);
   }, []);
 
+  const readonlyEditor = useEditorBridge({
+    autofocus: false,
+    editable: false,
+    initialContent:
+      formData.instructions.length > 0 ? formData.instructions : `<p>Add your instructions</p>`,
+  });
+
+  const editor = useEditorBridge({
+    autofocus: false,
+    bridgeExtensions: TenTapStartKit,
+    avoidIosKeyboard: true,
+    theme: {
+      webview: {
+        backgroundColor: '#FAF9FB',
+      },
+    },
+    initialContent:
+      formData.instructions.length > 0 ? formData.instructions : `<p>Add your instructions</p>`,
+    onChange: async () => {
+      // debounce
+      clearTimeout(timeout.current);
+      timeout.current = setTimeout(async () => {
+        let content = await editor.getHTML();
+        setField('instructions', content);
+        readonlyEditor.setContent(content);
+        navigation.setOptions({
+          headerRight: () =>
+            content ? (
+              <View className="mr-7">
+                <TabBarIcon name="save" color={'rgb(42 48 81)'} />
+              </View>
+            ) : null,
+        });
+        setTimeout(() => {
+          navigation.setOptions({
+            headerRight: () => null,
+          });
+        }, 1000);
+      }, 2000);
+    },
+  });
+
   useEffect(() => {
     // fetch ingredients
 
     fetchIngredients();
+
+    // inject css
+    editor.injectCSS(editorCSS);
+    readonlyEditor.injectCSS(editorCSS);
   }, []);
+
+  const closeRichText = () => {
+    editor.blur();
+    setOpenRichText(false);
+    navigation.setOptions({
+      title: 'Create Recipe',
+      headerLeft: () => null,
+    });
+  };
+
+  useEffect(() => {
+    // custom back handler
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (openRichText) {
+        closeRichText();
+        return true;
+      }
+      return null;
+    });
+
+    return () => backHandler.remove();
+  }, [openRichText]);
+
   const fetchIngredients = async () => {
     const { data, error } = await supabase.from('ingredient').select('*');
     if (error) {
@@ -142,6 +236,25 @@ const CreateRecipe = () => {
       console.log('ingError ->', ingError);
     }
 
+    if (categories.length > 0) {
+      let categoryToInsert: {
+        category_id: number;
+        recipe_id: any;
+      }[] = [];
+      for (let i = 0; i < categories.length; i++) {
+        const category = categories[i];
+        categoryToInsert.push({
+          category_id: category.id,
+          recipe_id: data.id,
+        });
+      }
+      const { data: catData, error: catError } = await supabase
+        .from('recipe_category')
+        .insert(categoryToInsert);
+      console.log('catData ->', catData);
+      console.log('catError ->', catError);
+    }
+
     setLoading(false);
     Alert.alert('Success', 'Recipe Created Successfully');
     resetFields();
@@ -155,98 +268,153 @@ const CreateRecipe = () => {
       instructions: '',
       thumbnail: '',
     });
-
+    readonlyEditor.setContent('');
+    editor.setContent('');
+    setCategories([]);
     setSelectedIngredients([]);
     setImage(undefined);
   };
 
   return (
-    <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-      <View className="flex w-full flex-1 items-center justify-between px-8">
-        <Box className="flex w-full gap-3 pb-12">
-          {/* Recipe Name */}
-          <FormControl>
-            <FormControlLabel className="mb-1">
-              <FormControlLabelText>Recipe Name</FormControlLabelText>
-            </FormControlLabel>
-            <Input className="bg-white">
-              <InputField
-                type="text"
-                defaultValue={formData.name}
-                onChange={(e) => setField('name', e.nativeEvent.text)}
-                placeholder="Spicy Ramen Noodle"
+    <>
+      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+        <View className="flex w-full flex-1 items-center justify-between px-8">
+          <Box className="flex w-full gap-3 pb-12">
+            {/* Recipe Name */}
+            <FormControl>
+              <FormControlLabel className="mb-1">
+                <FormControlLabelText>Recipe Name</FormControlLabelText>
+              </FormControlLabel>
+              <Input className="bg-white">
+                <InputField
+                  type="text"
+                  defaultValue={formData.name}
+                  onChange={(e) => setField('name', e.nativeEvent.text)}
+                  placeholder="Spicy Ramen Noodle"
+                />
+              </Input>
+              <FormControlError>
+                <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
+              </FormControlError>
+            </FormControl>
+            {/* Thumbnail */}
+            <FormControl>
+              <FormControlLabel className="mb-1">
+                <FormControlLabelText>Thumbnail</FormControlLabelText>
+              </FormControlLabel>
+              <ImagePickerInput
+                defaultImage={formData.thumbnail}
+                image={image}
+                pickImage={pickImage}
               />
-            </Input>
-            <FormControlError>
-              <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-          {/* Thumbnail */}
-          <FormControl>
-            <FormControlLabel className="mb-1">
-              <FormControlLabelText>Thumbnail</FormControlLabelText>
-            </FormControlLabel>
-            <ImagePickerInput
-              defaultImage={formData.thumbnail}
-              image={image}
-              pickImage={pickImage}
+              <FormControlError>
+                <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
+              </FormControlError>
+            </FormControl>
+            {/* Duration */}
+            <FormControl>
+              <FormControlLabel className="mb-1">
+                <FormControlLabelText>Duration</FormControlLabelText>
+              </FormControlLabel>
+              <Input className="flex flex-row items-center justify-between bg-white px-3">
+                <TextInput
+                  className="flex-1"
+                  keyboardType="numeric"
+                  defaultValue={formData.duration}
+                  onChange={(e) => setField('duration', e.nativeEvent.text)}
+                  placeholder="0"
+                />
+                <Text className="font-qs-medium text-sm text-dark">minute(s)</Text>
+              </Input>
+              <FormControlError>
+                <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
+              </FormControlError>
+            </FormControl>
+            {/* Category */}
+            <CategoryPicker selectedCategories={categories} setSelectedCategories={setCategories} />
+            {/* Ingredients */}
+            <IngredientPicker
+              ingredients={ingredients}
+              selectedIngredients={selectedIngredients}
+              setSelectedIngredients={setSelectedIngredients}
             />
-            <FormControlError>
-              <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-          {/* Duration */}
-          <FormControl>
-            <FormControlLabel className="mb-1">
-              <FormControlLabelText>Duration</FormControlLabelText>
-            </FormControlLabel>
-            <Input className="flex flex-row items-center justify-between bg-white px-3">
-              <TextInput
-                className="flex-1"
-                keyboardType="numeric"
-                defaultValue={formData.duration}
-                onChange={(e) => setField('duration', e.nativeEvent.text)}
-                placeholder="0"
-              />
-              <Text className="font-qs-medium text-sm text-dark">minute(s)</Text>
-            </Input>
-            <FormControlError>
-              <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-          {/* Ingredients */}
-          <IngredientPicker
-            ingredients={ingredients}
-            selectedIngredients={selectedIngredients}
-            setSelectedIngredients={setSelectedIngredients}
-          />
-          {/* Instructions */}
-          <FormControl>
-            <FormControlLabel className="mb-1">
-              <FormControlLabelText>Instructions</FormControlLabelText>
-            </FormControlLabel>
-            <Textarea className="bg-white">
-              <TextareaInput
-                numberOfLines={5}
-                defaultValue={formData.instructions}
-                onChange={(e) => setField('instructions', e.nativeEvent.text)}
-                textAlignVertical="top"
-                placeholder="Todo: rich text editor"
-                className="p-3"
-              />
-            </Textarea>
-          </FormControl>
-          {/* Save Button */}
-          <Button
-            disabled={loading}
-            className="mt-4 h-11 rounded-xl bg-warning-400"
-            onPress={handleCreateRecipe}>
-            {loading ? <ButtonSpinner color={'white'} /> : null}
-            <ButtonText className="text-md ml-4 font-medium">Create Recipe</ButtonText>
-          </Button>
-        </Box>
+            {/* Instructions */}
+            <FormControl>
+              <FormControlLabel className="mb-1">
+                <FormControlLabelText>Instructions</FormControlLabelText>
+              </FormControlLabel>
+
+              <TouchableOpacity
+                activeOpacity={0.75}
+                onPress={() => {
+                  console.log('open portal');
+                  navigation.setOptions({
+                    title: 'Instructions',
+                    headerLeft: () => (
+                      <TouchableOpacity
+                        style={{ marginLeft: 8, padding: 20 }}
+                        activeOpacity={0.75}
+                        onPress={() => {
+                          closeRichText();
+                        }}>
+                        <TabBarIcon name="chevron-left" size={20} color={'rgb(42 48 81)'} />
+                      </TouchableOpacity>
+                    ),
+                  });
+                  setOpenRichText(true);
+                  editor.focus(true);
+                }}>
+                <View
+                  className="h-96"
+                  style={{
+                    borderWidth: 1,
+                    borderColor: '#d3d3d3',
+                    borderRadius: 4,
+                    borderStyle: 'dashed',
+                    marginHorizontal: -28,
+                  }}>
+                  <RichText editor={readonlyEditor} />
+                </View>
+              </TouchableOpacity>
+              <FormControlError>
+                <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
+              </FormControlError>
+            </FormControl>
+            {/* Create Button */}
+            <Button
+              disabled={loading}
+              className="mt-4 h-11 rounded-xl bg-warning-400"
+              onPress={handleCreateRecipe}>
+              {loading ? <ButtonSpinner color={'white'} /> : null}
+              <ButtonText className="text-md ml-4 font-medium">Create Recipe</ButtonText>
+            </Button>
+          </Box>
+        </View>
+      </ScrollView>
+      <View
+        style={{
+          display: openRichText ? 'flex' : 'none',
+          position: 'absolute',
+          backgroundColor: 'rgb(250 249 251)',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+        }}>
+        <View style={{ flex: 1, width: '100%' }}>
+          <RichText editor={editor} />
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={{
+              position: 'absolute',
+              width: '100%',
+              bottom: 0,
+            }}>
+            <Toolbar editor={editor} />
+          </KeyboardAvoidingView>
+        </View>
       </View>
-    </ScrollView>
+    </>
   );
 };
 
