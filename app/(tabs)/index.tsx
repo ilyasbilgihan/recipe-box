@@ -91,18 +91,20 @@ export default function Home() {
   }, [selectedCategory]);
 
   const fetchRecipes = async () => {
-    console.log('CAT', selectedCategory);
     const { data, error } = await supabase
       .from('sorted_recipe')
       .select('*')
       .eq('confirmed', true)
       .eq('category_id', selectedCategory)
-      .order('rating', { ascending: true })
       .order('created_at', { ascending: false })
       .limit(5);
 
-    console.log(data);
-    setRecipes(data);
+    if (data) {
+      let sorted = [...data]?.sort((a, b) => {
+        return b.rating - a.rating;
+      });
+      setRecipes(sorted);
+    }
   };
 
   return (
@@ -120,7 +122,7 @@ export default function Home() {
             <TouchableOpacity
               activeOpacity={0.75}
               onPress={() => {
-                router.replace('/profile');
+                router.replace('/settings');
               }}>
               <Image
                 source={

@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { supabase, uploadImageToSupabaseBucket } from '~/utils/supabase';
-import { router } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { useGlobalContext } from '~/context/GlobalProvider';
 import {
   FormControl,
@@ -111,7 +111,7 @@ const Profile = () => {
 
     setLoading(false);
     Alert.alert('Success', 'Profile updated successfully');
-    router.replace('/profile');
+    router.replace('/settings');
   };
 
   return (

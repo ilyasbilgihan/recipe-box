@@ -36,7 +36,6 @@ export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
 
     if (error) Alert.alert(error.message);
     setSession(data.session);
-    router.replace('/profile');
     setLoading(false);
   };
   async function signUp(credentials: SignUpWithPasswordCredentials) {
@@ -45,7 +44,6 @@ export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
 
     if (error) Alert.alert(error.message);
     setSession(data.session);
-    router.replace('/profile');
     setLoading(false);
   }
 

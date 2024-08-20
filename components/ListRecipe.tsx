@@ -1,42 +1,31 @@
 import { View, Text, TouchableOpacity, Dimensions, Image } from 'react-native';
 import React from 'react';
-import { QueryData } from '@supabase/supabase-js';
 import { supabase } from '~/utils/supabase';
 import { TabBarIcon } from './TabBarIcon';
+import { SharedTransition } from 'react-native-reanimated';
 
 const windowWidth = Dimensions.get('window').width;
 
-const recipeQuery = supabase.from('recipe').select(`
-  id,
-  name,
-  thumbnail,
-  created_at,
-  duration,
-  recipe_category!inner(
-    id,
-    category!inner(name)
-  ),
-  recipe_reaction (
-    rating.avg()
-  )
-`);
-type recipeData = QueryData<typeof recipeQuery>;
+import { router } from 'expo-router';
 
 const ListRecipe = ({ recipes }: { recipes: any[] }) => {
   return (
-    <View className="flex flex-row flex-wrap items-stretch gap-4 px-7 pb-7">
+    <View className="flex flex-row flex-wrap items-stretch gap-6 px-7 pb-7">
       {recipes?.map((recipe, index) => (
         <TouchableOpacity
           key={'recipe-' + index}
           onPress={() => {
-            console.log(recipe.name);
+            if (recipe.id) {
+              // @ts-ignore
+              router.push(`/recipe/${'' + recipe.id}`);
+            }
           }}
           activeOpacity={0.75}
-          style={{ width: (windowWidth - 76) / 2 }}
+          style={{ width: (windowWidth - 72) / 2 }}
           className="flex flex-col overflow-hidden rounded-xl bg-white shadow-md">
           <Image
             source={{ uri: recipe.thumbnail }}
-            style={{ width: (windowWidth - 76) / 2 }}
+            style={{ width: (windowWidth - 72) / 2 }}
             className="aspect-square"
           />
           <View className="flex flex-1 flex-col justify-between p-3">
@@ -44,7 +33,13 @@ const ListRecipe = ({ recipes }: { recipes: any[] }) => {
             <View className="flex flex-row items-center justify-between">
               <View className="flex flex-row items-center gap-1 ">
                 <TabBarIcon name="star" size={20} color={'#FB954B'} />
-                <Text className="font-qs-medium text-dark">{(recipe.rating || 0).toFixed(2)}</Text>
+                <Text className="font-qs-medium text-dark">
+                  {recipe.rating
+                    ? recipe.rating.toFixed(2)
+                    : recipe.recipe_reaction
+                      ? (recipe.recipe_reaction[0]?.avg || 0)?.toFixed(2)
+                      : 0.0}
+                </Text>
               </View>
               <View className="flex flex-row items-center gap-1 ">
                 <TabBarIcon name="clock-o" size={20} color={'rgb(159 161 175)'} />

@@ -54,6 +54,7 @@ import { TabBarIcon } from '~/components/TabBarIcon';
 import { editorCSS } from '~/utils/editorCSS';
 
 import CategoryPicker from '~/components/CategoryPicker';
+import WebView, { WebViewMessageEvent } from 'react-native-webview';
 
 const CreateRecipe = () => {
   const { session } = useGlobalContext();
@@ -84,13 +85,6 @@ const CreateRecipe = () => {
     }, 1000);
   }, []);
 
-  const readonlyEditor = useEditorBridge({
-    autofocus: false,
-    editable: false,
-    initialContent:
-      formData.instructions.length > 0 ? formData.instructions : `<p>Add your instructions</p>`,
-  });
-
   const editor = useEditorBridge({
     autofocus: false,
     bridgeExtensions: TenTapStartKit,
@@ -108,7 +102,6 @@ const CreateRecipe = () => {
       timeout.current = setTimeout(async () => {
         let content = await editor.getHTML();
         setField('instructions', content);
-        readonlyEditor.setContent(content);
         navigation.setOptions({
           headerRight: () =>
             content ? (
@@ -133,7 +126,6 @@ const CreateRecipe = () => {
 
     // inject css
     editor.injectCSS(editorCSS);
-    readonlyEditor.injectCSS(editorCSS);
   }, []);
 
   const closeRichText = () => {
@@ -258,21 +250,28 @@ const CreateRecipe = () => {
     setLoading(false);
     Alert.alert('Success', 'Recipe Created Successfully');
     resetFields();
-    router.replace('/profile');
+    router.replace('/');
   };
 
   const resetFields = () => {
     setFormData({
       name: '',
       duration: '',
-      instructions: '',
+      instructions: `<p>Add your instructions</p>`,
       thumbnail: '',
     });
-    readonlyEditor.setContent('');
     editor.setContent('');
     setCategories([]);
+    setHeight(50);
     setSelectedIngredients([]);
     setImage(undefined);
+  };
+
+  const [height, setHeight] = useState(50);
+
+  const onWebViewMessage = (event: WebViewMessageEvent) => {
+    console.log(event.nativeEvent);
+    setHeight(+event.nativeEvent.data);
   };
 
   return (
@@ -365,7 +364,6 @@ const CreateRecipe = () => {
                   editor.focus(true);
                 }}>
                 <View
-                  className="h-96"
                   style={{
                     borderWidth: 1,
                     borderColor: '#d3d3d3',
@@ -373,7 +371,17 @@ const CreateRecipe = () => {
                     borderStyle: 'dashed',
                     marginHorizontal: -28,
                   }}>
-                  <RichText editor={readonlyEditor} />
+                  <WebView
+                    originWhitelist={['*']}
+                    style={{ height }}
+                    scrollEnabled={false}
+                    nestedScrollEnabled={false}
+                    injectedJavaScript="window.ReactNativeWebView.postMessage(document.body.scrollHeight)"
+                    onMessage={onWebViewMessage}
+                    source={{
+                      html: `<head><meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0"></head><body>${formData?.instructions}<style>${editorCSS}</style></body>`,
+                    }}
+                  />
                 </View>
               </TouchableOpacity>
               <FormControlError>

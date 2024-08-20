@@ -51,9 +51,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="profile/[id]"
         options={{
-          title: 'Profile',
+          href: {
+            pathname: '/profile/[id]',
+            params: {
+              id: session.user.id,
+            },
+          },
+          title: '@username',
           tabBarIcon: ({ color }) => <TabBarIcon name="user-o" color={color} />,
           headerShadowVisible: false,
           headerStyle: {
@@ -63,17 +69,6 @@ export default function TabLayout() {
             fontFamily: 'Quicksand SemiBold',
           },
           headerTitleAlign: 'center',
-          headerRight(props) {
-            return (
-              <TouchableOpacity
-                onPress={() => {
-                  supabase.auth.signOut();
-                }}
-                className="mr-7">
-                <TabBarIcon name="sign-out" color={'rgb(220 38 38)'} />
-              </TouchableOpacity>
-            );
-          },
         }}
       />
     </Tabs>

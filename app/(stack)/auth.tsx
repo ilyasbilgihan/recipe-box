@@ -49,6 +49,8 @@ const SignIn = () => {
       email: formData.email,
       password: formData.password,
     });
+
+    router.replace('/');
     setLoading(false);
   }
   async function checkUsername() {
@@ -121,7 +123,7 @@ const SignIn = () => {
 
     setLoading(false);
 
-    router.push('/profile');
+    router.replace('/');
   }
 
   const setField = (field: string, value: string) => {
@@ -146,7 +148,7 @@ const SignIn = () => {
             <FormControlLabel className="mb-1">
               <FormControlLabelText>Email</FormControlLabelText>
             </FormControlLabel>
-            <Input>
+            <Input className="bg-white">
               <InputField
                 type="text"
                 defaultValue={formData.email}
@@ -167,7 +169,7 @@ const SignIn = () => {
                 <FormControlLabel className="mb-1">
                   <FormControlLabelText>Username</FormControlLabelText>
                 </FormControlLabel>
-                <Input>
+                <Input className="bg-white">
                   <InputField
                     type="text"
                     defaultValue={formData.username}
@@ -185,7 +187,7 @@ const SignIn = () => {
             <FormControlLabel className="mb-1">
               <FormControlLabelText>Password</FormControlLabelText>
             </FormControlLabel>
-            <Input>
+            <Input className="bg-white">
               <InputField
                 type="password"
                 defaultValue={formData.password}
@@ -206,7 +208,7 @@ const SignIn = () => {
                 <FormControlLabel className="mb-1">
                   <FormControlLabelText>Confirm Password</FormControlLabelText>
                 </FormControlLabel>
-                <Input>
+                <Input className="bg-white">
                   <InputField
                     type="password"
                     defaultValue={formData.confirm_password}
