@@ -10,6 +10,7 @@ const User = () => {
   const navigation = useNavigation();
   const { id } = useLocalSearchParams();
   const [profile, setProfile] = useState<any>(null);
+  const [recipes, setRecipes] = useState<any>([]);
 
   useEffect(() => {
     fetchProfile();
@@ -26,6 +27,11 @@ const User = () => {
     } else {
       console.log('data', data);
       navigation.setOptions({ title: '@' + data.username });
+      setRecipes(
+        [...data.recipe].sort(
+          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        )
+      );
       setProfile(data);
     }
   };
@@ -37,7 +43,7 @@ const User = () => {
           <Image source={{ uri: profile?.profile_image }} className="h-24 w-24 rounded-full" />
 
           <View className="flex-col items-center ">
-            <Text className="font-qs-bold text-lg text-dark">0</Text>
+            <Text className="font-qs-bold text-lg text-dark">{recipes.length}</Text>
             <Text className="font-qs-medium text-dark">recipe</Text>
           </View>
           <View className="flex-col items-center ">
@@ -67,7 +73,7 @@ const User = () => {
         <Text className="my-4 font-qs-semibold text-2xl text-dark">Recipes</Text>
         {/* TODO: Tab view*/}
       </View>
-      <ListRecipe recipes={profile?.recipe} />
+      <ListRecipe recipes={recipes} />
     </ScrollView>
   );
 };

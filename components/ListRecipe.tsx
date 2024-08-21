@@ -35,10 +35,10 @@ const ListRecipe = ({ recipes }: { recipes: any[] }) => {
                 <TabBarIcon name="star" size={20} color={'#FB954B'} />
                 <Text className="font-qs-medium text-dark">
                   {recipe.rating
-                    ? recipe.rating.toFixed(2)
+                    ? recipe.rating.toFixed(1)
                     : recipe.recipe_reaction
-                      ? (recipe.recipe_reaction[0]?.avg || 0)?.toFixed(2)
-                      : 0.0}
+                      ? recipe.recipe_reaction[0]?.avg?.toFixed(1) || '-'
+                      : '-'}
                 </Text>
               </View>
               <View className="flex flex-row items-center gap-1 ">

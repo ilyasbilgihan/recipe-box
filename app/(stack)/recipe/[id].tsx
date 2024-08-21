@@ -6,8 +6,9 @@ import {
   ImageBackground,
   StatusBar,
   RefreshControl,
+  FlatList,
 } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { supabase } from '~/utils/supabase';
@@ -20,13 +21,25 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 import { editorCSS } from '~/utils/editorCSS';
+import { useGlobalContext } from '~/context/GlobalProvider';
+import StarRating from 'react-native-star-rating-widget';
 
 const User = () => {
   const { id } = useLocalSearchParams();
   const [recipe, setRecipe] = useState<any>({});
+  const [loading, setLoading] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
+
+  const timeout = useRef<any>(null);
+  const [rating, setRating] = useState(0);
+  const [initialRating, setInitialRating] = useState(0);
+  const [recipeRatings, setRecipeRatings] = useState<any>([]);
+
+  const { session } = useGlobalContext();
 
   useEffect(() => {
     fetchRecipe();
+    checkBookmark();
   }, []);
 
   useFocusEffect(
@@ -56,6 +69,7 @@ const User = () => {
     }
 
     if (data) {
+      setRecipeRatings(data.recipe_reaction);
       setRecipe(data);
     }
   };
@@ -67,6 +81,77 @@ const User = () => {
     setHeight(+event.nativeEvent.data);
   };
 
+  const checkBookmark = async () => {
+    const { data, error } = await supabase
+      .from('bookmark')
+      .select('*')
+      .eq('recipe_id', id)
+      .eq('user_id', session?.user.id)
+      .single();
+
+    if (data) {
+      setBookmarked(true);
+    }
+    return data;
+  };
+  const handleBookmark = async () => {
+    setLoading(true);
+    const data = await checkBookmark();
+
+    if (data) {
+      // remove bookmarked
+      const { error } = await supabase.from('bookmark').delete().eq('id', data.id);
+      if (!error) {
+        setBookmarked(false);
+      }
+    } else {
+      // add bookmark
+      const { error } = await supabase
+        .from('bookmark')
+        .insert({ user_id: session?.user.id, recipe_id: id });
+      if (!error) {
+        setBookmarked(true);
+      }
+    }
+
+    setLoading(false);
+  };
+
+  const handleRating = async () => {
+    clearTimeout(timeout.current);
+    timeout.current = setTimeout(async () => {
+      // update or insert rating
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('recipe_reaction')
+        .select('*')
+        .eq('recipe_id', id)
+        .eq('user_id', session?.user.id)
+        .single();
+
+      console.log(data);
+      if (data) {
+        // delete rating
+        const { error: deleteError } = await supabase
+          .from('recipe_reaction')
+          .delete()
+          .eq('id', data.id);
+      }
+
+      const { error: addReactionError } = await supabase
+        .from('recipe_reaction')
+        .upsert({ user_id: session?.user.id, recipe_id: id, rating: rating });
+      if (addReactionError) {
+        setRating(initialRating);
+      } else {
+        setRecipeRatings([
+          ...recipeRatings.filter((item: any) => item.user_id !== session?.user.id),
+          { user_id: session?.user.id, rating: rating },
+        ]);
+      }
+      setLoading(false);
+    }, 1000);
+  };
   return (
     <>
       <ScrollView>
@@ -78,7 +163,7 @@ const User = () => {
             position: 'relative',
             overflow: 'hidden',
           }}>
-          <View className="absolute left-7 top-7">
+          <View className="absolute left-0 top-0 w-full flex-row justify-between p-7">
             <TouchableOpacity
               activeOpacity={0.75}
               onPress={() => {
@@ -94,6 +179,45 @@ const User = () => {
               }}>
               <TabBarIcon name="chevron-left" color={'rgb(250 249 251)'} />
             </TouchableOpacity>
+            <View className="gap-4">
+              <TouchableOpacity
+                activeOpacity={0.75}
+                onPress={() => {
+                  if (!loading) {
+                    handleBookmark();
+                  }
+                }}
+                style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                  width: 48,
+                  height: 48,
+                  borderRadius: 24,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                {bookmarked ? (
+                  <TabBarIcon name="bookmark" size={24} color={'rgb(250 249 251)'} />
+                ) : (
+                  <TabBarIcon name="bookmark-o" size={24} color={'rgb(250 249 251)'} />
+                )}
+              </TouchableOpacity>
+              <View
+                style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                  width: 48,
+                  borderRadius: 24,
+                  paddingVertical: 12,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: 12,
+                }}>
+                <TabBarIcon name="clock-o" size={24} color={'rgb(250 249 251)'} />
+                <View className="items-center">
+                  <Text className=" font-qs-semibold text-light">30</Text>
+                  <Text className=" font-qs-medium text-light">min</Text>
+                </View>
+              </View>
+            </View>
           </View>
           <View className="absolute bottom-0 w-full">
             <View className="relative justify-center overflow-hidden px-7 pb-6 pt-5">
@@ -121,30 +245,56 @@ const User = () => {
             </View>
           </View>
         </ImageBackground>
-        <View className="flex-row justify-between px-7 py-6">
-          <View className="flex-row items-center gap-2">
-            <TabBarIcon name="clock-o" size={32} color={'rgb(42, 48, 81)'} />
-            <Text className="font-qs-medium">{recipe.duration} minutes</Text>
-          </View>
-          <View className="flex-row gap-4">
-            <TabBarIcon name="heart-o" size={32} color={'rgb(42, 48, 81)'} />
-            <TabBarIcon name="bookmark-o" size={32} color={'rgb(42, 48, 81)'} />
-          </View>
+        <View className="flex-row items-center justify-end gap-4 px-7 py-6">
+          <Text className="font-qs-medium">
+            {(
+              recipeRatings?.reduce((acc: any, rating: { rating: any }) => acc + rating.rating, 0) /
+              recipeRatings?.length
+            ).toFixed(1)}{' '}
+            ({recipeRatings?.length})
+          </Text>
+          <StarRating
+            starStyle={{ marginLeft: -6 }}
+            starSize={28}
+            onRatingStart={() => setInitialRating(rating)}
+            onRatingEnd={handleRating}
+            color={'#FB954B'}
+            rating={rating}
+            onChange={setRating}
+          />
         </View>
-        <View className="px-7">
-          <Text className="font-qs-semibold text-2xl text-dark">Ingredients</Text>
-          <View className="w-full flex-row flex-wrap gap-3 py-3">
-            {recipe?.recipe_ingredient?.map((item: any) => (
+        <View className="mx-7">
+          <Text className="font-qs-semibold text-2xl text-dark">
+            Ingredients{' '}
+            <Text className="font-qs text-lg">({recipe?.recipe_ingredient?.length})</Text>
+          </Text>
+          <FlatList
+            data={recipe?.recipe_ingredient}
+            className="py-4"
+            renderItem={({ item }) => (
               <View
-                className="flex-col rounded-2xl bg-warning-50 shadow-sm"
-                style={{ width: (windowWidth - 72) / 3, height: (windowWidth - 72) / 3 }}
+                className="flex-col items-center justify-center rounded-2xl border-2 border-dashed border-outline-400 px-2"
+                style={{ width: (windowWidth - 72) / 2.5, height: (windowWidth - 72) / 2.5 }}
                 key={item.id}>
-                <Text className="font-qs-medium text-dark">
-                  {item.ingredient.name} - {item.amount} {item.unit}{' '}
-                </Text>
+                <View>
+                  <Image source={{ uri: item.ingredient.image }} className="aspect-square w-1/2" />
+                </View>
+                <View className="w-full items-center">
+                  <Text className="text-center font-qs-semibold text-lg leading-5 text-dark">
+                    {item.ingredient.name}
+                  </Text>
+                  <Text className="font-qs-medium text-dark">
+                    {item.amount} {item.unit}
+                  </Text>
+                </View>
               </View>
-            ))}
-          </View>
+            )}
+            ItemSeparatorComponent={() => <View className="w-4" />}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => 'category-' + item.id}
+            /* extraData={selectedId}  // rerender when selectedId changes */
+          />
         </View>
         <Text className="ml-7 font-qs-semibold text-2xl text-dark">Instructions</Text>
         <View>
