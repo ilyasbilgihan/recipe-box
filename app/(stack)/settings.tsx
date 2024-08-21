@@ -111,7 +111,7 @@ const Profile = () => {
 
     setLoading(false);
     Alert.alert('Success', 'Profile updated successfully');
-    router.replace('/settings');
+    router.push('/settings');
   };
 
   return (

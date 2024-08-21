@@ -106,7 +106,7 @@ const CreateRecipe = () => {
           headerRight: () =>
             content ? (
               <View className="mr-7">
-                <Ionicons name="save-outline" color={'rgb(42 48 81)'} />
+                <Ionicons size={24} name="save-outline" color={'rgb(42 48 81)'} />
               </View>
             ) : null,
         });
@@ -250,7 +250,7 @@ const CreateRecipe = () => {
     setLoading(false);
     Alert.alert('Success', 'Recipe Created Successfully');
     resetFields();
-    router.replace('/');
+    router.push('/');
   };
 
   const resetFields = () => {
@@ -356,7 +356,7 @@ const CreateRecipe = () => {
                         onPress={() => {
                           closeRichText();
                         }}>
-                        <Ionicons name="chevron-back" size={20} color={'rgb(42 48 81)'} />
+                        <Ionicons name="chevron-back" size={22} color={'rgb(42 48 81)'} />
                       </TouchableOpacity>
                     ),
                   });

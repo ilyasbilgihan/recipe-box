@@ -21,7 +21,6 @@ import {
   FormControlLabelText,
 } from '~/components/ui/form-control';
 import { Input, InputField } from '~/components/ui/input';
-import { TabBarIcon } from '~/components/TabBarIcon';
 import { Box } from '~/components/ui/box';
 import { ButtonSpinner, ButtonText, Button } from '~/components/ui/button';
 import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
@@ -50,7 +49,7 @@ const SignIn = () => {
       password: formData.password,
     });
 
-    router.replace('/');
+    router.push('/');
     setLoading(false);
   }
   async function checkUsername() {
@@ -123,7 +122,7 @@ const SignIn = () => {
 
     setLoading(false);
 
-    router.replace('/');
+    router.push('/');
   }
 
   const setField = (field: string, value: string) => {

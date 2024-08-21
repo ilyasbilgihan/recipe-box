@@ -1,5 +1,5 @@
 import { StatusBar, View, Text, TouchableOpacity } from 'react-native';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import { supabase } from '~/utils/supabase';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -24,7 +24,7 @@ export default function StackLayout() {
         <Stack.Screen
           name="settings"
           options={{
-            title: '@username',
+            title: 'Settings',
             headerShadowVisible: false,
             headerStyle: {
               backgroundColor: '#FAF9FB',
@@ -38,9 +38,20 @@ export default function StackLayout() {
                 <TouchableOpacity
                   onPress={() => {
                     supabase.auth.signOut();
+                    router.push('/auth');
                   }}
                   className="mr-7">
-                  <Ionicons name="log-out-outline" color={'rgb(220 38 38)'} />
+                  <Ionicons size={24} name="log-out-outline" color={'rgb(220 38 38)'} />
+                </TouchableOpacity>
+              );
+            },
+            headerLeft(props) {
+              return (
+                <TouchableOpacity
+                  onPress={() => {
+                    router.back();
+                  }}>
+                  <Ionicons size={24} name="chevron-back" color={'rgb(42 48 81)'} />
                 </TouchableOpacity>
               );
             },

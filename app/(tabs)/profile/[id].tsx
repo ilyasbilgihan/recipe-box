@@ -1,31 +1,38 @@
 import { View, Text, Image } from 'react-native';
-import React, { useEffect, useState } from 'react';
-import { router, useLocalSearchParams, useNavigation } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { supabase } from '~/utils/supabase';
 import ListRecipe from '~/components/ListRecipe';
-import { Button, ButtonSpinner, ButtonText } from '~/components/ui/button';
+import { Button, ButtonText } from '~/components/ui/button';
+import { useGlobalContext } from '~/context/GlobalProvider';
+import { Ionicons } from '@expo/vector-icons';
 
 const User = () => {
+  const { session } = useGlobalContext();
   const navigation = useNavigation();
   const { id } = useLocalSearchParams();
   const [profile, setProfile] = useState<any>(null);
   const [recipes, setRecipes] = useState<any>([]);
+  const [likedRecipes, setLikedRecipes] = useState<any>([]);
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      console.log('fetching');
+      fetchProfile();
+      fetchHighRatedRecipes();
+    }, [])
+  );
 
   const fetchProfile = async () => {
     const { data, error } = await supabase
       .from('profile')
       .select('*, recipe(*, recipe_reaction(rating.avg()))')
-      .eq('id', id)
+      .eq('id', id || session?.user.id)
       .single();
     if (error) {
       console.log('error', error);
     } else {
-      console.log('data', data);
       navigation.setOptions({ title: '@' + data.username });
       setRecipes(
         [...data.recipe].sort(
@@ -35,6 +42,21 @@ const User = () => {
       setProfile(data);
     }
   };
+
+  const fetchHighRatedRecipes = async () => {
+    const { data, error } = await supabase
+      .from('recipe_reaction')
+      .select('*, recipe(*, recipe_reaction(rating.avg()))')
+      .eq('user_id', id || session?.user.id)
+      .gte('rating', 4); // filter recipes with rating >= 4
+    if (error) {
+      console.log('error', error);
+    } else {
+      setLikedRecipes(data.map((item) => item.recipe));
+    }
+  };
+
+  const [tab, setTab] = useState<'recipe' | 'liked'>('recipe');
 
   return (
     <ScrollView>
@@ -70,10 +92,34 @@ const User = () => {
             <ButtonText className="text-md font-medium">Follow</ButtonText>
           </Button>
         </View>
-        <Text className="my-4 font-qs-semibold text-2xl text-dark">Recipes</Text>
-        {/* TODO: Tab view*/}
       </View>
-      <ListRecipe recipes={recipes} />
+      <View className="mx-7 my-4 flex-row justify-between border-b-2 border-outline-200 py-3">
+        <View className="relative flex-1 items-center">
+          {tab === 'recipe' ? (
+            <>
+              <Ionicons name="grid" size={24} color={'rgb(42 48 81)'} />
+              <View style={{ height: 2 }} className="absolute -bottom-3.5 w-1/2 bg-dark"></View>
+            </>
+          ) : (
+            <TouchableOpacity onPress={() => setTab('recipe')}>
+              <Ionicons name="grid-outline" size={24} color={'rgb(42 48 81)'} />
+            </TouchableOpacity>
+          )}
+        </View>
+        <View className="relative flex-1 items-center">
+          {tab === 'liked' ? (
+            <>
+              <Ionicons name="heart" size={24} color={'rgb(239 68 68)'} />
+              <View style={{ height: 2 }} className="absolute -bottom-3.5 w-1/2 bg-red-500"></View>
+            </>
+          ) : (
+            <TouchableOpacity onPress={() => setTab('liked')}>
+              <Ionicons name="heart-outline" size={24} color={'rgb(42 48 81)'} />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+      {tab === 'recipe' ? <ListRecipe recipes={recipes} /> : <ListRecipe recipes={likedRecipes} />}
     </ScrollView>
   );
 };

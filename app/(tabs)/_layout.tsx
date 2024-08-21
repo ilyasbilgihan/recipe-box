@@ -29,7 +29,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <Ionicons name="home-outline" color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons size={22} name="home-outline" color={color} />,
           headerShown: false,
         }}
       />
@@ -37,7 +37,7 @@ export default function TabLayout() {
         name="create-recipe"
         options={{
           title: 'Create Recipe',
-          tabBarIcon: ({ color }) => <Ionicons name="create-outline" color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons size={22} name="create-outline" color={color} />,
           headerShadowVisible: false,
           headerStyle: {
             backgroundColor: '#FAF9FB',
@@ -51,14 +51,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile/[id]"
         options={{
-          href: {
-            pathname: '/profile/[id]',
-            params: {
-              id: session.user.id,
-            },
-          },
-          title: '@username',
-          tabBarIcon: ({ color }) => <Ionicons name="person-outline" color={color} />,
+          title: 'Profile',
+          tabBarIcon: ({ color }) => <Ionicons size={22} name="person-outline" color={color} />,
           headerShadowVisible: false,
           headerStyle: {
             backgroundColor: '#FAF9FB',

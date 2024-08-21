@@ -163,7 +163,7 @@ const User = () => {
             <TouchableOpacity
               activeOpacity={0.75}
               onPress={() => {
-                router.replace('/');
+                router.back();
               }}
               style={{
                 backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -173,7 +173,7 @@ const User = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <Ionicons name="chevron-back" color={'rgb(250 249 251)'} />
+              <Ionicons size={22} name="chevron-back" color={'rgb(250 249 251)'} />
             </TouchableOpacity>
             <View className="gap-4">
               <TouchableOpacity
@@ -293,7 +293,7 @@ const User = () => {
             </Text>
           </View>
         </View>
-        <View className="mx-7">
+        <View className="mx-7 mt-4">
           <View className="flex-row items-center gap-2 ">
             <Ionicons name="pricetags-outline" size={24} color={'rgb(42 48 81)'} />
             <Text className="font-qs-semibold text-2xl text-dark">

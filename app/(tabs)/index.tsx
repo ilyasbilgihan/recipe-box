@@ -19,11 +19,11 @@ import { useIsFocused } from '@react-navigation/native';
 import { useEffect, useState, useCallback } from 'react';
 import { QueryData } from '@supabase/supabase-js';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { TabBarIcon } from '~/components/TabBarIcon';
 import ListRecipe from '~/components/ListRecipe';
 const windowWidth = Dimensions.get('window').width;
 import { router } from 'expo-router';
 const userQuery = supabase.from('profile').select(`
+  id,
   name,
   username,
   email,
@@ -122,7 +122,7 @@ export default function Home() {
             <TouchableOpacity
               activeOpacity={0.75}
               onPress={() => {
-                router.replace('/settings');
+                router.push(`/profile/${user?.id}`);
               }}>
               <Image
                 source={
