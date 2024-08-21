@@ -1,10 +1,8 @@
 import { Tabs, Redirect } from 'expo-router';
-import { TabBarIcon } from '../../components/TabBarIcon';
+import { Ionicons } from '@expo/vector-icons';
 import { useGlobalContext } from '~/context/GlobalProvider';
 
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
-import { supabase } from '~/utils/supabase';
 
 export default function TabLayout() {
   const { session } = useGlobalContext();
@@ -31,7 +29,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="home-outline" color={color} />,
           headerShown: false,
         }}
       />
@@ -39,7 +37,7 @@ export default function TabLayout() {
         name="create-recipe"
         options={{
           title: 'Create Recipe',
-          tabBarIcon: ({ color }) => <TabBarIcon name="edit" color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="create-outline" color={color} />,
           headerShadowVisible: false,
           headerStyle: {
             backgroundColor: '#FAF9FB',
@@ -60,7 +58,7 @@ export default function TabLayout() {
             },
           },
           title: '@username',
-          tabBarIcon: ({ color }) => <TabBarIcon name="user-o" color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="person-outline" color={color} />,
           headerShadowVisible: false,
           headerStyle: {
             backgroundColor: '#FAF9FB',

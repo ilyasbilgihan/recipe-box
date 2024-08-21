@@ -1,7 +1,7 @@
 import { StatusBar, View, Text, TouchableOpacity } from 'react-native';
 import { Stack } from 'expo-router';
 import { supabase } from '~/utils/supabase';
-import { TabBarIcon } from '~/components/TabBarIcon';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function StackLayout() {
   return (
@@ -40,7 +40,7 @@ export default function StackLayout() {
                     supabase.auth.signOut();
                   }}
                   className="mr-7">
-                  <TabBarIcon name="sign-out" color={'rgb(220 38 38)'} />
+                  <Ionicons name="log-out-outline" color={'rgb(220 38 38)'} />
                 </TouchableOpacity>
               );
             },

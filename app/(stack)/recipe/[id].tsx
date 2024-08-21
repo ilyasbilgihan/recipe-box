@@ -1,24 +1,14 @@
-import {
-  View,
-  Text,
-  Image,
-  Dimensions,
-  ImageBackground,
-  StatusBar,
-  RefreshControl,
-  FlatList,
-} from 'react-native';
+import { View, Text, Image, Dimensions, ImageBackground, StatusBar, FlatList } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { supabase } from '~/utils/supabase';
-import { TabBarIcon } from '~/components/TabBarIcon';
+import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 
 import WebView, { WebViewMessageEvent } from 'react-native-webview';
 
 const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
 
 import { editorCSS } from '~/utils/editorCSS';
 import { useGlobalContext } from '~/context/GlobalProvider';
@@ -183,7 +173,7 @@ const User = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <TabBarIcon name="chevron-left" color={'rgb(250 249 251)'} />
+              <Ionicons name="chevron-back" color={'rgb(250 249 251)'} />
             </TouchableOpacity>
             <View className="gap-4">
               <TouchableOpacity
@@ -202,9 +192,9 @@ const User = () => {
                   alignItems: 'center',
                 }}>
                 {bookmarked ? (
-                  <TabBarIcon name="bookmark" size={24} color={'rgb(250 249 251)'} />
+                  <Ionicons name="bookmark" size={24} color={'rgb(250 249 251)'} />
                 ) : (
-                  <TabBarIcon name="bookmark-o" size={24} color={'rgb(250 249 251)'} />
+                  <Ionicons name="bookmark-outline" size={24} color={'rgb(250 249 251)'} />
                 )}
               </TouchableOpacity>
               <View
@@ -217,7 +207,7 @@ const User = () => {
                   alignItems: 'center',
                   gap: 12,
                 }}>
-                <TabBarIcon name="clock-o" size={24} color={'rgb(250 249 251)'} />
+                <Ionicons name="time" size={24} color={'rgb(250 249 251)'} />
                 <View className="items-center">
                   <Text className=" font-qs-semibold text-light">30</Text>
                   <Text className=" font-qs-medium text-light">min</Text>
@@ -304,10 +294,13 @@ const User = () => {
           </View>
         </View>
         <View className="mx-7">
-          <Text className="font-qs-semibold text-2xl text-dark">
-            Ingredients{' '}
-            <Text className="font-qs text-lg">({recipe?.recipe_ingredient?.length})</Text>
-          </Text>
+          <View className="flex-row items-center gap-2 ">
+            <Ionicons name="pricetags-outline" size={24} color={'rgb(42 48 81)'} />
+            <Text className="font-qs-semibold text-2xl text-dark">
+              Ingredients{' '}
+              <Text className="font-qs text-lg">({recipe?.recipe_ingredient?.length})</Text>
+            </Text>
+          </View>
           <FlatList
             data={recipe?.recipe_ingredient}
             className="py-4"
@@ -336,7 +329,10 @@ const User = () => {
             /* extraData={selectedId}  // rerender when selectedId changes */
           />
         </View>
-        <Text className="ml-7 font-qs-semibold text-2xl text-dark">Instructions</Text>
+        <View className="ml-7 mt-4 flex-row items-center gap-2">
+          <Ionicons name="footsteps-outline" size={24} color={'rgb(42 48 81)'} />
+          <Text className="font-qs-semibold text-2xl text-dark">Instructions</Text>
+        </View>
         <View>
           {recipe.instructions ? (
             <WebView

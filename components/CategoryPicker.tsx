@@ -19,7 +19,7 @@ import {
   FormControlLabelText,
 } from '~/components/ui/form-control';
 import { Input } from './ui/input';
-import { TabBarIcon } from './TabBarIcon';
+import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '~/utils/supabase';
 import { TouchableOpacity } from '@gorhom/bottom-sheet';
 
@@ -98,7 +98,7 @@ const CategoryPicker = ({
           </View>
           <SelectTrigger className="h-10 w-10 items-center justify-center border-0 " size="md">
             <View>
-              <TabBarIcon className="-mt-1" name="chevron-down" size={14} color={'#737373'} />
+              <Ionicons className="-mt-1" name="chevron-down" size={14} color={'#737373'} />
             </View>
           </SelectTrigger>
         </View>

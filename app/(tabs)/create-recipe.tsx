@@ -50,7 +50,7 @@ type Category = {
 import IngredientPicker from '~/components/IngredientPicker';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from 'expo-router';
-import { TabBarIcon } from '~/components/TabBarIcon';
+import { Ionicons } from '@expo/vector-icons';
 import { editorCSS } from '~/utils/editorCSS';
 
 import CategoryPicker from '~/components/CategoryPicker';
@@ -106,7 +106,7 @@ const CreateRecipe = () => {
           headerRight: () =>
             content ? (
               <View className="mr-7">
-                <TabBarIcon name="save" color={'rgb(42 48 81)'} />
+                <Ionicons name="save-outline" color={'rgb(42 48 81)'} />
               </View>
             ) : null,
         });
@@ -356,7 +356,7 @@ const CreateRecipe = () => {
                         onPress={() => {
                           closeRichText();
                         }}>
-                        <TabBarIcon name="chevron-left" size={20} color={'rgb(42 48 81)'} />
+                        <Ionicons name="chevron-back" size={20} color={'rgb(42 48 81)'} />
                       </TouchableOpacity>
                     ),
                   });

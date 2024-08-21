@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import React from 'react';
 
 import * as ImagePicker from 'expo-image-picker';
-import { TabBarIcon } from './TabBarIcon';
+import { Ionicons } from '@expo/vector-icons';
 
 const ImagePickerInput = ({
   image,
@@ -31,7 +31,7 @@ const ImagePickerInput = ({
           style={{ resizeMode: 'cover' }}
         />
       ) : (
-        <TabBarIcon name="image" size={32} color="rgb(115 115 115)" />
+        <Ionicons name="image-outline" size={32} color="rgb(115 115 115)" />
       )}
     </TouchableOpacity>
   );

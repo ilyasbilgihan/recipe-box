@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, Dimensions, Image } from 'react-native';
 import React from 'react';
 import { supabase } from '~/utils/supabase';
-import { TabBarIcon } from './TabBarIcon';
+import { Ionicons } from '@expo/vector-icons';
 import { SharedTransition } from 'react-native-reanimated';
 
 const windowWidth = Dimensions.get('window').width;
@@ -32,7 +32,7 @@ const ListRecipe = ({ recipes }: { recipes: any[] }) => {
             <Text className="mb-4 font-qs-semibold text-lg text-dark">{recipe.name}</Text>
             <View className="flex flex-row items-center justify-between">
               <View className="flex flex-row items-center gap-1 ">
-                <TabBarIcon name="star" size={20} color={'#FB954B'} />
+                <Ionicons name="star" size={20} color={'#FB954B'} />
                 <Text className="font-qs-medium text-dark">
                   {recipe.rating
                     ? recipe.rating.toFixed(1)
@@ -42,7 +42,7 @@ const ListRecipe = ({ recipes }: { recipes: any[] }) => {
                 </Text>
               </View>
               <View className="flex flex-row items-center gap-1 ">
-                <TabBarIcon name="clock-o" size={20} color={'rgb(159 161 175)'} />
+                <Ionicons name="time-outline" size={20} color={'rgb(159 161 175)'} />
                 <Text className="font-qs-medium text-dark">{recipe.duration} min</Text>
               </View>
             </View>

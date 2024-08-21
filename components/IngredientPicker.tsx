@@ -1,6 +1,6 @@
 import { View, Text, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { TabBarIcon } from './TabBarIcon';
+import { Ionicons } from '@expo/vector-icons';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import BottomSheet from '~/components/BottomSheet';
 import {
@@ -121,7 +121,7 @@ const IngredientPicker = ({
                     onPress={() => {
                       setSelectedIngredients(selectedIngredients.filter((_, i) => i !== index));
                     }}>
-                    <TabBarIcon name="trash" color="#737373" />
+                    <Ionicons name="trash-outline" color="#737373" />
                   </TouchableOpacity>
                 </View>
               ))
@@ -169,7 +169,7 @@ const IngredientPicker = ({
                 placeholder="Flour"
               />
               <View className="flex h-10 items-center justify-center">
-                <TabBarIcon name="search" size={16} color={'#737373'} />
+                <Ionicons name="search-sharp" size={16} color={'#737373'} />
               </View>
             </View>
             <FormControlError>
@@ -222,7 +222,7 @@ const IngredientPicker = ({
                 <SelectTrigger className="bg-white" variant="outline" size="md">
                   <SelectInput className="flex-1" placeholder="Unit" />
                   <View className="px-4">
-                    <TabBarIcon name="chevron-down" size={14} color={'#737373'} />
+                    <Ionicons name="chevron-down" size={14} color={'#737373'} />
                   </View>
                 </SelectTrigger>
                 <SelectPortal>
