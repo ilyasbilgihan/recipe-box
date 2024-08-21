@@ -251,27 +251,57 @@ const User = () => {
             </View>
           </View>
         </ImageBackground>
-        <View className="flex-row items-center justify-end gap-4 px-7 py-6">
-          <Text className="font-qs-medium">
-            {recipeRatings.length
-              ? (
-                  recipeRatings?.reduce(
-                    (acc: any, rating: { rating: any }) => acc + rating.rating,
-                    0
-                  ) / recipeRatings?.length
-                ).toFixed(1)
-              : '-'}{' '}
-            ({recipeRatings?.length})
-          </Text>
-          <StarRating
-            starStyle={{ marginLeft: -6 }}
-            starSize={28}
-            onRatingStart={() => setInitialRating(rating)}
-            onRatingEnd={handleRating}
-            color={'#FB954B'}
-            rating={rating}
-            onChange={setRating}
-          />
+        <View className="flex-row items-center justify-between gap-1 px-7 py-6">
+          {recipe.profile ? (
+            <TouchableOpacity
+              activeOpacity={0.75}
+              onPress={() => router.push(`/profile/${recipe.profile?.id}`)}>
+              <View className="w-1/2 flex-row items-center gap-2">
+                <Image
+                  source={{ uri: recipe.profile?.profile_image }}
+                  className="h-12 w-12 rounded-full"
+                />
+                <View>
+                  <Text className="font-qs-bold text-lg text-dark">
+                    {recipe.profile?.name || '@' + recipe.profile?.username}
+                  </Text>
+                  <Text className="-mt-1 font-qs-medium text-sm text-dark">
+                    {recipe.profile?.profession}
+                  </Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <View className="w-1/2 flex-row items-center gap-2">
+              <View className="h-12 w-12 rounded-full bg-outline-300"></View>
+              <View className="gap-1">
+                <View className="h-4 w-20 rounded-lg bg-outline-300"></View>
+                <View className="h-3 w-14 rounded-lg bg-outline-300"></View>
+              </View>
+            </View>
+          )}
+          <View className="flex-row items-end gap-1">
+            <StarRating
+              starStyle={{ marginLeft: -6 }}
+              starSize={28}
+              onRatingStart={() => setInitialRating(rating)}
+              onRatingEnd={handleRating}
+              color={'#FB954B'}
+              rating={rating}
+              onChange={setRating}
+            />
+            <Text className="font-qs-semibold text-lg">
+              {recipeRatings.length
+                ? (
+                    recipeRatings?.reduce(
+                      (acc: any, rating: { rating: any }) => acc + rating.rating,
+                      0
+                    ) / recipeRatings?.length
+                  ).toFixed(1)
+                : '-'}
+              <Text className="font-qs-medium text-sm"> ({recipeRatings?.length})</Text>
+            </Text>
+          </View>
         </View>
         <View className="mx-7">
           <Text className="font-qs-semibold text-2xl text-dark">
