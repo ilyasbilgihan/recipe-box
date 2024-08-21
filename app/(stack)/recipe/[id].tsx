@@ -70,6 +70,12 @@ const User = () => {
 
     if (data) {
       setRecipeRatings(data.recipe_reaction);
+      let rated = data?.recipe_reaction?.find(
+        (rating: { user_id: string | undefined }) => rating.user_id === session?.user.id
+      );
+      if (rated) {
+        setRating(rated.rating);
+      }
       setRecipe(data);
     }
   };
@@ -247,10 +253,14 @@ const User = () => {
         </ImageBackground>
         <View className="flex-row items-center justify-end gap-4 px-7 py-6">
           <Text className="font-qs-medium">
-            {(
-              recipeRatings?.reduce((acc: any, rating: { rating: any }) => acc + rating.rating, 0) /
-              recipeRatings?.length
-            ).toFixed(1)}{' '}
+            {recipeRatings.length
+              ? (
+                  recipeRatings?.reduce(
+                    (acc: any, rating: { rating: any }) => acc + rating.rating,
+                    0
+                  ) / recipeRatings?.length
+                ).toFixed(1)
+              : '-'}{' '}
             ({recipeRatings?.length})
           </Text>
           <StarRating
