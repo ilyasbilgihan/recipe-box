@@ -13,8 +13,7 @@ const windowWidth = Dimensions.get('window').width;
 import { editorCSS } from '~/utils/editorCSS';
 import { useGlobalContext } from '~/context/GlobalProvider';
 import StarRating from 'react-native-star-rating-widget';
-import { Textarea, TextareaInput } from '~/components/ui/textarea';
-import { Button, ButtonText } from '~/components/ui/button';
+import Comments from '~/components/Comments';
 
 const User = () => {
   const { id } = useLocalSearchParams();
@@ -350,67 +349,15 @@ const User = () => {
             />
           ) : null}
         </View>
-
-        <View className="mt-4 gap-4 px-7 pb-24">
-          <View className="flex-row items-center gap-2">
-            <Ionicons name="chatbubbles-outline" size={24} color={'rgb(42 48 81)'} />
-            <Text className="font-qs-semibold text-2xl text-dark">Comments</Text>
-          </View>
-          <Textarea>
-            <TextareaInput
-              numberOfLines={5}
-              defaultValue={''}
-              onChange={(e) => {}}
-              textAlignVertical="top"
-              placeholder="Once upon a time..."
-              className="p-3"
-            />
-          </Textarea>
-          <Button
-            className="h-10 w-1/2 rounded-lg bg-sky-500"
-            onPress={() => {
-              console.log('add comment');
-            }}>
-            {/* {loading ? <ButtonSpinner color={'white'} /> : null} */}
-            <ButtonText className="text-md font-medium">Add Comment</ButtonText>
-          </Button>
-          {recipe?.comment?.length > 0 ? (
-            recipe?.comment?.map((comment: any) => (
-              <View key={comment.id}>
-                <View className="flex-row items-center gap-4">
-                  <Image
-                    source={{ uri: comment?.profile?.profile_image }}
-                    className="h-10 w-10 rounded-md"
-                  />
-                  <Text className="font-qs-semibold text-lg">
-                    {comment?.profile?.name || '@' + comment?.profile?.username}
-                  </Text>
-                </View>
-                <View className="flex-row">
-                  <View className="relative w-10">
-                    <View
-                      style={{ left: 17 }}
-                      className="absolute top-2 h-full w-0.5 rounded-sm bg-outline-300"></View>
-                  </View>
-                  <View className="flex-1 px-4">
-                    <View>
-                      <Text>{comment?.content}</Text>
-                    </View>
-                    <View>
-                      <Text>actions</Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            ))
-          ) : (
-            <View className="items-center py-8">
-              <Ionicons name="logo-snapchat" size={24} color={'#3d3d3d'} />
-              <Text className="font-qs-medium text-lg">No comments yet.</Text>
+        {recipe?.id ? (
+          <View className="mt-4 gap-4 px-7 pb-24">
+            <View className="flex-row items-center gap-2">
+              <Ionicons name="chatbubbles-outline" size={24} color={'rgb(42 48 81)'} />
+              <Text className="font-qs-semibold text-2xl text-dark">Comments</Text>
             </View>
-          )}
-          <Text>{JSON.stringify(recipe?.comment, null, 2)}</Text>
-        </View>
+            <Comments recipeId={recipe?.id} />
+          </View>
+        ) : null}
       </ScrollView>
     </>
   );
