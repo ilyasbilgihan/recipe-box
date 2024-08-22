@@ -1,7 +1,16 @@
-import { View, Text, Image, Dimensions, ImageBackground, StatusBar, FlatList } from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  Dimensions,
+  ImageBackground,
+  StatusBar,
+  FlatList,
+  PixelRatio,
+} from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import { RefreshControl, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { supabase } from '~/utils/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
@@ -14,6 +23,7 @@ import { editorCSS } from '~/utils/editorCSS';
 import { useGlobalContext } from '~/context/GlobalProvider';
 import StarRating from 'react-native-star-rating-widget';
 import Comments from '~/components/Comments';
+import LazyImage from '~/components/LazyImage';
 
 const User = () => {
   const { id } = useLocalSearchParams();
@@ -28,16 +38,14 @@ const User = () => {
 
   const { session } = useGlobalContext();
 
-  useEffect(() => {
-    fetchRecipe();
-    checkBookmark();
-  }, []);
-
   useFocusEffect(
     useCallback(() => {
       console.log('hey');
       // This will run when screen is `focused` or mounted.
       StatusBar.setHidden(true);
+
+      fetchRecipe();
+      checkBookmark();
 
       // This will run when screen is `blured` or unmounted.
       return () => {
@@ -149,10 +157,23 @@ const User = () => {
       setLoading(false);
     }, 1000);
   };
+
+  const [refreshing, setRefreshing] = React.useState(false);
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setLoading(false);
+      fetchRecipe();
+      checkBookmark();
+      setRefreshing(false);
+    }, 1000);
+  }, []);
   return (
     <>
-      <ScrollView>
-        <ImageBackground
+      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+        <LazyImage
+          background
+          className="bg-warning-400"
           source={{ uri: recipe?.thumbnail }}
           style={{
             width: windowWidth,
@@ -241,13 +262,13 @@ const User = () => {
               </Text>
             </View>
           </View>
-        </ImageBackground>
+        </LazyImage>
         <View className="flex-row items-center justify-between gap-1 px-7 py-6">
           {recipe.profile ? (
             <TouchableOpacity
               activeOpacity={0.75}
               onPress={() => router.push(`/profile/${recipe.profile?.id}`)}>
-              <View className="w-1/2 flex-row items-center gap-2">
+              <View className="w-2/3 flex-row items-center gap-2">
                 <Image
                   source={{ uri: recipe.profile?.profile_image }}
                   className="h-12 w-12 rounded-full"
@@ -273,7 +294,7 @@ const User = () => {
           )}
           <View className="flex-row items-end gap-1">
             <StarRating
-              starStyle={{ marginLeft: -6 }}
+              starStyle={{ marginLeft: -8 }}
               starSize={28}
               onRatingStart={() => setInitialRating(rating)}
               onRatingEnd={handleRating}

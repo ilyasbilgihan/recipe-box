@@ -10,6 +10,8 @@ export default function TabLayout() {
   if (!session) return <Redirect href="/auth" />;
   return (
     <Tabs
+      initialRouteName="index"
+      backBehavior="history"
       sceneContainerStyle={{ backgroundColor: '#FAF9FB' }}
       screenOptions={{
         tabBarActiveTintColor: '#FCA020',
@@ -49,18 +51,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile/[id]"
+        name="profile/index"
         options={{
           title: 'Profile',
           tabBarIcon: ({ color }) => <Ionicons size={22} name="person-outline" color={color} />,
-          headerShadowVisible: false,
-          headerStyle: {
-            backgroundColor: '#FAF9FB',
-          },
-          headerTitleStyle: {
-            fontFamily: 'Quicksand SemiBold',
-          },
-          headerTitleAlign: 'center',
+          headerShown: false,
         }}
       />
     </Tabs>

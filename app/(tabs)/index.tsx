@@ -1,27 +1,26 @@
-import { Link } from 'expo-router';
 import {
   ImageBackground,
   StatusBar,
   Text,
   TouchableOpacity,
   View,
-  StyleSheet,
   Dimensions,
   ScrollView,
   Image,
   RefreshControl,
   FlatList,
-  TouchableWithoutFeedback,
 } from 'react-native';
 import { supabase } from '~/utils/supabase';
 import { useGlobalContext } from '~/context/GlobalProvider';
 import { useIsFocused } from '@react-navigation/native';
 import { useEffect, useState, useCallback } from 'react';
 import { QueryData } from '@supabase/supabase-js';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import ListRecipe from '~/components/ListRecipe';
 const windowWidth = Dimensions.get('window').width;
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
+import LazyImage from '~/components/LazyImage';
+
 const userQuery = supabase.from('profile').select(`
   id,
   name,
@@ -46,10 +45,12 @@ export default function Home() {
 
   const { session } = useGlobalContext();
 
-  useEffect(() => {
-    fetchUserDetails();
-    fetchCategories();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserDetails();
+      fetchCategories();
+    }, [])
+  );
 
   useEffect(() => {
     fetchRecipes();
@@ -122,15 +123,15 @@ export default function Home() {
             <TouchableOpacity
               activeOpacity={0.75}
               onPress={() => {
-                router.push(`/profile/${user?.id}`);
+                router.push(`/profile`);
               }}>
-              <Image
+              <LazyImage
                 source={
                   user?.profile_image
                     ? { uri: user.profile_image }
                     : require('~/assets/images/no-image.png')
                 }
-                className="h-16 w-16 rounded-full"
+                className="h-16 w-16 rounded-full bg-light"
               />
             </TouchableOpacity>
           </View>

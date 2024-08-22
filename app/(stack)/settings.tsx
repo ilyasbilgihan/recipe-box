@@ -25,6 +25,7 @@ import { Textarea, TextareaInput } from '~/components/ui/textarea';
 import useImagePicker from '~/utils/useImagePicker';
 
 import * as ImagePicker from 'expo-image-picker';
+import LazyImage from '~/components/LazyImage';
 
 const Profile = () => {
   const { session } = useGlobalContext();
@@ -111,7 +112,7 @@ const Profile = () => {
 
     setLoading(false);
     Alert.alert('Success', 'Profile updated successfully');
-    router.push('/settings');
+    router.push('/profile');
   };
 
   return (
@@ -119,7 +120,7 @@ const Profile = () => {
       <View className="flex w-full flex-1 items-center justify-between px-7 font-qs-medium ">
         <View className="my-12 flex flex-col gap-3">
           <TouchableOpacity onPress={pickImage}>
-            <Image
+            <LazyImage
               source={
                 image
                   ? { uri: image.uri }
@@ -127,7 +128,7 @@ const Profile = () => {
                     ? { uri: formData.profile_image }
                     : require('~/assets/images/no-image.png')
               }
-              className="h-32 w-32 rounded-full"
+              className="h-32 w-32 rounded-full bg-outline-100"
             />
           </TouchableOpacity>
           {formData.profile_image ? (
