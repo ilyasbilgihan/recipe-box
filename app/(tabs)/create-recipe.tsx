@@ -81,6 +81,7 @@ const CreateRecipe = () => {
     resetFields();
     setSelectedIngredients([]);
     setRefreshing(false);
+    editor.setContent(`<p>Add your instructions</p>`);
   }, []);
 
   const editor = useEditorBridge({
@@ -90,6 +91,7 @@ const CreateRecipe = () => {
     theme: {
       webview: {
         backgroundColor: '#FAF9FB',
+        marginHorizontal: 12,
       },
     },
     initialContent:
