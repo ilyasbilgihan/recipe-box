@@ -1,4 +1,4 @@
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, Alert } from 'react-native';
 import React, { useState } from 'react';
 import Collapsible from 'react-native-collapsible';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -8,6 +8,17 @@ import { useGlobalContext } from '~/context/GlobalProvider';
 import Comments from './Comments';
 import { Button, ButtonText } from './ui/button';
 import { Textarea, TextareaInput } from './ui/textarea';
+import {
+  Select,
+  SelectBackdrop,
+  SelectContent,
+  SelectDragIndicator,
+  SelectDragIndicatorWrapper,
+  SelectInput,
+  SelectItem,
+  SelectPortal,
+  SelectTrigger,
+} from './ui/select';
 
 const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
   const [repliesExpanded, setRepliesExpanded] = useState(false);
@@ -15,6 +26,8 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
   const [voteLoading, setVoteLoading] = useState(false);
   const [userVote, setUserVote] = useState(0);
   const [content, setContent] = useState('');
+  const [editMode, setEditMode] = useState(false);
+  const [editContent, setEditContent] = useState(comment.content);
 
   const { session } = useGlobalContext();
 
@@ -95,13 +108,98 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
     return data?.reaction || 0;
   };
 
+  const handleEditComment = async () => {
+    console.log('edit comment', comment.id);
+    const { data, error } = await supabase
+      .from('comment')
+      .update({ content: editContent })
+      .eq('id', comment.id);
+
+    if (error) {
+      console.log('edit comment error', error);
+    } else {
+      setEditMode(false);
+      refreshComments();
+    }
+  };
+
+  const handleCommentDelete = async () => {
+    console.log('delete comment', comment.id);
+    const { data, error } = await supabase.from('comment').delete().eq('id', comment.id);
+
+    console.log('delete comment error', error);
+    if (error) {
+      if (error.code == '23503') {
+        // Alert.alert('Delete Error', 'Comment has replies. Please delete all replies first.');
+        const { error: updtErr } = await supabase
+          .from('comment')
+          .update({ deleted: true })
+          .eq('id', comment.id);
+      }
+    }
+
+    refreshComments();
+  };
+
   return (
     <View key={comment.id}>
       <View className=" flex-row items-center gap-4">
-        <Image source={{ uri: comment?.profile?.profile_image }} className="h-10 w-10 rounded-md" />
+        <Image
+          source={
+            !comment?.profile?.profile_image || comment?.deleted
+              ? require('~/assets/images/no-image.png')
+              : { uri: comment?.profile?.profile_image }
+          }
+          className="h-10 w-10 rounded-md"
+        />
         <Text className="font-qs-bold text-lg text-dark">
-          {comment?.profile?.name || '@' + comment?.profile?.username}
+          {comment?.deleted
+            ? 'Anonymous'
+            : comment?.profile?.name || '@' + comment?.profile?.username}
         </Text>
+        {comment?.profile?.id == session?.user.id && !comment?.deleted ? (
+          <Select
+            onValueChange={(value) => {
+              if (value == 'edit') {
+                setEditMode(!editMode);
+              } else if (value == 'delete') {
+                Alert.alert(
+                  'Confirm Deletion',
+                  comment?.content,
+                  [
+                    {
+                      text: 'Cancel',
+                      style: 'cancel',
+                    },
+                    {
+                      text: 'Delete',
+                      style: 'default',
+                      onPress: async () => {
+                        await handleCommentDelete();
+                      },
+                    },
+                  ],
+                  {
+                    cancelable: true,
+                  }
+                );
+              }
+            }}>
+            <SelectTrigger className="border-0 " size="md">
+              <Ionicons size={18} name="ellipsis-horizontal" color={'rgb(42 48 81)'} />
+            </SelectTrigger>
+            <SelectPortal>
+              <SelectBackdrop />
+              <SelectContent>
+                <SelectDragIndicatorWrapper>
+                  <SelectDragIndicator />
+                </SelectDragIndicatorWrapper>
+                <SelectItem label={editMode ? 'Preview' : 'Edit Comment'} value={'edit'} />
+                <SelectItem label={'Delete Comment'} value={'delete'} />
+              </SelectContent>
+            </SelectPortal>
+          </Select>
+        ) : null}
       </View>
       <View className="flex-row">
         <View className="relative w-10 py-1">
@@ -109,11 +207,36 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
             style={{ left: 17 }}
             className="absolute top-1 h-full w-0.5 rounded bg-outline-300"></View>
         </View>
-        <View className="flex-1 px-4 pb-2">
+        <View className="ml-4 flex-1">
           <View>
-            <Text className="font-qs-medium text-lg text-dark">{comment?.content}</Text>
+            {editMode ? (
+              <View className="gap-2">
+                <Textarea className="bg-white">
+                  <TextareaInput
+                    numberOfLines={2}
+                    defaultValue={editContent}
+                    onChange={(e) => {
+                      setEditContent(e.nativeEvent.text);
+                    }}
+                    textAlignVertical="top"
+                    placeholder="What are your thoughts?"
+                    className="p-3"
+                  />
+                </Textarea>
+                <Button
+                  className="h-10 w-1/2 rounded-lg bg-warning-400"
+                  onPress={handleEditComment}>
+                  {/* {loading ? <ButtonSpinner color={'white'} /> : null} */}
+                  <ButtonText className="text-md font-medium">Edit</ButtonText>
+                </Button>
+              </View>
+            ) : comment?.deleted ? (
+              <Text className="font-qs-medium  text-dark line-through">Deleted Content</Text>
+            ) : (
+              <Text className="font-qs-medium text-lg text-dark">{editContent}</Text>
+            )}
           </View>
-          <View className="flex-row gap-2">
+          <View className="flex-row gap-2 py-2">
             <View className="flex-row items-center gap-2 ">
               <TouchableOpacity
                 activeOpacity={0.75}
@@ -157,45 +280,52 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                 />
               </TouchableOpacity>
             </View>
-            <View>
-              <TouchableOpacity
-                activeOpacity={0.75}
-                onPress={() => {
-                  setReplyFormExpanded(!replyFormExpanded);
-                }}>
-                <Text className="font-qs-semibold tracking-tighter text-sky-400">Reply</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View>
-            <Collapsible renderChildrenCollapsed={false} collapsed={!replyFormExpanded}>
-              <View className="gap-2 pt-3">
-                <Textarea className="bg-white">
-                  <TextareaInput
-                    numberOfLines={5}
-                    defaultValue={content}
-                    onChange={(e) => {
-                      setContent(e.nativeEvent.text);
-                    }}
-                    textAlignVertical="top"
-                    placeholder="What are your thoughts?"
-                    className="p-3"
-                  />
-                </Textarea>
-                <Button
-                  className="h-10 w-1/2 rounded-lg bg-warning-400"
-                  onPress={async () => {
-                    await handleAddComment({ parentId: comment.id, content });
-                    setReplyFormExpanded(false);
-                    setRepliesExpanded(true);
-                    setContent('');
+            {!comment?.deleted ? (
+              <View>
+                <TouchableOpacity
+                  activeOpacity={0.75}
+                  onPress={() => {
+                    setReplyFormExpanded(!replyFormExpanded);
                   }}>
-                  {/* {loading ? <ButtonSpinner color={'white'} /> : null} */}
-                  <ButtonText className="text-md font-medium">Add Reply</ButtonText>
-                </Button>
+                  <Text className="font-qs-semibold tracking-tighter text-sky-400">Reply</Text>
+                </TouchableOpacity>
               </View>
-            </Collapsible>
-            {comment?.comment[0]?.count > 0 ? (
+            ) : null}
+          </View>
+          <Collapsible renderChildrenCollapsed={false} collapsed={!replyFormExpanded}>
+            <View className="gap-2 pb-2">
+              <Textarea className="bg-white">
+                <TextareaInput
+                  numberOfLines={5}
+                  defaultValue={content}
+                  onChange={(e) => {
+                    setContent(e.nativeEvent.text);
+                  }}
+                  textAlignVertical="top"
+                  placeholder="What are your thoughts?"
+                  className="p-3"
+                />
+              </Textarea>
+              <Button
+                className="h-8 w-full rounded-lg bg-warning-400"
+                onPress={async () => {
+                  setRepliesExpanded(false);
+                  let res = await handleAddComment({ parentId: comment.id, content });
+                  if (res) {
+                    setReplyFormExpanded(false);
+                    setContent('');
+                    setTimeout(() => {
+                      setRepliesExpanded(true);
+                    }, 200);
+                  }
+                }}>
+                {/* {loading ? <ButtonSpinner color={'white'} /> : null} */}
+                <ButtonText className="text-center text-sm font-medium">Add Reply</ButtonText>
+              </Button>
+            </View>
+          </Collapsible>
+          <View>
+            {comment?.comment[0]?.count ? (
               <>
                 <TouchableOpacity
                   activeOpacity={0.75}
@@ -203,12 +333,16 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                     setRepliesExpanded(!repliesExpanded);
                   }}>
                   <Text className="font-qs-semibold tracking-tighter text-warning-400">
-                    Show Replies
+                    {repliesExpanded ? 'Hide' : 'Show'} Replies
                   </Text>
                 </TouchableOpacity>
                 <Collapsible renderChildrenCollapsed={false} collapsed={!repliesExpanded}>
                   <View className="pt-3">
-                    <Comments recipeId={comment.recipe_id} parentId={comment.id} />
+                    <Comments
+                      recipeId={comment.recipe_id}
+                      parentId={comment.id}
+                      refreshParent={refreshComments}
+                    />
                   </View>
                 </Collapsible>
               </>
