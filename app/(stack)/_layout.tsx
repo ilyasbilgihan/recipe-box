@@ -39,8 +39,7 @@ export default function StackLayout() {
                   onPress={() => {
                     supabase.auth.signOut();
                     router.push('/auth');
-                  }}
-                  className="mr-7">
+                  }}>
                   <Ionicons size={24} name="log-out-outline" color={'rgb(220 38 38)'} />
                 </TouchableOpacity>
               );
