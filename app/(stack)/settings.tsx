@@ -8,7 +8,7 @@ import {
   Text,
 } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { supabase, uploadImageToSupabaseBucket } from '~/utils/supabase';
+import { supabase, uploadImageToSupabaseBucket, deleteImage } from '~/utils/supabase';
 import { Link, router } from 'expo-router';
 import { useGlobalContext } from '~/context/GlobalProvider';
 import {
@@ -39,6 +39,7 @@ const Profile = () => {
 
   const { image, setImage, pickImage } = useImagePicker();
   const [loading, setLoading] = useState(false);
+  const [tempImage, setTempImage] = useState('');
 
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -63,6 +64,9 @@ const Profile = () => {
     }
 
     if (data) {
+      if (data.profile_image !== null || data.profile_image) {
+        setTempImage(data.profile_image.split('profile_images/')[1]);
+      }
       setFormData({
         name: data.name,
         location: data.location,
@@ -87,6 +91,14 @@ const Profile = () => {
     if (image !== undefined) {
       const url = await uploadImageToSupabaseBucket('profile_images', image);
       uploadedImageUrl = url;
+    }
+
+    // if there is a new image or user wants to delete own image
+    if (uploadedImageUrl || formData.profile_image == '') {
+      // delete image from bucket
+      if (tempImage) {
+        await deleteImage('profile_images/' + tempImage);
+      }
     }
 
     const { error } = await supabase
@@ -127,7 +139,7 @@ const Profile = () => {
               className="h-32 w-32 rounded-full bg-outline-100"
             />
           </TouchableOpacity>
-          {formData.profile_image ? (
+          {formData.profile_image || image ? (
             <TouchableOpacity
               onPress={() => {
                 setField('profile_image', '');

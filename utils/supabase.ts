@@ -6,6 +6,7 @@ import { ImagePickerAsset } from 'expo-image-picker';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+const bucket = 'recipe-box';
 
 export const supabase = createClient(supabaseUrl!, supabaseAnonKey!, {
   auth: {
@@ -27,7 +28,6 @@ import { decode } from 'base64-arraybuffer';
 import { nanoid } from 'nanoid';
 
 export const uploadImageToSupabaseBucket = async (location: string, uploaded: ImagePickerAsset) => {
-  const bucket = 'recipe-box';
   const base64 = uploaded.base64;
   const unique = nanoid();
   const filePath = `${location}/${unique}.${uploaded.uri.split('.').pop()}`;
@@ -48,4 +48,12 @@ export const uploadImageToSupabaseBucket = async (location: string, uploaded: Im
   const url = `${supabaseUrl}/storage/v1/object/public/${bucket}/${data.path}`;
 
   return url;
+};
+
+export const deleteImage = async (path: string) => {
+  const { error } = await supabase.storage.from(bucket).remove([path]);
+  if (error) {
+    Alert.alert('Error', error.message);
+    return;
+  }
 };

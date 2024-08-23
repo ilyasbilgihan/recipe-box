@@ -137,7 +137,11 @@ const Profile = () => {
           </View>
           <View className="flex-row items-center justify-between">
             <LazyImage
-              source={{ uri: profile?.profile_image }}
+              source={
+                profile?.profile_image
+                  ? { uri: profile.profile_image }
+                  : require('~/assets/images/no-image.png')
+              }
               className="h-24 w-24 rounded-full bg-outline-100"
             />
 
