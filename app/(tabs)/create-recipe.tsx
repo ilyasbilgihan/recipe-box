@@ -76,13 +76,11 @@ const CreateRecipe = () => {
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
-      setLoading(false);
-      fetchIngredients();
-      resetFields();
-      setSelectedIngredients([]);
-      setRefreshing(false);
-    }, 1000);
+    setLoading(false);
+    fetchIngredients();
+    resetFields();
+    setSelectedIngredients([]);
+    setRefreshing(false);
   }, []);
 
   const editor = useEditorBridge({

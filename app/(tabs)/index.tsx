@@ -74,9 +74,7 @@ export default function Home() {
 
   const fetchUserDetails = async () => {
     const { data, error } = await userQuery.eq('id', session?.user.id).single();
-    if (data?.profile_image) {
-      data.profile_image = data?.profile_image + '?time=' + new Date().getTime(); // Add timestamp to prevent caching
-    }
+
     setUser(data);
   };
 
@@ -84,11 +82,9 @@ export default function Home() {
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
-      fetchUserDetails();
-      fetchRecipes();
-      setRefreshing(false);
-    }, 1000);
+    fetchUserDetails();
+    fetchRecipes();
+    setRefreshing(false);
   }, [selectedCategory]);
 
   const fetchRecipes = async () => {

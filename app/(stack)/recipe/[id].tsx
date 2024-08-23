@@ -161,12 +161,10 @@ const User = () => {
   const [refreshing, setRefreshing] = React.useState(false);
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
-      setLoading(false);
-      fetchRecipe();
-      checkBookmark();
-      setRefreshing(false);
-    }, 1000);
+    setLoading(false);
+    fetchRecipe();
+    checkBookmark();
+    setRefreshing(false);
   }, []);
   return (
     <>

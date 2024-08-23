@@ -52,7 +52,7 @@ const Profile = () => {
         )
       );
       if (data?.profile_image) {
-        data.profile_image = data?.profile_image + '?time=' + new Date().getTime(); // Add timestamp to prevent caching
+        data.profile_image = data?.profile_image;
       }
       setProfile(data);
     }

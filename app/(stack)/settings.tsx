@@ -44,12 +44,10 @@ const Profile = () => {
 
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
-      fetchProfile();
-      setLoading(false);
-      setImage(undefined);
-      setRefreshing(false);
-    }, 1000);
+    fetchProfile();
+    setLoading(false);
+    setImage(undefined);
+    setRefreshing(false);
   }, []);
 
   const fetchProfile = async () => {
@@ -70,9 +68,7 @@ const Profile = () => {
         location: data.location,
         profession: data.profession,
         bio: data.bio,
-        profile_image: data.profile_image
-          ? data.profile_image + '?time=' + new Date().getTime() // Add timestamp to prevent caching
-          : '',
+        profile_image: data.profile_image || '',
       });
     }
   };
