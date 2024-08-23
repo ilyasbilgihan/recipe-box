@@ -98,7 +98,7 @@ const CategoryPicker = ({
           </View>
           <SelectTrigger className="h-10 w-10 items-center justify-center border-0 " size="md">
             <View>
-              <Ionicons className="-mt-1" name="chevron-down" size={14} color={'#737373'} />
+              <Ionicons name="chevron-down" size={14} color={'#737373'} />
             </View>
           </SelectTrigger>
         </View>

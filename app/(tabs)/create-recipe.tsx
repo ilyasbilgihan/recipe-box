@@ -62,7 +62,7 @@ const CreateRecipe = () => {
   const [formData, setFormData] = useState({
     name: '',
     duration: '',
-    instructions: '',
+    instructions: '<p>Add your <strong>instructions</strong></p>',
     thumbnail: '',
   });
   const [loading, setLoading] = useState(false);
@@ -81,7 +81,7 @@ const CreateRecipe = () => {
     resetFields();
     setSelectedIngredients([]);
     setRefreshing(false);
-    editor.setContent(`<p>Add your instructions</p>`);
+    editor.setContent(`<p>Add your <strong>instructions</strong></p>`);
   }, []);
 
   const editor = useEditorBridge({
@@ -94,8 +94,7 @@ const CreateRecipe = () => {
         marginHorizontal: 12,
       },
     },
-    initialContent:
-      formData.instructions.length > 0 ? formData.instructions : `<p>Add your instructions</p>`,
+    initialContent: formData.instructions,
     onChange: async () => {
       // debounce
       clearTimeout(timeout.current);
@@ -257,7 +256,7 @@ const CreateRecipe = () => {
     setFormData({
       name: '',
       duration: '',
-      instructions: `<p>Add your instructions</p>`,
+      instructions: `<p>Add your <strong>instructions</strong></p>`,
       thumbnail: '',
     });
     editor.setContent('');
