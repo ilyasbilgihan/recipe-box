@@ -4,11 +4,16 @@ import { useFocusEffect, useLocalSearchParams, useNavigation, router, Redirect }
 import { RefreshControl, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import { supabase } from '~/utils/supabase';
 import ListRecipe from '~/components/ListRecipe';
-import { Button, ButtonText } from '~/components/ui/button';
+import { Button, ButtonSpinner, ButtonText } from '~/components/ui/button';
 import { useGlobalContext } from '~/context/GlobalProvider';
 import { Ionicons } from '@expo/vector-icons';
 import LazyImage from '~/components/LazyImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+type Follow = {
+  follower_id: string;
+  following_id: string;
+};
 
 const Profile = () => {
   const { session } = useGlobalContext();
@@ -17,12 +22,18 @@ const Profile = () => {
   const [profile, setProfile] = useState<any>(null);
   const [recipes, setRecipes] = useState<any>([]);
   const [likedRecipes, setLikedRecipes] = useState<any>([]);
+  const [loading, setLoading] = useState(false);
+  const [follow, setFollow] = useState<{ followers: Follow[]; following: Follow[] }>({
+    followers: [],
+    following: [],
+  });
 
   useFocusEffect(
     useCallback(() => {
       console.log('fetching');
       fetchProfile();
       fetchHighRatedRecipes();
+      checkFollow();
     }, [])
   );
 
@@ -65,12 +76,50 @@ const Profile = () => {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => {
-      fetchProfile();
-      fetchHighRatedRecipes();
-      setRefreshing(false);
-    }, 1000);
+    fetchProfile();
+    fetchHighRatedRecipes();
+    setRefreshing(false);
+    checkFollow();
   }, []);
+
+  const checkFollow = async () => {
+    const { data: follower_data } = await supabase
+      .from('follow')
+      .select('*')
+      .eq('following_id', id || session?.user.id);
+
+    const { data: following_data } = await supabase
+      .from('follow')
+      .select('*')
+      .eq('follower_id', id || session?.user.id);
+
+    setFollow({ followers: follower_data!, following: following_data! });
+  };
+
+  const handleFollow = async () => {
+    if (!loading) {
+      setLoading(true);
+      let isFollowing = follow.followers?.find(
+        (follower) => follower.follower_id === session?.user.id
+      );
+      if (isFollowing) {
+        // remove follow
+        const { error } = await supabase
+          .from('follow')
+          .delete()
+          .eq('follower_id', session?.user.id)
+          .eq('following_id', id);
+      } else {
+        // add follow
+        const { error } = await supabase
+          .from('follow')
+          .insert({ follower_id: session?.user.id, following_id: id });
+      }
+
+      checkFollow();
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView>
@@ -80,7 +129,7 @@ const Profile = () => {
             <Text className="font-qs-bold text-2xl text-dark">@{profile?.username}</Text>
             {!id || session?.user.id === id ? (
               <View className="ml-auto">
-                <TouchableOpacity activeOpacity={0.75} onPress={() => router.push('settings')}>
+                <TouchableOpacity activeOpacity={0.75} onPress={() => router.push('/settings')}>
                   <Ionicons size={24} name="settings-outline" color={'rgb(42 48 81)'} />
                 </TouchableOpacity>
               </View>
@@ -97,28 +146,37 @@ const Profile = () => {
               <Text className="font-qs-medium text-dark">recipe</Text>
             </View>
             <View className="flex-col items-center ">
-              <Text className="font-qs-bold text-lg text-dark">0</Text>
+              <Text className="font-qs-bold text-lg text-dark">{follow.followers?.length}</Text>
               <Text className="font-qs-medium text-dark">followers</Text>
             </View>
             <View className="flex-col items-center ">
-              <Text className="font-qs-bold text-lg text-dark">0</Text>
+              <Text className="font-qs-bold text-lg text-dark">{follow.following?.length}</Text>
               <Text className="font-qs-medium text-dark">following</Text>
             </View>
           </View>
           <View className="my-4 flex-col">
-            <Text className="font-qs-bold text-xl text-dark">{profile?.name}</Text>
-            <Text className="-mt-1 font-qs-medium">{profile?.profession}</Text>
-            <Text numberOfLines={4} className="my-2 font-qs-medium text-lg leading-6">
-              {profile?.bio}
-            </Text>
-            <Button
-              className="mt-3 h-10 w-1/2 rounded-lg bg-sky-500"
-              onPress={() => {
-                console.log('followed');
-              }}>
-              {/* {loading ? <ButtonSpinner color={'white'} /> : null} */}
-              <ButtonText className="text-md font-medium">Follow</ButtonText>
-            </Button>
+            {profile?.name && (
+              <Text className="font-qs-bold text-xl text-dark">{profile?.name}</Text>
+            )}
+            {profile?.name && <Text className="-mt-1 font-qs-medium">{profile?.profession}</Text>}
+            {profile?.bio && (
+              <Text numberOfLines={4} className="my-2 font-qs-medium text-lg leading-6">
+                {profile?.bio}
+              </Text>
+            )}
+            {id && id !== session?.user.id ? (
+              follow.followers?.find((follower) => follower.follower_id === session?.user.id) ? (
+                <Button
+                  className="mt-3 h-10 w-1/2 rounded-lg border border-sky-500 bg-light "
+                  onPress={handleFollow}>
+                  <ButtonText className="text-md font-medium text-sky-500">Following</ButtonText>
+                </Button>
+              ) : (
+                <Button className="mt-3 h-10 w-1/2 rounded-lg bg-sky-500" onPress={handleFollow}>
+                  <ButtonText className="text-md font-medium">Follow</ButtonText>
+                </Button>
+              )
+            ) : null}
           </View>
         </View>
         <View className="mx-7 my-4 flex-row justify-between border-b-2 border-outline-200 py-3">
