@@ -1,12 +1,13 @@
-import { View, Text, TextInput, Dimensions } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+
 import {
   Select,
   SelectBackdrop,
   SelectContent,
   SelectDragIndicator,
   SelectDragIndicatorWrapper,
-  SelectInput,
   SelectItem,
   SelectPortal,
   SelectTrigger,
@@ -18,47 +19,21 @@ import {
   FormControlLabel,
   FormControlLabelText,
 } from '~/components/ui/form-control';
-import { Input } from './ui/input';
-import { Ionicons } from '@expo/vector-icons';
-import { supabase } from '~/utils/supabase';
-import { TouchableOpacity } from '@gorhom/bottom-sheet';
 
 type Category = {
   id: number;
   name: string;
 };
 
-const windowWidth = Dimensions.get('window').width;
-
 const CategoryPicker = ({
+  categories,
   selectedCategories,
   setSelectedCategories,
 }: {
+  categories: Category[];
   selectedCategories: Category[];
   setSelectedCategories: React.Dispatch<React.SetStateAction<Category[]>>;
 }) => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const fetchCategories = async () => {
-    const { data, error } = await supabase
-      .from('category')
-      .select('*')
-      .neq('id', 1)
-      .order('id', { ascending: true });
-
-    if (error) {
-      console.log('error', error);
-      return;
-    }
-
-    if (data) {
-      setCategories(data);
-    }
-  };
-
   return (
     <FormControl>
       <FormControlLabel className="mb-1">

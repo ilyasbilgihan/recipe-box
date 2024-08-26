@@ -14,11 +14,11 @@ import {
   SelectContent,
   SelectDragIndicator,
   SelectDragIndicatorWrapper,
-  SelectInput,
   SelectItem,
   SelectPortal,
   SelectTrigger,
 } from './ui/select';
+import { router } from 'expo-router';
 
 const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
   const [repliesExpanded, setRepliesExpanded] = useState(false);
@@ -36,10 +36,8 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
     console.log('try downvote');
     const currentVote = await checkVote();
 
-    if (currentVote == -1) {
-      // remove vote
-      await removeVote();
-    } else {
+    await removeVote();
+    if (currentVote != -1) {
       console.log('downvote');
       const { error } = await supabase
         .from('comment_reaction')
@@ -59,11 +57,10 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
     console.log('try upvote');
     const currentVote = await checkVote();
 
-    if (currentVote == 1) {
-      // remove vote
-      await removeVote();
-    } else {
+    await removeVote();
+    if (currentVote != 1) {
       console.log('downvote');
+      await removeVote();
       const { error } = await supabase
         .from('comment_reaction')
         .upsert({ comment_id: comment.id, user_id: session?.user.id, reaction: 1 });
@@ -144,19 +141,28 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
   return (
     <View key={comment.id}>
       <View className=" flex-row items-center gap-4">
-        <Image
-          source={
-            !comment?.profile?.profile_image || comment?.deleted
-              ? require('~/assets/images/no-image.png')
-              : { uri: comment?.profile?.profile_image }
-          }
-          className="h-10 w-10 rounded-md"
-        />
-        <Text className="font-qs-bold text-lg text-dark">
-          {comment?.deleted
-            ? 'Anonymous'
-            : comment?.profile?.name || '@' + comment?.profile?.username}
-        </Text>
+        <TouchableOpacity
+          activeOpacity={0.75}
+          onPress={() => {
+            if (comment?.deleted) return;
+            router.push(`/profile/${comment?.profile?.id}`);
+          }}>
+          <View className="flex-row items-center gap-3">
+            <Image
+              source={
+                !comment?.profile?.profile_image || comment?.deleted
+                  ? require('~/assets/images/no-image.png')
+                  : { uri: comment?.profile?.profile_image }
+              }
+              className="h-10 w-10 rounded-md"
+            />
+            <Text className="font-qs-bold text-lg text-dark">
+              {comment?.deleted
+                ? 'Anonymous'
+                : comment?.profile?.name || '@' + comment?.profile?.username}
+            </Text>
+          </View>
+        </TouchableOpacity>
         {comment?.profile?.id == session?.user.id && !comment?.deleted ? (
           <Select
             onValueChange={(value) => {
@@ -236,7 +242,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
               <Text className="font-qs-medium text-lg text-dark">{editContent}</Text>
             )}
           </View>
-          <View className="flex-row gap-2 py-2">
+          <View className="flex-row items-center gap-2 py-2">
             <View className="flex-row items-center gap-2 ">
               <TouchableOpacity
                 activeOpacity={0.75}

@@ -55,6 +55,7 @@ import { editorCSS } from '~/utils/editorCSS';
 
 import CategoryPicker from '~/components/CategoryPicker';
 import WebView, { WebViewMessageEvent } from 'react-native-webview';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const CreateRecipe = () => {
   const { session } = useGlobalContext();
@@ -62,7 +63,7 @@ const CreateRecipe = () => {
   const [formData, setFormData] = useState({
     name: '',
     duration: '',
-    instructions: '<p>Add your <strong>instructions</strong></p>',
+    instructions: '<p>Click to add your <strong>instructions</strong></p>',
     thumbnail: '',
   });
   const [loading, setLoading] = useState(false);
@@ -74,14 +75,34 @@ const CreateRecipe = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const timeout = useRef<any>(null);
 
+  const [listOfCategories, setListOfCategories] = useState<Category[]>([]);
+
+  const fetchCategories = async () => {
+    const { data, error } = await supabase
+      .from('category')
+      .select('*')
+      .neq('id', 1)
+      .order('id', { ascending: true });
+
+    if (error) {
+      console.log('error', error);
+      return;
+    }
+
+    if (data) {
+      setListOfCategories(data);
+    }
+  };
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
     setLoading(false);
     fetchIngredients();
     resetFields();
+    fetchCategories();
     setSelectedIngredients([]);
     setRefreshing(false);
-    editor.setContent(`<p>Add your <strong>instructions</strong></p>`);
+    editor.setContent(`<p>Click to add your <strong>instructions</strong></p>`);
   }, []);
 
   const editor = useEditorBridge({
@@ -122,6 +143,7 @@ const CreateRecipe = () => {
     // fetch ingredients
 
     fetchIngredients();
+    fetchCategories();
 
     // inject css
     editor.injectCSS(editorCSS);
@@ -249,14 +271,14 @@ const CreateRecipe = () => {
     setLoading(false);
     Alert.alert('Success', 'Recipe Created Successfully');
     resetFields();
-    router.push('/');
+    router.push(`/recipe/${data.id}`);
   };
 
   const resetFields = () => {
     setFormData({
       name: '',
       duration: '',
-      instructions: `<p>Add your <strong>instructions</strong></p>`,
+      instructions: `<p>Click to add your <strong>instructions</strong></p>`,
       thumbnail: '',
     });
     editor.setContent('');
@@ -274,8 +296,11 @@ const CreateRecipe = () => {
   };
 
   return (
-    <>
+    <SafeAreaView>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+        <View className="h-16 flex-row items-center justify-center px-7">
+          <Text className="font-qs-bold text-2xl text-dark">Create Recipe</Text>
+        </View>
         <View className="flex w-full flex-1 items-center justify-between px-8">
           <Box className="flex w-full gap-3 pb-12">
             {/* Recipe Name */}
@@ -329,7 +354,11 @@ const CreateRecipe = () => {
               </FormControlError>
             </FormControl>
             {/* Category */}
-            <CategoryPicker selectedCategories={categories} setSelectedCategories={setCategories} />
+            <CategoryPicker
+              selectedCategories={categories}
+              categories={listOfCategories}
+              setSelectedCategories={setCategories}
+            />
             {/* Ingredients */}
             <IngredientPicker
               ingredients={ingredients}
@@ -345,7 +374,6 @@ const CreateRecipe = () => {
               <TouchableOpacity
                 activeOpacity={0.75}
                 onPress={() => {
-                  console.log('open portal');
                   navigation.setOptions({
                     title: 'Instructions',
                     headerLeft: () => (
@@ -355,7 +383,7 @@ const CreateRecipe = () => {
                         onPress={() => {
                           closeRichText();
                         }}>
-                        <Ionicons name="chevron-back" size={22} color={'rgb(42 48 81)'} />
+                        <Ionicons name="chevron-down" size={22} color={'rgb(42 48 81)'} />
                       </TouchableOpacity>
                     ),
                   });
@@ -421,7 +449,7 @@ const CreateRecipe = () => {
           </KeyboardAvoidingView>
         </View>
       </View>
-    </>
+    </SafeAreaView>
   );
 };
 

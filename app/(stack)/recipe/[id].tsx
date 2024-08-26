@@ -1,29 +1,19 @@
-import {
-  View,
-  Text,
-  Image,
-  Dimensions,
-  ImageBackground,
-  StatusBar,
-  FlatList,
-  PixelRatio,
-} from 'react-native';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { router, useLocalSearchParams } from 'expo-router';
-import { RefreshControl, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
-import { supabase } from '~/utils/supabase';
+import React, { useCallback, useRef, useState } from 'react';
+import { View, Text, Image, Dimensions, StatusBar, FlatList } from 'react-native';
+import { useFocusEffect, router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useFocusEffect } from 'expo-router';
-
+import { RefreshControl, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
 import WebView, { WebViewMessageEvent } from 'react-native-webview';
+import StarRating from 'react-native-star-rating-widget';
 
-const windowWidth = Dimensions.get('window').width;
+import { supabase } from '~/utils/supabase';
+import { useGlobalContext } from '~/context/GlobalProvider';
 
 import { editorCSS } from '~/utils/editorCSS';
-import { useGlobalContext } from '~/context/GlobalProvider';
-import StarRating from 'react-native-star-rating-widget';
 import Comments from '~/components/Comments';
 import LazyImage from '~/components/LazyImage';
+
+const windowWidth = Dimensions.get('window').width;
 
 const User = () => {
   const { id } = useLocalSearchParams();
@@ -261,36 +251,8 @@ const User = () => {
             </View>
           </View>
         </LazyImage>
-        <View className="flex-row items-center justify-between gap-1 px-7 py-6">
-          {recipe.profile ? (
-            <TouchableOpacity
-              activeOpacity={0.75}
-              onPress={() => router.push(`/profile/${recipe.profile?.id}`)}>
-              <View className="w-2/3 flex-row items-center gap-2">
-                <Image
-                  source={{ uri: recipe.profile?.profile_image }}
-                  className="h-12 w-12 rounded-full"
-                />
-                <View>
-                  <Text className="font-qs-bold text-lg text-dark">
-                    {recipe.profile?.name || '@' + recipe.profile?.username}
-                  </Text>
-                  <Text className="-mt-1 font-qs-medium text-sm text-dark">
-                    {recipe.profile?.profession}
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ) : (
-            <View className="w-1/2 flex-row items-center gap-2">
-              <View className="h-12 w-12 rounded-full bg-outline-300"></View>
-              <View className="gap-1">
-                <View className="h-4 w-20 rounded-lg bg-outline-300"></View>
-                <View className="h-3 w-14 rounded-lg bg-outline-300"></View>
-              </View>
-            </View>
-          )}
-          <View className="flex-row items-end gap-1">
+        <View className=" gap-2 px-7 py-6">
+          <View className="ml-auto flex-row items-end gap-1">
             <StarRating
               starStyle={{ marginLeft: -8 }}
               starSize={28}
@@ -312,6 +274,37 @@ const User = () => {
               <Text className="font-qs-medium text-sm"> ({recipeRatings?.length})</Text>
             </Text>
           </View>
+
+          {recipe.profile ? (
+            <TouchableOpacity
+              activeOpacity={0.75}
+              onPress={() => router.push(`/profile/${recipe.profile?.id}`)}>
+              <View className="w-2/3 flex-row items-center gap-2">
+                <Image
+                  source={{ uri: recipe.profile?.profile_image }}
+                  className="h-12 w-12 rounded-full"
+                />
+                <View>
+                  <Text className="font-qs-bold text-lg text-dark">
+                    {recipe.profile?.name || '@' + recipe.profile?.username}
+                  </Text>
+                  {recipe.profile?.profession ? (
+                    <Text className="-mt-1 font-qs-medium text-sm text-dark">
+                      {recipe.profile?.profession}
+                    </Text>
+                  ) : null}
+                </View>
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <View className="w-1/2 flex-row items-center gap-2">
+              <View className="h-12 w-12 rounded-full bg-outline-300"></View>
+              <View className="gap-1">
+                <View className="h-4 w-20 rounded-lg bg-outline-300"></View>
+                <View className="h-3 w-14 rounded-lg bg-outline-300"></View>
+              </View>
+            </View>
+          )}
         </View>
         <View className="mx-7 mt-4">
           <View className="flex-row items-center gap-2 ">

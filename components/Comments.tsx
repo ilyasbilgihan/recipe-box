@@ -1,12 +1,14 @@
+import React, { useCallback, useState } from 'react';
 import { View, Text, Alert } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
-import { supabase } from '~/utils/supabase';
 import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Button, ButtonSpinner, ButtonText } from './ui/button';
-import CommentItem from './CommentItem';
-import { Textarea, TextareaInput } from './ui/textarea';
+
+import { supabase } from '~/utils/supabase';
 import { useGlobalContext } from '~/context/GlobalProvider';
+
+import { Button, ButtonSpinner, ButtonText } from './ui/button';
+import { Textarea, TextareaInput } from './ui/textarea';
+import CommentItem from './CommentItem';
 
 const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) => {
   const [comments, setComments] = useState<any[]>([]);
@@ -33,8 +35,9 @@ const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) 
     if (error) {
       console.log('comment error', error);
     }
-
-    setComments(data!);
+    let tmp = [...data!];
+    tmp.sort((a, b) => b.comment_reaction[0].sum - a.comment_reaction[0].sum);
+    setComments(tmp);
   };
 
   const fetchReplies = async () => {
@@ -51,7 +54,9 @@ const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) 
     if (data?.length == 0) {
       refreshParent();
     }
-    setComments(data!);
+    let tmp = [...data!];
+    tmp.sort((a, b) => b.comment_reaction[0].sum - a.comment_reaction[0].sum);
+    setComments(tmp);
   };
 
   const refreshComments = () => {

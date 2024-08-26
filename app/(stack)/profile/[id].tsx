@@ -1,14 +1,16 @@
-import { View, Text, Image, BackHandler } from 'react-native';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useFocusEffect, useLocalSearchParams, useNavigation, router, Redirect } from 'expo-router';
-import { RefreshControl, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
-import { supabase } from '~/utils/supabase';
-import ListRecipe from '~/components/ListRecipe';
-import { Button, ButtonSpinner, ButtonText } from '~/components/ui/button';
-import { useGlobalContext } from '~/context/GlobalProvider';
+import React, { useCallback, useState } from 'react';
+import { View, Text } from 'react-native';
+import { useFocusEffect, useLocalSearchParams, useNavigation, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import LazyImage from '~/components/LazyImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { RefreshControl, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+
+import { supabase } from '~/utils/supabase';
+import { useGlobalContext } from '~/context/GlobalProvider';
+
+import ListRecipe from '~/components/ListRecipe';
+import { Button, ButtonText } from '~/components/ui/button';
+import LazyImage from '~/components/LazyImage';
 
 type Follow = {
   follower_id: string;
@@ -183,7 +185,7 @@ const Profile = () => {
             ) : null}
           </View>
         </View>
-        <View className="mx-7 my-4 flex-row justify-between border-b-2 border-outline-200 py-3">
+        <View className="mx-7 my-4 flex-row justify-between border-b-2 border-outline-200 pb-3 pt-2">
           <View className="relative flex-1 items-center">
             {tab === 'recipe' ? (
               <>

@@ -6,7 +6,6 @@ import {
   View,
   Dimensions,
   ScrollView,
-  Image,
   RefreshControl,
   FlatList,
 } from 'react-native';
@@ -49,7 +48,8 @@ export default function Home() {
     useCallback(() => {
       fetchUserDetails();
       fetchCategories();
-    }, [])
+      fetchRecipes();
+    }, [selectedCategory])
   );
 
   useEffect(() => {
@@ -112,7 +112,7 @@ export default function Home() {
           <View className="flex flex-row items-center justify-between bg-warning-400 px-7 pb-12 pt-4">
             <View className="flex flex-col ">
               <Text className="font-qs text-xl text-light">
-                Hi, <Text className="font-qs-bold">{user?.name || user?.username}</Text>
+                Hi, <Text className="font-qs-bold">{user?.name || '@' + user?.username}</Text>
               </Text>
               <Text className="font-qs text-light">{user?.profession}</Text>
             </View>
@@ -161,7 +161,7 @@ recipe `}
             keyExtractor={(item) => 'category-' + item.id}
             /* extraData={selectedId}  // rerender when selectedId changes */
           />
-          {recipes?.length > 0 ? <ListRecipe recipes={recipes} /> : null}
+          <ListRecipe recipes={recipes} />
         </ScrollView>
       </SafeAreaView>
       {isFocused ? <StatusBar backgroundColor="#FB954B" barStyle={'light-content'} /> : null}
