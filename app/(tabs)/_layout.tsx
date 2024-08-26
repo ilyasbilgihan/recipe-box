@@ -1,8 +1,8 @@
+import React from 'react';
 import { Tabs, Redirect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useGlobalContext } from '~/context/GlobalProvider';
 
-import React from 'react';
+import { useGlobalContext } from '~/context/GlobalProvider';
 
 export default function TabLayout() {
   const { session } = useGlobalContext();
@@ -31,7 +31,12 @@ export default function TabLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <Ionicons size={22} name="home-outline" color={color} />,
+          tabBarIcon: ({ color, focused }) =>
+            !focused ? (
+              <Ionicons size={22} name="home-outline" color={color} />
+            ) : (
+              <Ionicons size={22} name="home" color={color} />
+            ),
           headerShown: false,
         }}
       />
@@ -39,22 +44,38 @@ export default function TabLayout() {
         name="create-recipe"
         options={{
           title: 'Create Recipe',
-          tabBarIcon: ({ color }) => <Ionicons size={22} name="create-outline" color={color} />,
-          headerShadowVisible: false,
-          headerStyle: {
-            backgroundColor: '#FAF9FB',
-          },
-          headerTitleStyle: {
-            fontFamily: 'Quicksand SemiBold',
-          },
-          headerTitleAlign: 'center',
+          tabBarIcon: ({ color, focused }) =>
+            !focused ? (
+              <Ionicons size={22} name="create-outline" color={color} />
+            ) : (
+              <Ionicons size={22} name="create" color={color} />
+            ),
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="bookmark"
+        options={{
+          title: 'Bookmarks',
+          tabBarIcon: ({ color, focused }) =>
+            !focused ? (
+              <Ionicons size={22} name="bookmark-outline" color={color} />
+            ) : (
+              <Ionicons size={22} name="bookmark" color={color} />
+            ),
+          headerShown: false,
         }}
       />
       <Tabs.Screen
         name="profile/index"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => <Ionicons size={22} name="person-outline" color={color} />,
+          tabBarIcon: ({ color, focused }) =>
+            !focused ? (
+              <Ionicons size={22} name="person-outline" color={color} />
+            ) : (
+              <Ionicons size={22} name="person" color={color} />
+            ),
           headerShown: false,
         }}
       />
