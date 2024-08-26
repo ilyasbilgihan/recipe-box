@@ -29,13 +29,13 @@ import useImagePicker from '~/utils/useImagePicker';
 import { RichText, TenTapStartKit, Toolbar, useEditorBridge } from '@10play/tentap-editor';
 
 type Ingredient = {
-  id: string;
+  id?: string;
   name: string;
   image: string;
 };
 
 type RecipeIngredient = {
-  ingredient_id: string;
+  ingredient_id: string | undefined;
   name: string;
   image: string;
   amount: string;
@@ -56,6 +56,7 @@ import { editorCSS } from '~/utils/editorCSS';
 import CategoryPicker from '~/components/CategoryPicker';
 import WebView, { WebViewMessageEvent } from 'react-native-webview';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ImagePickerAsset } from 'expo-image-picker';
 
 const CreateRecipe = () => {
   const { session } = useGlobalContext();
@@ -74,6 +75,9 @@ const CreateRecipe = () => {
   const [openRichText, setOpenRichText] = React.useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const timeout = useRef<any>(null);
+  const [newIngredients, setNewIngredients] = useState<{ name: string; image: ImagePickerAsset }[]>(
+    []
+  );
 
   const [listOfCategories, setListOfCategories] = useState<Category[]>([]);
 
@@ -101,6 +105,7 @@ const CreateRecipe = () => {
     resetFields();
     fetchCategories();
     setSelectedIngredients([]);
+    setNewIngredients([]);
     setRefreshing(false);
     editor.setContent(`<p>Click to add your <strong>instructions</strong></p>`);
   }, []);
@@ -187,6 +192,8 @@ const CreateRecipe = () => {
   };
 
   const handleCreateRecipe = async () => {
+    if (loading) return;
+
     setLoading(true);
 
     if (
@@ -233,12 +240,34 @@ const CreateRecipe = () => {
       }[] = [];
       for (let i = 0; i < selectedIngredients.length; i++) {
         const ingredient = selectedIngredients[i];
-        ingredientsToInsert.push({
-          ingredient_id: ingredient.ingredient_id,
-          recipe_id: data.id,
-          amount: ingredient.amount,
-          unit: ingredient.unit,
-        });
+        if (ingredient.ingredient_id != undefined) {
+          ingredientsToInsert.push({
+            ingredient_id: ingredient.ingredient_id!,
+            recipe_id: data.id,
+            amount: ingredient.amount,
+            unit: ingredient.unit,
+          });
+        } else {
+          // add non existed (undefined id) ingredient to supabase
+          let newIngImage = newIngredients.find((item) => (item.name = ingredient.name))?.image;
+
+          const url = await uploadImageToSupabaseBucket('ingredient_images', newIngImage!);
+
+          const { data: newIng, error: newIngErr } = await supabase
+            .from('ingredient')
+            .insert({ name: ingredient.name, image: url })
+            .select('id, name, image')
+            .single();
+
+          console.log('newIng Err ->', newIngErr);
+
+          ingredientsToInsert.push({
+            ingredient_id: newIng?.id, // instead of undefined
+            recipe_id: data.id,
+            amount: ingredient.amount,
+            unit: ingredient.unit,
+          });
+        }
       }
 
       console.log('ingredientsToInsert ->', ingredientsToInsert);
@@ -285,6 +314,7 @@ const CreateRecipe = () => {
     setCategories([]);
     setHeight(50);
     setSelectedIngredients([]);
+    setNewIngredients([]);
     setImage(undefined);
   };
 
@@ -362,6 +392,9 @@ const CreateRecipe = () => {
             {/* Ingredients */}
             <IngredientPicker
               ingredients={ingredients}
+              setIngredients={setIngredients}
+              newIngredients={newIngredients}
+              setNewIngredients={setNewIngredients}
               selectedIngredients={selectedIngredients}
               setSelectedIngredients={setSelectedIngredients}
             />

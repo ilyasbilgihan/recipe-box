@@ -32,7 +32,6 @@ const Bookmark = () => {
       .order('created_at', { ascending: false });
 
     if (data) {
-      console.log('bookmarked ->', data);
       setRecipes([...data].map((item) => item.recipe));
     }
   };

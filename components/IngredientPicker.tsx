@@ -1,7 +1,11 @@
-import { View, Text, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { View, Text, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { ScrollView as GHScrollView } from 'react-native-gesture-handler';
+
+import useImagePicker from '~/utils/useImagePicker';
+
+import { BottomSheetFooter, BottomSheetModal } from '@gorhom/bottom-sheet';
 import BottomSheet from '~/components/BottomSheet';
 import {
   FormControl,
@@ -11,7 +15,6 @@ import {
   FormControlLabelText,
 } from './ui/form-control';
 
-import { ScrollView as GHScrollView } from 'react-native-gesture-handler';
 import { Modal, ModalBackdrop, ModalBody, ModalContent, ModalFooter } from './ui/modal';
 import {
   Select,
@@ -26,9 +29,11 @@ import {
 } from './ui/select';
 import { Input } from './ui/input';
 import { Button, ButtonText } from './ui/button';
+import ImagePickerInput from './ImagePickerInput';
+import { ImagePickerAsset } from 'expo-image-picker';
 
 type RecipeIngredient = {
-  ingredient_id: string;
+  ingredient_id: string | undefined;
   name: string;
   image: string;
   amount: string;
@@ -36,7 +41,7 @@ type RecipeIngredient = {
 };
 
 type Ingredient = {
-  id: string;
+  id?: string;
   name: string;
   image: string;
 };
@@ -55,17 +60,24 @@ const units = {
   piece: 'Piece',
 };
 
+type newIngredient = { name: string; image: ImagePickerAsset };
+
 const IngredientPicker = ({
   ingredients,
+  setIngredients,
+  newIngredients,
+  setNewIngredients,
   selectedIngredients,
   setSelectedIngredients,
 }: {
   ingredients: Ingredient[];
+  newIngredients: newIngredient[];
+  setNewIngredients: React.Dispatch<React.SetStateAction<newIngredient[]>>;
+  setIngredients: React.Dispatch<React.SetStateAction<Ingredient[]>>;
   selectedIngredients: RecipeIngredient[];
   setSelectedIngredients: React.Dispatch<React.SetStateAction<RecipeIngredient[]>>;
 }) => {
   const [selectedIngredient, setSelectedIngredient] = useState<Ingredient | null>(null);
-  const [modal, setModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -83,16 +95,27 @@ const IngredientPicker = ({
     } else {
       setFilteredIngredients([]);
     }
-  }, [searchTerm]);
+  }, [searchTerm, ingredients]);
 
   const [amount, setAmount] = useState('');
   const [unit, setUnit] = useState('');
+  const [modal, setModal] = useState(false);
 
   const resetModal = () => {
     setModal(false);
     setSelectedIngredient(null);
     setAmount('');
     setUnit('');
+  };
+
+  const [ingredientName, setIngredientName] = useState('');
+  const { image: ingredientImage, setImage: setIngredientImage, pickImage } = useImagePicker();
+  const [newIngredientModal, setNewIngredientModal] = useState(false);
+
+  const resetIngredientModal = () => {
+    setNewIngredientModal(false);
+    setIngredientName('');
+    setIngredientImage(undefined);
   };
 
   return (
@@ -121,7 +144,7 @@ const IngredientPicker = ({
                     onPress={() => {
                       setSelectedIngredients(selectedIngredients.filter((_, i) => i !== index));
                     }}>
-                    <Ionicons name="trash-outline" color="#737373" />
+                    <Ionicons name="trash-outline" size={22} color="#737373" />
                   </TouchableOpacity>
                 </View>
               ))
@@ -142,18 +165,19 @@ const IngredientPicker = ({
       <BottomSheet
         ref={bottomSheetModalRef}
         snapPoints={['30%', '60%']}
-        /* footerComponent={(props) => (
-            <BottomSheetFooter {...props} bottomInset={20} style={{ paddingHorizontal: 28 }}>
-              <Button
-                style={{ backgroundColor: 'rgb(2 132 199)' }}
-                className="rounded-lg"
-                onPress={() => console.log('open ingredient creation modal')}>
-                {loading ? <ButtonSpinner color={'white'} /> : null}
-                <ButtonText className="text-md font-medium text-light">New Ingredient</ButtonText>
-              </Button>
-            </BottomSheetFooter>
-          )} */
-      >
+        footerComponent={(props) => (
+          <BottomSheetFooter {...props} bottomInset={20} style={{ paddingHorizontal: 28 }}>
+            <Button
+              style={{ backgroundColor: 'rgb(2 132 199)' }}
+              className="rounded-lg"
+              onPress={() => {
+                bottomSheetModalRef.current?.dismiss();
+                setNewIngredientModal(true);
+              }}>
+              <ButtonText className="text-md font-medium text-light">New Ingredient</ButtonText>
+            </Button>
+          </BottomSheetFooter>
+        )}>
         <View className="flex flex-col ">
           <FormControl className="px-7 pt-4">
             <FormControlLabel className="mb-1">
@@ -176,7 +200,7 @@ const IngredientPicker = ({
               <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
             </FormControlError>
           </FormControl>
-          <GHScrollView style={{ marginBottom: 150, paddingHorizontal: 28 }}>
+          <GHScrollView style={{ marginBottom: 215, paddingHorizontal: 28 }}>
             <View className="my-4">
               {(filteredIngredients.length > 0 ? filteredIngredients : ingredients).map(
                 (item, index) => (
@@ -187,7 +211,7 @@ const IngredientPicker = ({
                       setModal(true);
                     }}
                     activeOpacity={0.75}
-                    key={item.id}
+                    key={item.id || item.name}
                     style={{ backgroundColor: index % 2 === 1 ? '#E6E6E6' : '' }}
                     className="flex flex-row items-center gap-4 rounded-md p-2">
                     <Image source={{ uri: item.image }} style={{ width: 50, height: 50 }} />
@@ -263,7 +287,7 @@ const IngredientPicker = ({
               onPress={() => {
                 if (selectedIngredient && amount && unit && amount !== '0') {
                   let isExist = selectedIngredients.find(
-                    (item) => item.ingredient_id === selectedIngredient.id && item.unit === unit
+                    (item) => item.name.toLowerCase() === selectedIngredient.name.toLowerCase()
                   );
 
                   if (!isExist) {
@@ -282,6 +306,112 @@ const IngredientPicker = ({
                   }
 
                   resetModal();
+                } else {
+                  Alert.alert('Error', 'Please fill in all fields');
+                }
+              }}
+              size="sm"
+              className="flex-grow">
+              <ButtonText>Confirm</ButtonText>
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={newIngredientModal}
+        onClose={() => {
+          resetIngredientModal();
+        }}>
+        <ModalBackdrop />
+        <ModalContent className="max-w-[375px] bg-light">
+          <ModalBody className="mb-5 " contentContainerClassName="">
+            <Text className="font-qs-medium text-xl text-typography-600">
+              You choose to create a new ingredient
+            </Text>
+            <Text className="text text-left font-qs text-typography-500">
+              Please provide name and image.
+            </Text>
+            <View className="mt-4 flex flex-col gap-2">
+              <FormControl>
+                <FormControlLabel className="mb-1">
+                  <FormControlLabelText>Ingredient Name</FormControlLabelText>
+                </FormControlLabel>
+                <Input className="flex flex-row items-center justify-between bg-white px-3">
+                  <TextInput
+                    className="flex-1"
+                    defaultValue={ingredientName}
+                    onChange={(e) => setIngredientName(e.nativeEvent.text)}
+                    placeholder="Garlic"
+                  />
+                </Input>
+                <FormControlError>
+                  <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
+                </FormControlError>
+              </FormControl>
+              <FormControl>
+                <FormControlLabel className="mb-1">
+                  <FormControlLabelText>Ingredient Image</FormControlLabelText>
+                </FormControlLabel>
+                <View className="w-1/3">
+                  <ImagePickerInput
+                    defaultImage={ingredientImage?.uri}
+                    image={ingredientImage}
+                    pickImage={pickImage}
+                  />
+                </View>
+                <FormControlError>
+                  <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
+                </FormControlError>
+              </FormControl>
+            </View>
+          </ModalBody>
+          <ModalFooter className="w-full">
+            <Button
+              variant="outline"
+              action="secondary"
+              size="sm"
+              onPress={() => {
+                resetIngredientModal();
+              }}
+              className="flex-grow">
+              <ButtonText>Cancel</ButtonText>
+            </Button>
+            <Button
+              onPress={() => {
+                if (ingredientName && ingredientImage) {
+                  let isExistInNewOnes = newIngredients.find(
+                    (item) => item.name.toLowerCase() === ingredientName.toLowerCase()
+                  );
+                  let isExistInRecent = ingredients.find((item) => item.name === ingredientName);
+
+                  if (!isExistInNewOnes && !isExistInRecent) {
+                    setNewIngredients([
+                      ...newIngredients,
+                      {
+                        name: ingredientName,
+                        image: ingredientImage,
+                      },
+                    ]);
+                    setIngredients([
+                      ...ingredients,
+                      {
+                        name: ingredientName,
+                        image: ingredientImage.uri,
+                      },
+                    ]);
+                    setSelectedIngredient({
+                      name: ingredientName,
+                      image: ingredientImage.uri,
+                    });
+                    setModal(true);
+                  } else {
+                    Alert.alert(
+                      'Error',
+                      "You've already created an ingredient named " + ingredientName
+                    );
+                  }
+
+                  resetIngredientModal();
                 } else {
                   Alert.alert('Error', 'Please fill in all fields');
                 }
