@@ -24,6 +24,7 @@ const Profile = () => {
   const [profile, setProfile] = useState<any>(null);
   const [recipes, setRecipes] = useState<any>([]);
   const [likedRecipes, setLikedRecipes] = useState<any>([]);
+  const [draftRecipes, setDraftRecipes] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [follow, setFollow] = useState<{ followers: Follow[]; following: Follow[] }>({
     followers: [],
@@ -43,17 +44,18 @@ const Profile = () => {
     const { data, error } = await supabase
       .from('profile')
       .select('*, recipe(*, recipe_reaction(rating.avg()))')
-      .eq('recipe.status', 'confirmed') // unconfirmed recipes will be listing another tab
       .eq('id', id || session?.user.id)
       .single();
     if (error) {
       console.log('error', error);
     } else {
-      setRecipes(
-        [...data.recipe].sort(
-          (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        )
+      let all = [...data.recipe].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
+
+      setDraftRecipes(all.filter((item) => item.status != 'confirmed'));
+      setRecipes(all.filter((item) => item.status == 'confirmed'));
+
       if (data?.profile_image) {
         data.profile_image = data?.profile_image;
       }
@@ -74,7 +76,7 @@ const Profile = () => {
     }
   };
 
-  const [tab, setTab] = useState<'recipe' | 'liked'>('recipe');
+  const [tab, setTab] = useState<'recipe' | 'liked' | 'draft'>('recipe');
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = React.useCallback(() => {
@@ -213,12 +215,31 @@ const Profile = () => {
               </TouchableOpacity>
             )}
           </View>
+          {!id || session?.user.id === id ? (
+            <View className="relative flex-1 items-center">
+              {tab === 'draft' ? (
+                <>
+                  <Ionicons name="receipt" size={24} color={'#FCA020'} />
+                  <View
+                    style={{ height: 2 }}
+                    className="absolute -bottom-3.5 w-1/2 bg-red-500"></View>
+                </>
+              ) : (
+                <TouchableOpacity onPress={() => setTab('draft')}>
+                  <Ionicons name="receipt-outline" size={24} color={'rgb(42 48 81)'} />
+                </TouchableOpacity>
+              )}
+            </View>
+          ) : null}
         </View>
-        {tab === 'recipe' ? (
-          <ListRecipe recipes={recipes} />
-        ) : (
-          <ListRecipe recipes={likedRecipes} />
-        )}
+
+        {
+          {
+            recipe: <ListRecipe recipes={recipes} />,
+            liked: <ListRecipe recipes={likedRecipes} />,
+            draft: <ListRecipe recipes={draftRecipes} />,
+          }[tab]
+        }
       </ScrollView>
     </SafeAreaView>
   );
