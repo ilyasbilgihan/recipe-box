@@ -43,6 +43,7 @@ const Profile = () => {
     const { data, error } = await supabase
       .from('profile')
       .select('*, recipe(*, recipe_reaction(rating.avg()))')
+      .eq('recipe.status', 'confirmed') // unconfirmed recipes will be listing another tab
       .eq('id', id || session?.user.id)
       .single();
     if (error) {
@@ -149,7 +150,7 @@ const Profile = () => {
 
             <View className="flex-col items-center ">
               <Text className="font-qs-bold text-lg text-dark">{recipes.length}</Text>
-              <Text className="font-qs-medium text-dark">recipe</Text>
+              <Text className="font-qs-medium text-dark">recipes</Text>
             </View>
             <View className="flex-col items-center ">
               <Text className="font-qs-bold text-lg text-dark">{follow.followers?.length}</Text>

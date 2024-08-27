@@ -281,7 +281,11 @@ const User = () => {
               onPress={() => router.push(`/profile/${recipe.profile?.id}`)}>
               <View className="w-2/3 flex-row items-center gap-2">
                 <Image
-                  source={{ uri: recipe.profile?.profile_image }}
+                  source={
+                    recipe.profile?.profile_image
+                      ? { uri: recipe.profile.profile_image }
+                      : require('~/assets/images/no-image.png')
+                  }
                   className="h-12 w-12 rounded-full"
                 />
                 <View>
