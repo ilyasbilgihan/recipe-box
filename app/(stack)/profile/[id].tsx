@@ -45,14 +45,12 @@ const Profile = () => {
       .from('profile')
       .select('*, recipe(*, recipe_reaction(rating.avg()))')
       .eq('id', id || session?.user.id)
+      .order('created_at', { ascending: false, referencedTable: 'recipe' })
       .single();
     if (error) {
       console.log('error', error);
     } else {
-      let all = [...data.recipe].sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
-
+      let all = [...data.recipe];
       setDraftRecipes(all.filter((item) => item.status != 'confirmed'));
       setRecipes(all.filter((item) => item.status == 'confirmed'));
 
@@ -102,28 +100,27 @@ const Profile = () => {
   };
 
   const handleFollow = async () => {
-    if (!loading) {
-      setLoading(true);
-      let isFollowing = follow.followers?.find(
-        (follower) => follower.follower_id === session?.user.id
-      );
-      if (isFollowing) {
-        // remove follow
-        const { error } = await supabase
-          .from('follow')
-          .delete()
-          .eq('follower_id', session?.user.id)
-          .eq('following_id', id);
-      } else {
-        // add follow
-        const { error } = await supabase
-          .from('follow')
-          .insert({ follower_id: session?.user.id, following_id: id });
-      }
-
-      checkFollow();
-      setLoading(false);
+    if (loading) return;
+    setLoading(true);
+    let isFollowing = follow.followers?.find(
+      (follower) => follower.follower_id === session?.user.id
+    );
+    if (isFollowing) {
+      // remove follow
+      const { error } = await supabase
+        .from('follow')
+        .delete()
+        .eq('follower_id', session?.user.id)
+        .eq('following_id', id);
+    } else {
+      // add follow
+      const { error } = await supabase
+        .from('follow')
+        .insert({ follower_id: session?.user.id, following_id: id });
     }
+
+    checkFollow();
+    setLoading(false);
   };
 
   return (

@@ -68,6 +68,12 @@ export default function StackLayout() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="edit-recipe/[id]"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
       <StatusBar backgroundColor="#FAF9FB" />
     </>

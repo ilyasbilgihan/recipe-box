@@ -15,7 +15,7 @@ import LazyImage from '~/components/LazyImage';
 
 const windowWidth = Dimensions.get('window').width;
 
-const User = () => {
+const RecipeDetail = () => {
   const { id } = useLocalSearchParams();
   const [recipe, setRecipe] = useState<any>({});
   const [loading, setLoading] = useState(false);
@@ -90,6 +90,8 @@ const User = () => {
     return data;
   };
   const handleBookmark = async () => {
+    if (loading) return;
+
     setLoading(true);
     const data = await checkBookmark();
 
@@ -185,28 +187,43 @@ const User = () => {
               }}>
               <Ionicons size={22} name="chevron-back" color={'rgb(250 249 251)'} />
             </TouchableOpacity>
-            <View className="gap-4">
-              <TouchableOpacity
-                activeOpacity={0.75}
-                onPress={() => {
-                  if (!loading) {
-                    handleBookmark();
-                  }
-                }}
-                style={{
-                  backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                  width: 48,
-                  height: 48,
-                  borderRadius: 24,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                {bookmarked ? (
-                  <Ionicons name="bookmark" size={24} color={'rgb(250 249 251)'} />
-                ) : (
-                  <Ionicons name="bookmark-outline" size={24} color={'rgb(250 249 251)'} />
-                )}
-              </TouchableOpacity>
+            <View className="items-end gap-4">
+              <View className="flex-row gap-4">
+                {session?.user.id === recipe?.owner_id ? (
+                  <TouchableOpacity
+                    activeOpacity={0.75}
+                    onPress={() => {
+                      router.push(`/edit-recipe/${recipe?.id}`);
+                    }}
+                    style={{
+                      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                      width: 48,
+                      height: 48,
+                      borderRadius: 24,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Ionicons name="create" size={24} color={'rgb(250 249 251)'} />
+                  </TouchableOpacity>
+                ) : null}
+                <TouchableOpacity
+                  activeOpacity={0.75}
+                  onPress={handleBookmark}
+                  style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    width: 48,
+                    height: 48,
+                    borderRadius: 24,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  {bookmarked ? (
+                    <Ionicons name="bookmark" size={24} color={'rgb(250 249 251)'} />
+                  ) : (
+                    <Ionicons name="bookmark-outline" size={24} color={'rgb(250 249 251)'} />
+                  )}
+                </TouchableOpacity>
+              </View>
               <View
                 style={{
                   backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -324,7 +341,7 @@ const User = () => {
             renderItem={({ item }) => (
               <View
                 className="flex-col items-center justify-center rounded-2xl border-2 border-dashed border-outline-400 px-2"
-                style={{ width: (windowWidth - 72) / 2.5, height: (windowWidth - 72) / 2.5 }}
+                style={{ width: (windowWidth - 72) / 2.5, paddingVertical: 12 }}
                 key={item.id}>
                 <View>
                   <Image source={{ uri: item.ingredient.image }} className="aspect-square w-1/2" />
@@ -360,7 +377,7 @@ const User = () => {
               injectedJavaScript="window.ReactNativeWebView.postMessage(document.body.scrollHeight)"
               onMessage={onWebViewMessage}
               source={{
-                html: `<head><meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0"></head><body class="gray">${recipe?.instructions}<style>${editorCSS}</style></body>`,
+                html: `<head><meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0"></head><body class="gray">${recipe?.instructions}<style>${editorCSS} *{user-select:none}</style></body>`,
               }}
             />
           ) : null}
@@ -379,4 +396,4 @@ const User = () => {
   );
 };
 
-export default User;
+export default RecipeDetail;

@@ -10,7 +10,7 @@ import {
   BackHandler,
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import { supabase, uploadImageToSupabaseBucket } from '~/utils/supabase';
+import { deleteImage, supabase, uploadImageToSupabaseBucket } from '~/utils/supabase';
 import { router } from 'expo-router';
 import { useGlobalContext } from '~/context/GlobalProvider';
 import {
@@ -55,31 +55,37 @@ import { editorCSS } from '~/utils/editorCSS';
 
 import CategoryPicker from '~/components/CategoryPicker';
 import WebView, { WebViewMessageEvent } from 'react-native-webview';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ImagePickerAsset } from 'expo-image-picker';
 
-const CreateRecipe = () => {
+const CreateRecipe = ({ id = null, recipe }: any) => {
   const { session } = useGlobalContext();
   const navigation = useNavigation();
   const [formData, setFormData] = useState({
-    name: '',
-    duration: '',
-    instructions: '<p>Click to add your <strong>instructions</strong></p>',
-    thumbnail: '',
+    name: recipe?.name || '',
+    duration: recipe?.duration || '',
+    instructions: recipe?.instructions || '<p>Click to add your <strong>instructions</strong></p>',
+    thumbnail: recipe?.thumbnail || '',
   });
   const [loading, setLoading] = useState(false);
   const { image, setImage, pickImage } = useImagePicker();
   const [refreshing, setRefreshing] = React.useState(false);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
-  const [selectedIngredients, setSelectedIngredients] = useState<RecipeIngredient[]>([]);
+  const [selectedIngredients, setSelectedIngredients] = useState<RecipeIngredient[]>(
+    recipe?.ingredients || []
+  );
   const [openRichText, setOpenRichText] = React.useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>(
+    recipe?.categories || []
+  );
   const timeout = useRef<any>(null);
+  const insets = useSafeAreaInsets();
   const [newIngredients, setNewIngredients] = useState<{ name: string; image: ImagePickerAsset }[]>(
     []
   );
+  const [saveIndicator, setSaveIndicator] = useState(false);
 
-  const [listOfCategories, setListOfCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const fetchCategories = async () => {
     const { data, error } = await supabase
@@ -94,7 +100,7 @@ const CreateRecipe = () => {
     }
 
     if (data) {
-      setListOfCategories(data);
+      setCategories(data);
     }
   };
 
@@ -104,7 +110,7 @@ const CreateRecipe = () => {
     fetchIngredients();
     resetFields();
     fetchCategories();
-    setSelectedIngredients([]);
+    setSelectedIngredients(recipe?.ingredients || []);
     setNewIngredients([]);
     setRefreshing(false);
     editor.setContent(`<p>Click to add your <strong>instructions</strong></p>`);
@@ -127,18 +133,9 @@ const CreateRecipe = () => {
       timeout.current = setTimeout(async () => {
         let content = await editor.getHTML();
         setField('instructions', content);
-        navigation.setOptions({
-          headerRight: () =>
-            content ? (
-              <View className="mr-7">
-                <Ionicons size={24} name="save-outline" color={'rgb(42 48 81)'} />
-              </View>
-            ) : null,
-        });
+        setSaveIndicator(true);
         setTimeout(() => {
-          navigation.setOptions({
-            headerRight: () => null,
-          });
+          setSaveIndicator(false);
         }, 1000);
       }, 2000);
     },
@@ -149,7 +146,7 @@ const CreateRecipe = () => {
 
     fetchIngredients();
     fetchCategories();
-
+    console.log('testing testing');
     // inject css
     editor.injectCSS(editorCSS);
   }, []);
@@ -209,29 +206,71 @@ const CreateRecipe = () => {
 
     let uploadedImageUrl = null;
     if (image !== undefined) {
+      if (id) {
+        await deleteImage('recipe_images/' + formData.thumbnail.split('recipe_images/')[1]);
+      }
       const url = await uploadImageToSupabaseBucket('recipe_images', image);
       uploadedImageUrl = url;
     }
 
-    const { data, error } = await supabase
-      .from('recipe')
-      .insert({
-        name: formData.name,
-        duration: formData.duration,
-        instructions: formData.instructions,
-        thumbnail: uploadedImageUrl ? uploadedImageUrl : formData.thumbnail,
-        owner_id: session?.user.id,
-      })
-      .select('id')
-      .single();
+    let upserted_id = null;
+    if (!id) {
+      const { data: newRecipe, error } = await supabase
+        .from('recipe')
+        .insert({
+          name: formData.name,
+          duration: formData.duration,
+          instructions: formData.instructions,
+          thumbnail: uploadedImageUrl ? uploadedImageUrl : formData.thumbnail,
+          owner_id: session?.user.id,
+        })
+        .select('id')
+        .single();
 
-    if (error) {
-      Alert.alert('Error', error.message);
-      setLoading(false);
-      return;
+      if (error) {
+        Alert.alert('Error 1', error.message);
+        setLoading(false);
+        return;
+      }
+      upserted_id = newRecipe.id;
+    } else {
+      const { data: updatedRecipe, error } = await supabase
+        .from('recipe')
+        .update({
+          name: formData.name,
+          duration: formData.duration,
+          instructions: formData.instructions,
+          thumbnail: uploadedImageUrl ? uploadedImageUrl : formData.thumbnail,
+        })
+        .eq('id', id)
+        .select('id')
+        .single();
+
+      if (error) {
+        console.log(error);
+        Alert.alert('Error 2', error.message);
+        setLoading(false);
+        return;
+      }
+      upserted_id = updatedRecipe.id;
     }
-    console.log('data ->', data);
-    if (data) {
+    if (upserted_id) {
+      if (id) {
+        const { error: delIngErr } = await supabase
+          .from('recipe_ingredient')
+          .delete()
+          .eq('recipe_id', id);
+
+        console.log('delIngErr ->', delIngErr);
+
+        const { error: delCatErr } = await supabase
+          .from('recipe_category')
+          .delete()
+          .eq('recipe_id', id);
+
+        console.log('delCatErr ->', delCatErr);
+      }
+
       let ingredientsToInsert: {
         ingredient_id: string;
         recipe_id: any;
@@ -243,7 +282,7 @@ const CreateRecipe = () => {
         if (ingredient.ingredient_id != undefined) {
           ingredientsToInsert.push({
             ingredient_id: ingredient.ingredient_id!,
-            recipe_id: data.id,
+            recipe_id: upserted_id,
             amount: ingredient.amount,
             unit: ingredient.unit,
           });
@@ -263,7 +302,7 @@ const CreateRecipe = () => {
 
           ingredientsToInsert.push({
             ingredient_id: newIng?.id, // instead of undefined
-            recipe_id: data.id,
+            recipe_id: upserted_id,
             amount: ingredient.amount,
             unit: ingredient.unit,
           });
@@ -278,16 +317,16 @@ const CreateRecipe = () => {
       console.log('ingError ->', ingError);
     }
 
-    if (categories.length > 0) {
+    if (selectedCategories.length > 0) {
       let categoryToInsert: {
         category_id: number;
         recipe_id: any;
       }[] = [];
-      for (let i = 0; i < categories.length; i++) {
-        const category = categories[i];
+      for (let i = 0; i < selectedCategories.length; i++) {
+        const category = selectedCategories[i];
         categoryToInsert.push({
           category_id: category.id,
-          recipe_id: data.id,
+          recipe_id: upserted_id,
         });
       }
       const { data: catData, error: catError } = await supabase
@@ -298,22 +337,27 @@ const CreateRecipe = () => {
     }
 
     setLoading(false);
-    Alert.alert('Success', 'Recipe Created Successfully');
     resetFields();
-    router.push(`/recipe/${data.id}`);
+    if (id) {
+      Alert.alert('Success', 'Recipe Updated Successfully');
+    } else {
+      Alert.alert('Success', 'Recipe Created Successfully');
+    }
+    router.replace(`/recipe/${upserted_id}`);
   };
 
   const resetFields = () => {
     setFormData({
-      name: '',
-      duration: '',
-      instructions: `<p>Click to add your <strong>instructions</strong></p>`,
-      thumbnail: '',
+      name: recipe?.name || '',
+      duration: recipe?.duration || '',
+      instructions:
+        recipe?.instructions || '<p>Click to add your <strong>instructions</strong></p>',
+      thumbnail: recipe?.thumbnail || '',
     });
-    editor.setContent('');
-    setCategories([]);
+    editor.setContent('<p>Click to add your <strong>instructions</strong></p>');
+    setSelectedCategories([]);
     setHeight(50);
-    setSelectedIngredients([]);
+    setSelectedIngredients(recipe?.ingredients || []);
     setNewIngredients([]);
     setImage(undefined);
   };
@@ -329,7 +373,7 @@ const CreateRecipe = () => {
     <SafeAreaView>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View className="h-16 flex-row items-center justify-center px-7">
-          <Text className="font-qs-bold text-2xl text-dark">Create Recipe</Text>
+          <Text className="font-qs-bold text-2xl text-dark">{id ? 'Edit' : 'Create'} Recipe</Text>
         </View>
         <View className="flex w-full flex-1 items-center justify-between px-8">
           <Box className="flex w-full gap-3 pb-12">
@@ -385,9 +429,9 @@ const CreateRecipe = () => {
             </FormControl>
             {/* Category */}
             <CategoryPicker
-              selectedCategories={categories}
-              categories={listOfCategories}
-              setSelectedCategories={setCategories}
+              categories={categories}
+              selectedCategories={selectedCategories}
+              setSelectedCategories={setSelectedCategories}
             />
             {/* Ingredients */}
             <IngredientPicker
@@ -407,19 +451,6 @@ const CreateRecipe = () => {
               <TouchableOpacity
                 activeOpacity={0.75}
                 onPress={() => {
-                  navigation.setOptions({
-                    title: 'Instructions',
-                    headerLeft: () => (
-                      <TouchableOpacity
-                        style={{ marginLeft: 8, padding: 20 }}
-                        activeOpacity={0.75}
-                        onPress={() => {
-                          closeRichText();
-                        }}>
-                        <Ionicons name="chevron-down" size={22} color={'rgb(42 48 81)'} />
-                      </TouchableOpacity>
-                    ),
-                  });
                   setOpenRichText(true);
                   editor.focus(true);
                 }}>
@@ -464,22 +495,42 @@ const CreateRecipe = () => {
           display: openRichText ? 'flex' : 'none',
           position: 'absolute',
           backgroundColor: 'rgb(250 249 251)',
-          top: 0,
+          top: insets.top,
           left: 0,
           right: 0,
           bottom: 0,
         }}>
-        <View style={{ flex: 1, width: '100%' }}>
-          <RichText editor={editor} />
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={{
-              position: 'absolute',
-              width: '100%',
-              bottom: 0,
+        <View className="h-16 flex-row items-center justify-between">
+          <TouchableOpacity
+            style={{ paddingHorizontal: 28 }}
+            activeOpacity={0.75}
+            onPress={() => {
+              closeRichText();
             }}>
-            <Toolbar editor={editor} />
-          </KeyboardAvoidingView>
+            <Ionicons name="chevron-down" size={22} color={'rgb(42 48 81)'} />
+          </TouchableOpacity>
+          <Text className="font-qs-bold text-2xl text-dark">Instructions</Text>
+          <View className="mr-7 w-10 items-end">
+            {saveIndicator ? (
+              <Ionicons size={24} name="save-outline" color={'rgb(42 48 81)'} />
+            ) : null}
+          </View>
+        </View>
+        <View style={{ flex: 1, width: '100%' }}>
+          {editor ? (
+            <>
+              <RichText editor={editor} />
+              <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={{
+                  position: 'absolute',
+                  width: '100%',
+                  bottom: 0,
+                }}>
+                <Toolbar editor={editor} />
+              </KeyboardAvoidingView>
+            </>
+          ) : null}
         </View>
       </View>
     </SafeAreaView>

@@ -46,19 +46,7 @@ type Ingredient = {
   image: string;
 };
 
-const units = {
-  kg: 'Kg',
-  g: 'G',
-  mg: 'mG',
-  pound: 'Pound',
-  ounce: 'Ounce',
-  tsp: 'Tsp',
-  tbsp: 'Tbsp',
-  cup: 'Cup',
-  l: 'L',
-  mL: 'mL',
-  piece: 'Piece',
-};
+const units = ['Kg', 'G', 'mG', 'Pound', 'Ounce', 'Tsp', 'Tbsp', 'Cup', 'L', 'mL', 'Piece'];
 
 type newIngredient = { name: string; image: ImagePickerAsset };
 
@@ -131,9 +119,11 @@ const IngredientPicker = ({
                 <View
                   key={index}
                   className="flex w-full flex-row items-center justify-between gap-2">
-                  <View className="flex flex-row items-center gap-2">
+                  <View className="flex flex-1 flex-row items-center gap-2">
                     <Image source={{ uri: ingredient.image }} style={{ width: 50, height: 50 }} />
-                    <Text className="font-qs-semibold text-lg">{ingredient.name}</Text>
+                    <Text className="flex-1 flex-wrap font-qs-semibold text-lg">
+                      {ingredient.name}
+                    </Text>
                     <Text className="font-qs-medium text-dark">
                       ({ingredient.amount} {ingredient.unit})
                     </Text>
@@ -255,8 +245,8 @@ const IngredientPicker = ({
                     <SelectDragIndicatorWrapper>
                       <SelectDragIndicator />
                     </SelectDragIndicatorWrapper>
-                    {Object.entries(units).map(([value, item]) => (
-                      <SelectItem key={value} label={item} value={value} />
+                    {units.map((val) => (
+                      <SelectItem key={val} label={val} value={val} />
                     ))}
                   </SelectContent>
                 </SelectPortal>
