@@ -1,6 +1,6 @@
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
-  Alert,
   ScrollView,
   RefreshControl,
   Text,
@@ -9,10 +9,20 @@ import {
   Platform,
   BackHandler,
 } from 'react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import { router, useNavigation } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { ImagePickerAsset } from 'expo-image-picker';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import WebView, { WebViewMessageEvent } from 'react-native-webview';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import { deleteImage, supabase, uploadImageToSupabaseBucket } from '~/utils/supabase';
-import { router } from 'expo-router';
+import useImagePicker from '~/utils/useImagePicker';
+import { editorCSS } from '~/utils/editorCSS';
 import { useGlobalContext } from '~/context/GlobalProvider';
+
+import { RichText, TenTapStartKit, Toolbar, useEditorBridge } from '@10play/tentap-editor';
+
 import {
   FormControl,
   FormControlError,
@@ -23,10 +33,10 @@ import {
 import { Input, InputField } from '~/components/ui/input';
 import { Box } from '~/components/ui/box';
 import { ButtonSpinner, ButtonText, Button } from '~/components/ui/button';
-
 import ImagePickerInput from '~/components/ImagePickerInput';
-import useImagePicker from '~/utils/useImagePicker';
-import { RichText, TenTapStartKit, Toolbar, useEditorBridge } from '@10play/tentap-editor';
+import IngredientPicker from '~/components/IngredientPicker';
+import CategoryPicker from '~/components/CategoryPicker';
+import useCustomToast from '~/components/useCustomToast';
 
 type Ingredient = {
   id?: string;
@@ -47,45 +57,43 @@ type Category = {
   name: string;
 };
 
-import IngredientPicker from '~/components/IngredientPicker';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import { useNavigation } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { editorCSS } from '~/utils/editorCSS';
-
-import CategoryPicker from '~/components/CategoryPicker';
-import WebView, { WebViewMessageEvent } from 'react-native-webview';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ImagePickerAsset } from 'expo-image-picker';
-
 const CreateRecipe = ({ id = null, recipe }: any) => {
   const { session } = useGlobalContext();
   const navigation = useNavigation();
+
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [loading, setLoading] = useState(false);
+  const [saveIndicator, setSaveIndicator] = useState(false);
+  const toast = useCustomToast();
+
   const [formData, setFormData] = useState({
     name: recipe?.name || '',
     duration: recipe?.duration || '',
     instructions: recipe?.instructions || '<p>Click to add your <strong>instructions</strong></p>',
     thumbnail: recipe?.thumbnail || '',
   });
-  const [loading, setLoading] = useState(false);
   const { image, setImage, pickImage } = useImagePicker();
-  const [refreshing, setRefreshing] = React.useState(false);
+
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [selectedIngredients, setSelectedIngredients] = useState<RecipeIngredient[]>(
     recipe?.ingredients || []
   );
-  const [openRichText, setOpenRichText] = React.useState(false);
+
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<Category[]>(
     recipe?.categories || []
   );
+
+  const [openRichText, setOpenRichText] = React.useState(false);
   const timeout = useRef<any>(null);
   const insets = useSafeAreaInsets();
   const [newIngredients, setNewIngredients] = useState<{ name: string; image: ImagePickerAsset }[]>(
     []
   );
-  const [saveIndicator, setSaveIndicator] = useState(false);
 
-  const [categories, setCategories] = useState<Category[]>([]);
+  const setField = (field: string, value: string) => {
+    setFormData({ ...formData, [field]: value });
+  };
 
   const fetchCategories = async () => {
     const { data, error } = await supabase
@@ -101,6 +109,17 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
 
     if (data) {
       setCategories(data);
+    }
+  };
+
+  const fetchIngredients = async () => {
+    const { data, error } = await supabase.from('ingredient').select('*');
+    if (error) {
+      toast.error('Something went wrong. ' + error.message);
+      return;
+    }
+    if (data) {
+      setIngredients(data);
     }
   };
 
@@ -142,11 +161,8 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
   });
 
   useEffect(() => {
-    // fetch ingredients
-
     fetchIngredients();
     fetchCategories();
-    console.log('testing testing');
     // inject css
     editor.injectCSS(editorCSS);
   }, []);
@@ -173,125 +189,94 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
     return () => backHandler.remove();
   }, [openRichText]);
 
-  const fetchIngredients = async () => {
-    const { data, error } = await supabase.from('ingredient').select('*');
-    if (error) {
-      Alert.alert('Error', error.message);
-      return;
-    }
-    if (data) {
-      setIngredients(data);
-    }
-  };
-
-  const setField = (field: string, value: string) => {
-    setFormData({ ...formData, [field]: value });
-  };
-
-  const handleCreateRecipe = async () => {
-    if (loading) return;
-
-    setLoading(true);
-
-    if (
-      formData.name === '' ||
-      formData.duration === '' ||
-      formData.instructions === '' ||
-      selectedIngredients.length == 0
-    ) {
-      Alert.alert('Error', 'Please fill in all fields');
-      setLoading(false);
-      return;
-    }
-
+  const handleUploadImage = async () => {
     let uploadedImageUrl = null;
     if (image !== undefined) {
       if (id) {
-        await deleteImage('recipe_images/' + formData.thumbnail.split('recipe_images/')[1]);
+        const { error } = await deleteImage(
+          'recipe_images/' + formData.thumbnail.split('recipe_images/')[1]
+        );
+        if (error) {
+          toast.error('Delete image error ' + error.message);
+        }
       }
-      const url = await uploadImageToSupabaseBucket('recipe_images', image);
-      uploadedImageUrl = url;
-    }
-
-    let upserted_id = null;
-    if (!id) {
-      const { data: newRecipe, error } = await supabase
-        .from('recipe')
-        .insert({
-          name: formData.name,
-          duration: formData.duration,
-          instructions: formData.instructions,
-          thumbnail: uploadedImageUrl ? uploadedImageUrl : formData.thumbnail,
-          owner_id: session?.user.id,
-        })
-        .select('id')
-        .single();
-
+      const { url, error } = await uploadImageToSupabaseBucket('recipe_images', image);
       if (error) {
-        Alert.alert('Error 1', error.message);
-        setLoading(false);
-        return;
+        toast.error('Image upload error ' + error.message);
+      } else {
+        uploadedImageUrl = url;
       }
-      upserted_id = newRecipe.id;
-    } else {
-      const { data: updatedRecipe, error } = await supabase
-        .from('recipe')
-        .update({
-          name: formData.name,
-          duration: formData.duration,
-          instructions: formData.instructions,
-          thumbnail: uploadedImageUrl ? uploadedImageUrl : formData.thumbnail,
-        })
-        .eq('id', id)
-        .select('id')
-        .single();
-
-      if (error) {
-        console.log(error);
-        Alert.alert('Error 2', error.message);
-        setLoading(false);
-        return;
-      }
-      upserted_id = updatedRecipe.id;
     }
-    if (upserted_id) {
-      if (id) {
-        const { error: delIngErr } = await supabase
-          .from('recipe_ingredient')
-          .delete()
-          .eq('recipe_id', id);
+    return uploadedImageUrl;
+  };
 
-        console.log('delIngErr ->', delIngErr);
+  const handleInsertRecipe = async (uploadedImageUrl: any) => {
+    const { data: newRecipe, error } = await supabase
+      .from('recipe')
+      .insert({
+        name: formData.name,
+        duration: formData.duration,
+        instructions: formData.instructions,
+        thumbnail: uploadedImageUrl ? uploadedImageUrl : formData.thumbnail,
+        owner_id: session?.user.id,
+      })
+      .select('id')
+      .single();
 
-        const { error: delCatErr } = await supabase
-          .from('recipe_category')
-          .delete()
-          .eq('recipe_id', id);
+    if (error) {
+      toast.error('Create Recipe Error. ' + error.message);
+      setLoading(false);
+      return;
+    }
+    return newRecipe.id;
+  };
 
-        console.log('delCatErr ->', delCatErr);
-      }
+  const handleUpdateRecipe = async (uploadedImageUrl: any) => {
+    const { data: updatedRecipe, error } = await supabase
+      .from('recipe')
+      .update({
+        name: formData.name,
+        duration: formData.duration,
+        instructions: formData.instructions,
+        thumbnail: uploadedImageUrl ? uploadedImageUrl : formData.thumbnail,
+      })
+      .eq('id', id)
+      .select('id')
+      .single();
 
-      let ingredientsToInsert: {
-        ingredient_id: string;
-        recipe_id: any;
-        amount: string;
-        unit: string;
-      }[] = [];
-      for (let i = 0; i < selectedIngredients.length; i++) {
-        const ingredient = selectedIngredients[i];
-        if (ingredient.ingredient_id != undefined) {
-          ingredientsToInsert.push({
-            ingredient_id: ingredient.ingredient_id!,
-            recipe_id: upserted_id,
-            amount: ingredient.amount,
-            unit: ingredient.unit,
-          });
+    if (error) {
+      toast.error('Update Recipe Error. ' + error.message);
+      setLoading(false);
+      return;
+    }
+    return updatedRecipe.id;
+  };
+
+  const handleInsertIngredients = async (upserted_id: any) => {
+    let ingredientsToInsert: {
+      ingredient_id: string;
+      recipe_id: any;
+      amount: string;
+      unit: string;
+    }[] = [];
+
+    for (let i = 0; i < selectedIngredients.length; i++) {
+      const ingredient = selectedIngredients[i];
+      if (ingredient.ingredient_id != undefined) {
+        ingredientsToInsert.push({
+          ingredient_id: ingredient.ingredient_id!,
+          recipe_id: upserted_id,
+          amount: ingredient.amount,
+          unit: ingredient.unit,
+        });
+      } else {
+        // add non existed (undefined id) ingredient to supabase
+        let newIngImage = newIngredients.find((item) => (item.name = ingredient.name))?.image;
+
+        const { url, error } = await uploadImageToSupabaseBucket('ingredient_images', newIngImage!);
+        if (error) {
+          toast.error('Image upload error ' + error.message);
         } else {
-          // add non existed (undefined id) ingredient to supabase
-          let newIngImage = newIngredients.find((item) => (item.name = ingredient.name))?.image;
-
-          const url = await uploadImageToSupabaseBucket('ingredient_images', newIngImage!);
-
           const { data: newIng, error: newIngErr } = await supabase
             .from('ingredient')
             .insert({ name: ingredient.name, image: url })
@@ -308,40 +293,92 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
           });
         }
       }
-
-      console.log('ingredientsToInsert ->', ingredientsToInsert);
-      const { data: ingData, error: ingError } = await supabase
-        .from('recipe_ingredient')
-        .insert(ingredientsToInsert);
-      console.log('ingData ->', ingData);
-      console.log('ingError ->', ingError);
     }
 
-    if (selectedCategories.length > 0) {
-      let categoryToInsert: {
-        category_id: number;
-        recipe_id: any;
-      }[] = [];
-      for (let i = 0; i < selectedCategories.length; i++) {
-        const category = selectedCategories[i];
-        categoryToInsert.push({
-          category_id: category.id,
-          recipe_id: upserted_id,
-        });
+    console.log('ingredientsToInsert ->', ingredientsToInsert);
+    const { data: ingData, error: ingError } = await supabase
+      .from('recipe_ingredient')
+      .insert(ingredientsToInsert);
+    console.log('ingData ->', ingData);
+    console.log('ingError ->', ingError);
+  };
+
+  const handleInsertCategories = async (upserted_id: any) => {
+    let categoryToInsert: {
+      category_id: number;
+      recipe_id: any;
+    }[] = [];
+    for (let i = 0; i < selectedCategories.length; i++) {
+      const category = selectedCategories[i];
+      categoryToInsert.push({
+        category_id: category.id,
+        recipe_id: upserted_id,
+      });
+    }
+    const { data: catData, error: catError } = await supabase
+      .from('recipe_category')
+      .insert(categoryToInsert);
+    console.log('catData ->', catData);
+    console.log('catError ->', catError);
+  };
+
+  const handleCreateRecipe = async () => {
+    if (loading) return;
+
+    setLoading(true);
+
+    if (
+      formData.name === '' ||
+      formData.duration === '' ||
+      formData.instructions === '' ||
+      selectedIngredients.length == 0
+    ) {
+      toast.warning('Please fill in all the required fields.');
+      setLoading(false);
+      return;
+    }
+
+    let uploadedImageUrl = await handleUploadImage();
+
+    let upserted_id = null;
+    if (!id) {
+      upserted_id = await handleInsertRecipe(uploadedImageUrl);
+    } else {
+      upserted_id = await handleUpdateRecipe(uploadedImageUrl);
+    }
+
+    if (upserted_id) {
+      if (id) {
+        // delete old ingredients and categories
+        const { error: delIngErr } = await supabase
+          .from('recipe_ingredient')
+          .delete()
+          .eq('recipe_id', id);
+
+        console.log('delIngErr ->', delIngErr);
+
+        const { error: delCatErr } = await supabase
+          .from('recipe_category')
+          .delete()
+          .eq('recipe_id', id);
+
+        console.log('delCatErr ->', delCatErr);
       }
-      const { data: catData, error: catError } = await supabase
-        .from('recipe_category')
-        .insert(categoryToInsert);
-      console.log('catData ->', catData);
-      console.log('catError ->', catError);
+
+      if (selectedIngredients.length > 0) {
+        await handleInsertIngredients(upserted_id);
+      }
+      if (selectedCategories.length > 0) {
+        await handleInsertCategories(upserted_id);
+      }
     }
 
     setLoading(false);
     resetFields();
     if (id) {
-      Alert.alert('Success', 'Recipe Updated Successfully');
+      toast.success('Recipe Updated Successfully');
     } else {
-      Alert.alert('Success', 'Recipe Created Successfully');
+      toast.success('Recipe Created Successfully');
     }
     router.replace(`/recipe/${upserted_id}`);
   };
