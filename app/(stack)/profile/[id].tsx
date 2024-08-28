@@ -11,11 +11,16 @@ import { useGlobalContext } from '~/context/GlobalProvider';
 import ListRecipe from '~/components/ListRecipe';
 import { Button, ButtonText } from '~/components/ui/button';
 import LazyImage from '~/components/LazyImage';
+import FollowListTrigger from '~/components/FollowList';
 
-type Follow = {
-  follower_id: string;
-  following_id: string;
-};
+type Follow =
+  | {
+      id: any;
+      name: any;
+      username: any;
+      profile_image: any;
+    }[]
+  | undefined;
 
 const Profile = () => {
   const { session } = useGlobalContext();
@@ -26,9 +31,9 @@ const Profile = () => {
   const [likedRecipes, setLikedRecipes] = useState<any>([]);
   const [draftRecipes, setDraftRecipes] = useState<any>([]);
   const [loading, setLoading] = useState(false);
-  const [follow, setFollow] = useState<{ followers: Follow[]; following: Follow[] }>({
-    followers: [],
-    following: [],
+  const [follow, setFollow] = useState<{ followers: Follow; following: Follow }>({
+    followers: undefined,
+    following: undefined,
   });
 
   useFocusEffect(
@@ -86,25 +91,36 @@ const Profile = () => {
   }, []);
 
   const checkFollow = async () => {
-    const { data: follower_data } = await supabase
+    const { data: follower_sb } = await supabase
       .from('follow')
-      .select('*')
-      .eq('following_id', id || session?.user.id);
+      .select(
+        'follower:profile!follower_id(id, name, username, profile_image, followers:follow!following_id(follower_id))'
+      )
+      .eq('following_id', id || session?.user.id)
+      .eq('follower.followers.follower_id', session?.user.id);
 
-    const { data: following_data } = await supabase
+    let follower_data = follower_sb?.map(
+      (item) => (Array.isArray(item.follower) ? item.follower[0] : item.follower) // some weird typescript error
+    );
+    const { data: following_sb } = await supabase
       .from('follow')
-      .select('*')
-      .eq('follower_id', id || session?.user.id);
+      .select(
+        'following:profile!following_id(id, name, username, profile_image, followers:follow!following_id(follower_id))'
+      )
+      .eq('follower_id', id || session?.user.id)
+      .eq('following.followers.follower_id', session?.user.id);
 
-    setFollow({ followers: follower_data!, following: following_data! });
+    let following_data = following_sb?.map(
+      (item) => (Array.isArray(item.following) ? item.following[0] : item.following) // some weird typescript error
+    );
+
+    setFollow({ followers: follower_data, following: following_data });
   };
 
   const handleFollow = async () => {
     if (loading) return;
     setLoading(true);
-    let isFollowing = follow.followers?.find(
-      (follower) => follower.follower_id === session?.user.id
-    );
+    let isFollowing = follow.followers?.find((follower) => follower.id === session?.user.id);
     if (isFollowing) {
       // remove follow
       const { error } = await supabase
@@ -151,14 +167,18 @@ const Profile = () => {
               <Text className="font-qs-bold text-lg text-dark">{recipes.length}</Text>
               <Text className="font-qs-medium text-dark">recipes</Text>
             </View>
-            <View className="flex-col items-center ">
-              <Text className="font-qs-bold text-lg text-dark">{follow.followers?.length}</Text>
-              <Text className="font-qs-medium text-dark">followers</Text>
-            </View>
-            <View className="flex-col items-center ">
-              <Text className="font-qs-bold text-lg text-dark">{follow.following?.length}</Text>
-              <Text className="font-qs-medium text-dark">following</Text>
-            </View>
+            <FollowListTrigger list={follow.followers} checkFollow={checkFollow} title="Followers">
+              <View className="flex-col items-center ">
+                <Text className="font-qs-bold text-lg text-dark">{follow.followers?.length}</Text>
+                <Text className="font-qs-medium text-dark">followers</Text>
+              </View>
+            </FollowListTrigger>
+            <FollowListTrigger list={follow.following} checkFollow={checkFollow} title="Following">
+              <View className="flex-col items-center ">
+                <Text className="font-qs-bold text-lg text-dark">{follow.following?.length}</Text>
+                <Text className="font-qs-medium text-dark">following</Text>
+              </View>
+            </FollowListTrigger>
           </View>
           <View className="my-4 flex-col">
             {profile?.name && (
@@ -171,7 +191,7 @@ const Profile = () => {
               </Text>
             )}
             {id && id !== session?.user.id ? (
-              follow.followers?.find((follower) => follower.follower_id === session?.user.id) ? (
+              follow.followers?.find((follower) => follower.id === session?.user.id) ? (
                 <Button
                   className="mt-3 h-10 w-1/2 rounded-lg border border-sky-500 bg-light "
                   onPress={handleFollow}>
