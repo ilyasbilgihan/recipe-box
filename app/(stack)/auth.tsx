@@ -1,29 +1,22 @@
-import {
-  View,
-  Alert,
-  Text,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  TouchableHighlight,
-} from 'react-native';
 import React, { useState } from 'react';
-import { supabase } from '~/utils/supabase';
+import { View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { router, useNavigation } from 'expo-router';
+import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
 import { useGlobalContext } from '~/context/GlobalProvider';
+
+import { supabase } from '~/utils/supabase';
+
 import {
   FormControl,
   FormControlError,
   FormControlErrorText,
-  FormControlHelper,
-  FormControlHelperText,
   FormControlLabel,
   FormControlLabelText,
 } from '~/components/ui/form-control';
 import { Input, InputField } from '~/components/ui/input';
 import { Box } from '~/components/ui/box';
 import { ButtonSpinner, ButtonText, Button } from '~/components/ui/button';
-import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
+import useCustomToast from '~/components/useCustomToast';
 
 const SignIn = () => {
   const [formState, setFormState] = useState('login');
@@ -35,12 +28,13 @@ const SignIn = () => {
   });
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
+  const toast = useCustomToast();
 
   const { signIn, signUp } = useGlobalContext();
 
   async function signInWithEmail() {
     if (formData.email === '' || formData.password === '') {
-      Alert.alert('Error', 'Please fill in all fields');
+      toast.warning('Please fill in all fields');
       return;
     }
     setLoading(true);
@@ -59,7 +53,7 @@ const SignIn = () => {
       .eq('username', formData.username);
 
     if (error) {
-      Alert.alert('Error', 'Something went wrong');
+      toast.error('Something went wrong. ' + error.message);
       setLoading(false);
       return;
     }
@@ -76,19 +70,19 @@ const SignIn = () => {
     const usernameExists = await checkUsername();
 
     if (usernameExists) {
-      Alert.alert('Error', 'Username already exists');
+      toast.error('Username already exists');
       setLoading(false);
       return;
     }
 
     if (formData.email === '' || formData.password === '') {
-      Alert.alert('Error', 'Please fill in all fields');
+      toast.warning('Please fill in all fields');
       setLoading(false);
       return;
     }
 
     if (formData.password !== formData.confirm_password) {
-      Alert.alert('Error', 'Passwords do not match');
+      toast.error('Passwords do not match');
       setLoading(false);
       return;
     }
@@ -101,7 +95,7 @@ const SignIn = () => {
       password: formData.password,
     });
     if (signUpError) {
-      Alert.alert(signUpError.message);
+      toast.error('Something went wrong. ' + signUpError.message);
       setLoading(false);
       return;
     }
@@ -115,7 +109,7 @@ const SignIn = () => {
     if (profileError) {
       console.log(session?.user.email);
       console.log(profileError);
-      Alert.alert('profile Something went wrong. Please try again');
+      toast.error('Something went wrong. ' + profileError);
       setLoading(false);
       return;
     }

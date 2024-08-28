@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useCallback, useContext, useEffect, useState } from 'react';
+import React, { PropsWithChildren, useContext, useEffect, useState } from 'react';
 
 import {
   Session,
@@ -12,8 +12,7 @@ export interface GlobalContextValue {
   signIn: (credentials: SignInWithPasswordCredentials) => void;
   signUp: (credentials: SignUpWithPasswordCredentials) => void;
 }
-import { Alert } from 'react-native';
-import { router } from 'expo-router';
+import useCustomToast from '~/components/useCustomToast';
 
 const GlobalContext = React.createContext<GlobalContextValue>({} as GlobalContextValue);
 
@@ -30,20 +29,20 @@ export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
     });
   }, []);
 
+  const toast = useCustomToast();
+
   const signIn = async (credentials: SignInWithPasswordCredentials) => {
     setLoading(true);
     const { data, error } = await supabase.auth.signInWithPassword(credentials);
 
-    if (error) Alert.alert(error.message);
-    setSession(data.session);
+    if (error) toast.error(error.message);
     setLoading(false);
   };
   async function signUp(credentials: SignUpWithPasswordCredentials) {
     setLoading(true);
     const { data, error } = await supabase.auth.signUp(credentials);
 
-    if (error) Alert.alert(error.message);
-    setSession(data.session);
+    if (error) toast.error(error.message);
     setLoading(false);
   }
 

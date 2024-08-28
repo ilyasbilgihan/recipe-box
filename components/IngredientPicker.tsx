@@ -31,6 +31,7 @@ import { Input } from './ui/input';
 import { Button, ButtonText } from './ui/button';
 import ImagePickerInput from './ImagePickerInput';
 import { ImagePickerAsset } from 'expo-image-picker';
+import useCustomToast from './useCustomToast';
 
 type RecipeIngredient = {
   ingredient_id: string | undefined;
@@ -72,6 +73,8 @@ const IngredientPicker = ({
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
+
+  const toast = useCustomToast();
 
   const [filteredIngredients, setFilteredIngredients] = useState<Ingredient[]>([]);
   useEffect(() => {
@@ -292,12 +295,12 @@ const IngredientPicker = ({
                       },
                     ]);
                   } else {
-                    Alert.alert('Error', 'Ingredient already added');
+                    toast.warning('Ingredient already added');
                   }
 
                   resetModal();
                 } else {
-                  Alert.alert('Error', 'Please fill in all fields');
+                  toast.warning('Please fill all fields');
                 }
               }}
               size="sm"
@@ -395,15 +398,12 @@ const IngredientPicker = ({
                     });
                     setModal(true);
                   } else {
-                    Alert.alert(
-                      'Error',
-                      "You've already created an ingredient named " + ingredientName
-                    );
+                    toast.error("You've already created an ingredient named " + ingredientName);
                   }
 
                   resetIngredientModal();
                 } else {
-                  Alert.alert('Error', 'Please fill in all fields');
+                  toast.warning('Please fill in all fields');
                 }
               }}
               size="sm"

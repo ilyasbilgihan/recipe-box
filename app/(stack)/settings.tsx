@@ -1,16 +1,11 @@
-import {
-  View,
-  Alert,
-  Image,
-  ScrollView,
-  RefreshControl,
-  TouchableOpacity,
-  Text,
-} from 'react-native';
 import React, { useEffect, useState } from 'react';
+import { View, ScrollView, RefreshControl, TouchableOpacity, Text } from 'react-native';
+import { router } from 'expo-router';
+
 import { supabase, uploadImageToSupabaseBucket, deleteImage } from '~/utils/supabase';
-import { Link, router } from 'expo-router';
+import useImagePicker from '~/utils/useImagePicker';
 import { useGlobalContext } from '~/context/GlobalProvider';
+
 import {
   FormControl,
   FormControlError,
@@ -22,10 +17,8 @@ import { Input, InputField } from '~/components/ui/input';
 import { Box } from '~/components/ui/box';
 import { ButtonSpinner, ButtonText, Button } from '~/components/ui/button';
 import { Textarea, TextareaInput } from '~/components/ui/textarea';
-import useImagePicker from '~/utils/useImagePicker';
-
-import * as ImagePicker from 'expo-image-picker';
 import LazyImage from '~/components/LazyImage';
+import useCustomToast from '~/components/useCustomToast';
 
 const Profile = () => {
   const { session } = useGlobalContext();
@@ -40,6 +33,7 @@ const Profile = () => {
   const { image, setImage, pickImage } = useImagePicker();
   const [loading, setLoading] = useState(false);
   const [tempImage, setTempImage] = useState('');
+  const toast = useCustomToast();
 
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -89,15 +83,22 @@ const Profile = () => {
 
     let uploadedImageUrl = null;
     if (image !== undefined) {
-      const url = await uploadImageToSupabaseBucket('profile_images', image);
-      uploadedImageUrl = url;
+      const { url, error } = await uploadImageToSupabaseBucket('profile_images', image);
+      if (error) {
+        toast.error('Image upload error ' + error.message);
+      } else {
+        uploadedImageUrl = url;
+      }
     }
 
     // if there is a new image or user wants to delete own image
     if (uploadedImageUrl || formData.profile_image == '') {
       // delete image from bucket
       if (tempImage) {
-        await deleteImage('profile_images/' + tempImage);
+        const { error } = await deleteImage('profile_images/' + tempImage);
+        if (error) {
+          toast.error('Delete image error ' + error.message);
+        }
       }
     }
 
@@ -113,13 +114,13 @@ const Profile = () => {
       .eq('id', session?.user.id);
 
     if (error) {
-      Alert.alert('Error', error.message);
+      toast.error('Something went wrong. ' + error.message);
       setLoading(false);
       return;
     }
 
     setLoading(false);
-    Alert.alert('Success', 'Profile updated successfully');
+    toast.success('Profile updated successfully');
     router.push('/profile');
   };
 

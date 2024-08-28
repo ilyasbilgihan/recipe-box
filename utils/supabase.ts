@@ -39,21 +39,13 @@ export const uploadImageToSupabaseBucket = async (location: string, uploaded: Im
       upsert: true,
     });
 
-  if (uploadError) {
-    Alert.alert('Error', uploadError.message);
-    return;
-  }
-
   // Construct public URL
-  const url = `${supabaseUrl}/storage/v1/object/public/${bucket}/${data.path}`;
+  const url = `${supabaseUrl}/storage/v1/object/public/${bucket}/${data?.path}`;
 
-  return url;
+  return { url, error: uploadError };
 };
 
 export const deleteImage = async (path: string) => {
   const { error } = await supabase.storage.from(bucket).remove([path]);
-  if (error) {
-    Alert.alert('Error', error.message);
-    return;
-  }
+  return { error };
 };

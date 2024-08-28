@@ -19,6 +19,7 @@ import {
   SelectTrigger,
 } from './ui/select';
 import { router } from 'expo-router';
+import useCustomToast from './useCustomToast';
 
 const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
   const [repliesExpanded, setRepliesExpanded] = useState(false);
@@ -30,6 +31,8 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
   const [editContent, setEditContent] = useState(comment.content);
 
   const { session } = useGlobalContext();
+
+  const toast = useCustomToast();
 
   const handleDownVote = async () => {
     setVoteLoading(true);
@@ -113,7 +116,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
       .eq('id', comment.id);
 
     if (error) {
-      console.log('edit comment error', error);
+      toast.error('Edit Comment Error. ' + error.message);
     } else {
       setEditMode(false);
       refreshComments();
@@ -121,13 +124,10 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
   };
 
   const handleCommentDelete = async () => {
-    console.log('delete comment', comment.id);
     const { data, error } = await supabase.from('comment').delete().eq('id', comment.id);
 
-    console.log('delete comment error', error);
     if (error) {
       if (error.code == '23503') {
-        // Alert.alert('Delete Error', 'Comment has replies. Please delete all replies first.');
         const { error: updtErr } = await supabase
           .from('comment')
           .update({ deleted: true })
@@ -169,26 +169,14 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
               if (value == 'edit') {
                 setEditMode(!editMode);
               } else if (value == 'delete') {
-                Alert.alert(
-                  'Confirm Deletion',
-                  comment?.content,
-                  [
-                    {
-                      text: 'Cancel',
-                      style: 'cancel',
-                    },
-                    {
-                      text: 'Delete',
-                      style: 'default',
-                      onPress: async () => {
-                        await handleCommentDelete();
-                      },
-                    },
-                  ],
-                  {
-                    cancelable: true,
-                  }
-                );
+                toast.confirm({
+                  title: 'Are you sure you want to delete this comment?',
+                  message: comment?.content,
+                  icon: <Ionicons name="trash-outline" size={20} />,
+                  handler: async () => {
+                    await handleCommentDelete();
+                  },
+                });
               }
             }}>
             <SelectTrigger className="border-0 " size="md">

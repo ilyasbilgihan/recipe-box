@@ -9,6 +9,7 @@ import { useGlobalContext } from '~/context/GlobalProvider';
 import { Button, ButtonSpinner, ButtonText } from './ui/button';
 import { Textarea, TextareaInput } from './ui/textarea';
 import CommentItem from './CommentItem';
+import useCustomToast from './useCustomToast';
 
 const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) => {
   const [comments, setComments] = useState<any[]>([]);
@@ -16,6 +17,8 @@ const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) 
   const [loading, setLoading] = useState(false);
 
   const { session } = useGlobalContext();
+
+  const toast = useCustomToast();
 
   useFocusEffect(
     useCallback(() => {
@@ -91,7 +94,7 @@ const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) 
         setContent('');
         return true;
       } else {
-        Alert.alert('Comment cannot be empty');
+        toast.warning('Comment cannot be empty');
         setLoading(false);
         return false;
       }
