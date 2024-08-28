@@ -30,6 +30,7 @@ const Profile = () => {
   const [recipes, setRecipes] = useState<any>([]);
   const [likedRecipes, setLikedRecipes] = useState<any>([]);
   const [draftRecipes, setDraftRecipes] = useState<any>([]);
+  const [bookmarkedRecipes, setBookmarkedRecipes] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [follow, setFollow] = useState<{ followers: Follow; following: Follow }>({
     followers: undefined,
@@ -41,6 +42,7 @@ const Profile = () => {
       console.log('fetching');
       fetchProfile();
       fetchHighRatedRecipes();
+      fetchBookmarks();
       checkFollow();
     }, [])
   );
@@ -66,6 +68,18 @@ const Profile = () => {
     }
   };
 
+  const fetchBookmarks = async () => {
+    const { data, error } = await supabase
+      .from('bookmark')
+      .select('*, recipe(*, recipe_reaction(rating.avg()))')
+      .eq('user_id', session?.user.id)
+      .order('created_at', { ascending: false });
+
+    if (data) {
+      setBookmarkedRecipes([...data].map((item) => item.recipe));
+    }
+  };
+
   const fetchHighRatedRecipes = async () => {
     const { data, error } = await supabase
       .from('recipe_reaction')
@@ -79,7 +93,7 @@ const Profile = () => {
     }
   };
 
-  const [tab, setTab] = useState<'recipe' | 'liked' | 'draft'>('recipe');
+  const [tab, setTab] = useState<'recipe' | 'liked' | 'draft' | 'bookmark'>('recipe');
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = React.useCallback(() => {
@@ -205,7 +219,7 @@ const Profile = () => {
             ) : null}
           </View>
         </View>
-        <View className="mx-7 my-4 flex-row justify-between border-b-2 border-outline-200 pb-3 pt-2">
+        <View className="mx-7 mb-8 mt-4 flex-row justify-between border-b-2 border-outline-200 pb-3 pt-2">
           <View className="relative flex-1 items-center">
             {tab === 'recipe' ? (
               <>
@@ -234,12 +248,28 @@ const Profile = () => {
           </View>
           {!id || session?.user.id === id ? (
             <View className="relative flex-1 items-center">
-              {tab === 'draft' ? (
+              {tab === 'bookmark' ? (
                 <>
-                  <Ionicons name="receipt" size={24} color={'#FCA020'} />
+                  <Ionicons name="bookmark" size={24} color={'#FCA020'} />
                   <View
                     style={{ height: 2 }}
-                    className="absolute -bottom-3.5 w-1/2 bg-red-500"></View>
+                    className="absolute -bottom-3.5 w-1/2 bg-warning-400"></View>
+                </>
+              ) : (
+                <TouchableOpacity onPress={() => setTab('bookmark')}>
+                  <Ionicons name="bookmark-outline" size={24} color={'rgb(42 48 81)'} />
+                </TouchableOpacity>
+              )}
+            </View>
+          ) : null}
+          {!id || session?.user.id === id ? (
+            <View className="relative flex-1 items-center">
+              {tab === 'draft' ? (
+                <>
+                  <Ionicons name="receipt" size={24} color={'rgb(2 132 199)'} />
+                  <View
+                    style={{ height: 2 }}
+                    className="absolute -bottom-3.5 w-1/2 bg-sky-600"></View>
                 </>
               ) : (
                 <TouchableOpacity onPress={() => setTab('draft')}>
@@ -252,9 +282,38 @@ const Profile = () => {
 
         {
           {
-            recipe: <ListRecipe recipes={recipes} />,
-            liked: <ListRecipe recipes={likedRecipes} />,
-            draft: <ListRecipe recipes={draftRecipes} />,
+            recipe: (
+              <>
+                <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
+                  Shared Recipes ({recipes.length})
+                </Text>
+                <ListRecipe recipes={recipes} />
+              </>
+            ),
+            liked: (
+              <>
+                <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
+                  Liked Recipes ({likedRecipes.length})
+                </Text>
+                <ListRecipe recipes={likedRecipes} />
+              </>
+            ),
+            bookmark: (
+              <>
+                <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
+                  Bookmarked Recipes ({bookmarkedRecipes.length})
+                </Text>
+                <ListRecipe recipes={bookmarkedRecipes} />
+              </>
+            ),
+            draft: (
+              <>
+                <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
+                  Draft Recipes ({draftRecipes.length})
+                </Text>
+                <ListRecipe recipes={draftRecipes} />
+              </>
+            ),
           }[tab]
         }
       </ScrollView>
