@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, Image, TouchableOpacity, TextInput, Alert, BackHandler } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ScrollView as GHScrollView } from 'react-native-gesture-handler';
 
@@ -108,6 +108,16 @@ const IngredientPicker = ({
     setIngredientName('');
     setIngredientImage(undefined);
   };
+
+  useEffect(() => {
+    // custom back handler
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      bottomSheetModalRef.current?.forceClose();
+      return null;
+    });
+
+    return () => backHandler.remove();
+  }, []);
 
   return (
     <>

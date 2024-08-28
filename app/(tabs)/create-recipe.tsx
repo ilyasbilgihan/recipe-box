@@ -522,7 +522,9 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
               className="mt-4 h-11 rounded-xl bg-warning-400"
               onPress={handleCreateRecipe}>
               {loading ? <ButtonSpinner color={'white'} /> : null}
-              <ButtonText className="text-md ml-4 font-medium">Create Recipe</ButtonText>
+              <ButtonText className="text-md ml-4 font-medium">
+                {id ? 'Update' : 'Create'} Recipe
+              </ButtonText>
             </Button>
           </Box>
         </View>
