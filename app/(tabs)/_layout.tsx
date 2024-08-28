@@ -41,27 +41,27 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="create-recipe"
+        name="feed"
         options={{
-          title: 'Create Recipe',
+          title: 'Feed',
           tabBarIcon: ({ color, focused }) =>
             !focused ? (
-              <Ionicons size={22} name="create-outline" color={color} />
+              <Ionicons size={22} name="compass-outline" color={color} />
             ) : (
-              <Ionicons size={22} name="create" color={color} />
+              <Ionicons size={22} name="compass" color={color} />
             ),
           headerShown: false,
         }}
       />
       <Tabs.Screen
-        name="bookmark"
+        name="create-recipe"
         options={{
-          title: 'Bookmarks',
+          title: 'Create Recipe',
           tabBarIcon: ({ color, focused }) =>
             !focused ? (
-              <Ionicons size={22} name="bookmark-outline" color={color} />
+              <Ionicons size={22} name="restaurant-outline" color={color} />
             ) : (
-              <Ionicons size={22} name="bookmark" color={color} />
+              <Ionicons size={22} name="restaurant" color={color} />
             ),
           headerShown: false,
         }}

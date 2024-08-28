@@ -21,26 +21,35 @@ const Bookmark = () => {
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
+    fetchBookmarks();
     setRefreshing(false);
   }, []);
 
   const fetchBookmarks = async () => {
+    console.log('fetch ');
     const { data, error } = await supabase
-      .from('bookmark')
-      .select('*, recipe(*, recipe_reaction(rating.avg()))')
-      .eq('user_id', session?.user.id)
-      .order('created_at', { ascending: false });
+      .from('follow')
+      .select(
+        'profile!following_id(*, recipe(id, created_at, name, duration, thumbnail, recipe_reaction(rating.avg())))'
+      )
+      .eq('follower_id', session?.user.id);
 
-    if (data) {
-      setRecipes([...data].map((item) => item.recipe));
-    }
+    console.log('errr-> ', error);
+    setRecipes(
+      data
+        ?.map((item: any) => {
+          return item.profile.recipe;
+        })
+        .flat()
+        .sort((a, b) => b.created_at.localeCompare(a.created_at))
+    );
   };
 
   return (
     <SafeAreaView>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View className="h-16 flex-row items-center justify-center px-7">
-          <Text className="font-qs-bold text-2xl text-dark">Bookmarks ({recipes.length})</Text>
+          <Text className="font-qs-bold text-2xl text-dark">Your Feed ({recipes?.length})</Text>
         </View>
         <ListRecipe recipes={recipes} />
       </ScrollView>
