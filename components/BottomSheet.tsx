@@ -2,6 +2,7 @@ import React, { forwardRef, useCallback, useMemo } from 'react';
 import { BottomSheetFooterProps, BottomSheetModal, BottomSheetView } from '@gorhom/bottom-sheet';
 import { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
+import { useGlobalContext } from '~/context/GlobalProvider';
 
 const CustomBackdrop = ({ animatedIndex, style }: BottomSheetBackdropProps) => {
   // animated variables
@@ -38,9 +39,11 @@ const BottomSheet = forwardRef<
     console.log('handleSheetChanges', index);
   }, []);
 
+  const { ifLight } = useGlobalContext();
+
   return (
     <BottomSheetModal
-      backgroundStyle={{ backgroundColor: '#FAF9FB' }}
+      backgroundStyle={{ backgroundColor: ifLight('rgb(250 249 251)', 'rgb(40 44 61)') }}
       backdropComponent={CustomBackdrop}
       ref={ref}
       index={1}

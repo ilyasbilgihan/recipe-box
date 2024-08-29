@@ -17,7 +17,7 @@ const ImagePickerInput = ({
     <TouchableOpacity
       onPress={pickImage}
       activeOpacity={0.75}
-      className="flex aspect-square w-full border-spacing-2 items-center justify-center overflow-hidden rounded border border-dashed border-outline-300">
+      className="flex aspect-square w-full border-spacing-2 items-center justify-center overflow-hidden rounded border border-dashed border-outline-200">
       {image ? (
         <Image
           source={{ uri: image.uri }}

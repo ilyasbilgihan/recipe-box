@@ -26,7 +26,7 @@ const RecipeDetail = () => {
   const [initialRating, setInitialRating] = useState(0);
   const [recipeRatings, setRecipeRatings] = useState<any>([]);
 
-  const { session } = useGlobalContext();
+  const { session, ifLight } = useGlobalContext();
 
   useFocusEffect(
     useCallback(() => {
@@ -185,7 +185,11 @@ const RecipeDetail = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}>
-              <Ionicons size={22} name="chevron-back" color={'rgb(250 249 251)'} />
+              <Ionicons
+                size={22}
+                name="chevron-back"
+                color={ifLight('rgb(250 249 251)', 'rgb(228 230 255)')}
+              />
             </TouchableOpacity>
             <View className="items-end gap-4">
               <View className="flex-row gap-4">
@@ -218,9 +222,17 @@ const RecipeDetail = () => {
                     alignItems: 'center',
                   }}>
                   {bookmarked ? (
-                    <Ionicons name="bookmark" size={24} color={'rgb(250 249 251)'} />
+                    <Ionicons
+                      name="bookmark"
+                      size={24}
+                      color={ifLight('rgb(250 249 251)', 'rgb(228 230 255)')}
+                    />
                   ) : (
-                    <Ionicons name="bookmark-outline" size={24} color={'rgb(250 249 251)'} />
+                    <Ionicons
+                      name="bookmark-outline"
+                      size={24}
+                      color={ifLight('rgb(250 249 251)', 'rgb(228 230 255)')}
+                    />
                   )}
                 </TouchableOpacity>
               </View>
@@ -234,10 +246,22 @@ const RecipeDetail = () => {
                   alignItems: 'center',
                   gap: 12,
                 }}>
-                <Ionicons name="time" size={24} color={'rgb(250 249 251)'} />
+                <Ionicons
+                  name="time"
+                  size={24}
+                  color={ifLight('rgb(250 249 251)', 'rgb(228 230 255)')}
+                />
                 <View className="items-center">
-                  <Text className=" font-qs-semibold text-light">30</Text>
-                  <Text className=" font-qs-medium text-light">min</Text>
+                  <Text
+                    style={{ color: ifLight('rgb(250 249 251)', 'rgb(228 230 255)') }}
+                    className="font-qs-semibold">
+                    {recipe?.duration}
+                  </Text>
+                  <Text
+                    style={{ color: ifLight('rgb(250 249 251)', 'rgb(228 230 255)') }}
+                    className="font-qs-medium">
+                    min
+                  </Text>
                 </View>
               </View>
             </View>
@@ -262,7 +286,9 @@ const RecipeDetail = () => {
                   aspectRatio: 1,
                   backgroundColor: 'rgba(42, 48, 81, 0.5)',
                 }}></View>
-              <Text style={{ fontSize: 36 }} className="font-qs-semibold text-light">
+              <Text
+                style={{ fontSize: 36, color: 'rgb(228 230 255)' }}
+                className="font-qs-semibold">
                 {recipe.name}
               </Text>
             </View>
@@ -275,11 +301,11 @@ const RecipeDetail = () => {
               starSize={28}
               onRatingStart={() => setInitialRating(rating)}
               onRatingEnd={handleRating}
-              color={'#FB954B'}
+              color={ifLight('#FB954B', 'rgb(231 120 40)')}
               rating={rating}
               onChange={setRating}
             />
-            <Text className="font-qs-semibold text-lg">
+            <Text className="font-qs-semibold text-lg text-dark">
               {recipeRatings.length
                 ? (
                     recipeRatings?.reduce(
@@ -319,17 +345,27 @@ const RecipeDetail = () => {
             </TouchableOpacity>
           ) : (
             <View className="w-1/2 flex-row items-center gap-2">
-              <View className="h-12 w-12 rounded-full bg-outline-300"></View>
+              <View
+                style={{ backgroundColor: ifLight('rgb(221 220 219)', 'rgb(52 54 79)') }}
+                className="h-12 w-12 rounded-full "></View>
               <View className="gap-1">
-                <View className="h-4 w-20 rounded-lg bg-outline-300"></View>
-                <View className="h-3 w-14 rounded-lg bg-outline-300"></View>
+                <View
+                  style={{ backgroundColor: ifLight('rgb(221 220 219)', 'rgb(52 54 79)') }}
+                  className="h-4 w-20 rounded-lg "></View>
+                <View
+                  style={{ backgroundColor: ifLight('rgb(221 220 219)', 'rgb(52 54 79)') }}
+                  className="h-3 w-14 rounded-lg "></View>
               </View>
             </View>
           )}
         </View>
         <View className="mx-7 mt-4">
           <View className="flex-row items-center gap-2 ">
-            <Ionicons name="pricetags-outline" size={24} color={'rgb(42 48 81)'} />
+            <Ionicons
+              name="pricetags-outline"
+              size={24}
+              color={ifLight('rgb(42 48 81)', 'rgb(250 249 251)')}
+            />
             <Text className="font-qs-semibold text-2xl text-dark">
               Ingredients{' '}
               <Text className="font-qs text-lg">({recipe?.recipe_ingredient?.length})</Text>
@@ -340,7 +376,7 @@ const RecipeDetail = () => {
             className="py-4"
             renderItem={({ item }) => (
               <View
-                className="flex-col items-center justify-center rounded-2xl border-2 border-dashed border-outline-400 px-2"
+                className="flex-col items-center justify-center rounded-2xl border-2 border-dashed border-outline-300 px-2"
                 style={{ width: (windowWidth - 72) / 2.5, paddingVertical: 12 }}
                 key={item.id}>
                 <View>
@@ -364,7 +400,11 @@ const RecipeDetail = () => {
           />
         </View>
         <View className="ml-7 mt-4 flex-row items-center gap-2">
-          <Ionicons name="footsteps-outline" size={24} color={'rgb(42 48 81)'} />
+          <Ionicons
+            name="footsteps-outline"
+            size={24}
+            color={ifLight('rgb(42 48 81)', 'rgb(250 249 251)')}
+          />
           <Text className="font-qs-semibold text-2xl text-dark">Instructions</Text>
         </View>
         <View>
@@ -377,7 +417,7 @@ const RecipeDetail = () => {
               injectedJavaScript="window.ReactNativeWebView.postMessage(document.body.scrollHeight)"
               onMessage={onWebViewMessage}
               source={{
-                html: `<head><meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0"></head><body class="gray">${recipe?.instructions}<style>${editorCSS} *{user-select:none}</style></body>`,
+                html: `<head><meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0"></head><body class="${ifLight('light', 'dark')}">${recipe?.instructions}<style>${editorCSS} *{user-select:none}</style></body>`,
               }}
             />
           ) : null}
@@ -385,7 +425,11 @@ const RecipeDetail = () => {
         {recipe?.id ? (
           <View className="mt-4 gap-4 px-7 pb-24">
             <View className="flex-row items-center gap-2">
-              <Ionicons name="chatbubbles-outline" size={24} color={'rgb(42 48 81)'} />
+              <Ionicons
+                name="chatbubbles-outline"
+                size={24}
+                color={ifLight('rgb(42 48 81)', 'rgb(250 249 251)')}
+              />
               <Text className="font-qs-semibold text-2xl text-dark">Comments</Text>
             </View>
             <Comments recipeId={recipe?.id} />

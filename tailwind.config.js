@@ -168,14 +168,9 @@ module.exports = {
           info: 'rgb(var(--color-indicator-info)/<alpha-value>)',
           error: 'rgb(var(--color-indicator-error)/<alpha-value>)',
         },
-        accent: {
-          100: '#FFF9F3',
-          400: '#F1AE6F',
-          500: '#FCA020',
-        },
-        light: '#FAF9FB',
-        gray: '#9FA1AF',
-        dark: '#2A3051',
+        light: 'rgb(var(--color-light)/<alpha-value>)',
+        dark: 'rgb(var(--color-dark)/<alpha-value>)',
+        back: 'rgb(var(--color-back)/<alpha-value>)',
       },
       fontFamily: {
         heading: undefined,

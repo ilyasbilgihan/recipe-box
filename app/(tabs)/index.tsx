@@ -42,7 +42,7 @@ export default function Home() {
   const [recipes, setRecipes] = useState<any>(null);
   const [categories, setCategories] = useState<CategoryData[]>([]);
 
-  const { session } = useGlobalContext();
+  const { session, ifLight } = useGlobalContext();
 
   useFocusEffect(
     useCallback(() => {
@@ -132,7 +132,10 @@ export default function Home() {
             </TouchableOpacity>
           </View>
           <ImageBackground
-            source={require('~/assets/images/welcome.webp')}
+            source={ifLight(
+              require(`~/assets/images/welcome.webp`),
+              require(`~/assets/images/welcome-dark.webp`)
+            )}
             style={{ width: windowWidth, aspectRatio: 2 / 1, paddingHorizontal: 28 }}>
             <Text className="ml-auto mt-4 text-right font-qs text-3xl text-light">
               <Text className="text-right font-qs-bold">Find</Text>
@@ -148,9 +151,9 @@ recipe `}
               <TouchableOpacity
                 onPress={() => setSelectedCategory(item.id)}
                 style={{ borderRadius: 20 }}
-                className={`${selectedCategory == item.id ? 'bg-warning-400' : 'bg-white'} justify-center px-6 py-2  shadow-md`}>
+                className={`${selectedCategory == item.id ? 'bg-warning-400' : 'bg-back'} justify-center px-6 py-2  shadow-md`}>
                 <Text
-                  className={`${selectedCategory == item.id ? ' text-light' : 'text-dark'} font-qs-semibold`}>
+                  className={`${selectedCategory == item.id ? ' text-warning-50' : 'text-dark'} font-qs-semibold`}>
                   {item?.name}
                 </Text>
               </TouchableOpacity>
@@ -164,7 +167,12 @@ recipe `}
           <ListRecipe recipes={recipes} />
         </ScrollView>
       </SafeAreaView>
-      {isFocused ? <StatusBar backgroundColor="#FB954B" barStyle={'light-content'} /> : null}
+      {isFocused ? (
+        <StatusBar
+          backgroundColor={ifLight('rgb(251 149 75)', 'rgb(231 120 40)')}
+          barStyle={'light-content'}
+        />
+      ) : null}
     </>
   );
 }

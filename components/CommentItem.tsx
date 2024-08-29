@@ -30,7 +30,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
   const [editMode, setEditMode] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
 
-  const { session } = useGlobalContext();
+  const { session, ifLight } = useGlobalContext();
 
   const toast = useCustomToast();
 
@@ -180,11 +180,15 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
               }
             }}>
             <SelectTrigger className="border-0 " size="md">
-              <Ionicons size={18} name="ellipsis-horizontal" color={'rgb(42 48 81)'} />
+              <Ionicons
+                size={18}
+                name="ellipsis-horizontal"
+                color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+              />
             </SelectTrigger>
             <SelectPortal>
               <SelectBackdrop />
-              <SelectContent>
+              <SelectContent className="bg-back">
                 <SelectDragIndicatorWrapper>
                   <SelectDragIndicator />
                 </SelectDragIndicatorWrapper>
@@ -198,14 +202,14 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
       <View className="flex-row">
         <View className="relative w-10 py-1">
           <View
-            style={{ left: 17 }}
-            className="absolute top-1 h-full w-0.5 rounded bg-outline-300"></View>
+            style={{ left: 17, backgroundColor: ifLight('rgb(221 220 219)', 'rgb(52 54 79)') }}
+            className="absolute top-1 h-full w-0.5 rounded"></View>
         </View>
         <View className="ml-4 flex-1">
           <View>
             {editMode ? (
               <View className="gap-2">
-                <Textarea className="bg-white">
+                <Textarea>
                   <TextareaInput
                     numberOfLines={2}
                     defaultValue={editContent}
@@ -234,15 +238,6 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
             <View className="flex-row items-center gap-2 ">
               <TouchableOpacity
                 activeOpacity={0.75}
-                style={
-                  userVote == 1
-                    ? {
-                        backgroundColor: 'rgb(240 253 244) rgb(254 202 202)',
-                        borderRadius: 100,
-                        padding: 4,
-                      }
-                    : {}
-                }
                 onPress={() => {
                   if (voteLoading) return;
                   handleUpVote();
@@ -250,7 +245,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                 <Ionicons
                   name="chevron-up"
                   size={22}
-                  color={userVote == 1 ? 'rgb(21 128 61) rgb(220 38 38)' : '#3d3d3d'}
+                  color={userVote == 1 ? 'rgb(21 128 61)' : ifLight('#3d3d3d', 'rgb(228 230 255)')}
                 />
               </TouchableOpacity>
               <Text className="font-qs-semibold text-dark">
@@ -258,11 +253,6 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
               </Text>
               <TouchableOpacity
                 activeOpacity={0.75}
-                style={
-                  userVote == -1
-                    ? { backgroundColor: 'rgb(254 202 202)', borderRadius: 100, padding: 4 }
-                    : {}
-                }
                 onPress={() => {
                   if (voteLoading) return;
                   handleDownVote();
@@ -270,7 +260,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                 <Ionicons
                   name="chevron-down"
                   size={22}
-                  color={userVote == -1 ? 'rgb(220 38 38)' : '#3d3d3d'}
+                  color={userVote == -1 ? 'rgb(220 38 38)' : ifLight('#3d3d3d', 'rgb(228 230 255)')}
                 />
               </TouchableOpacity>
             </View>
@@ -281,14 +271,14 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                   onPress={() => {
                     setReplyFormExpanded(!replyFormExpanded);
                   }}>
-                  <Text className="font-qs-semibold tracking-tighter text-sky-400">Reply</Text>
+                  <Text className="font-qs-semibold tracking-tighter text-info-500">Reply</Text>
                 </TouchableOpacity>
               </View>
             ) : null}
           </View>
           <Collapsible renderChildrenCollapsed={false} collapsed={!replyFormExpanded}>
             <View className="gap-2 pb-2">
-              <Textarea className="bg-white">
+              <Textarea>
                 <TextareaInput
                   numberOfLines={5}
                   defaultValue={content}

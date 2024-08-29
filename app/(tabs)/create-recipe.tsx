@@ -58,7 +58,7 @@ type Category = {
 };
 
 const CreateRecipe = ({ id = null, recipe }: any) => {
-  const { session } = useGlobalContext();
+  const { session, ifLight } = useGlobalContext();
   const navigation = useNavigation();
 
   const [refreshing, setRefreshing] = React.useState(false);
@@ -164,7 +164,13 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
     fetchIngredients();
     fetchCategories();
     // inject css
-    editor.injectCSS(editorCSS);
+    editor.injectCSS(
+      editorCSS +
+        ifLight(
+          ' body{background-color: #FAF9FB; color: rgb(42 48 81)}',
+          ' body{background-color: rgb(40 44 61); color: #FAF9FB}'
+        )
+    );
   }, []);
 
   const closeRichText = () => {
@@ -371,16 +377,16 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
       if (selectedCategories.length > 0) {
         await handleInsertCategories(upserted_id);
       }
+      resetFields();
+      if (id) {
+        toast.success('Recipe Updated Successfully');
+      } else {
+        toast.success('Recipe Created Successfully');
+      }
+      router.replace(`/recipe/${upserted_id}`);
     }
 
     setLoading(false);
-    resetFields();
-    if (id) {
-      toast.success('Recipe Updated Successfully');
-    } else {
-      toast.success('Recipe Created Successfully');
-    }
-    router.replace(`/recipe/${upserted_id}`);
   };
 
   const resetFields = () => {
@@ -413,13 +419,13 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
           <Text className="font-qs-bold text-2xl text-dark">{id ? 'Edit' : 'Create'} Recipe</Text>
         </View>
         <View className="flex w-full flex-1 items-center justify-between px-8">
-          <Box className="flex w-full gap-3 pb-12">
+          <Box className="flex w-full gap-3 pb-7">
             {/* Recipe Name */}
             <FormControl>
               <FormControlLabel className="mb-1">
                 <FormControlLabelText>Recipe Name</FormControlLabelText>
               </FormControlLabel>
-              <Input className="bg-white">
+              <Input>
                 <InputField
                   type="text"
                   defaultValue={formData.name}
@@ -450,15 +456,16 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
               <FormControlLabel className="mb-1">
                 <FormControlLabelText>Duration</FormControlLabelText>
               </FormControlLabel>
-              <Input className="flex flex-row items-center justify-between bg-white px-3">
-                <TextInput
-                  className="flex-1"
+              <Input className="flex-row items-center">
+                <InputField
                   keyboardType="numeric"
                   defaultValue={formData.duration}
                   onChange={(e) => setField('duration', e.nativeEvent.text)}
                   placeholder="0"
                 />
-                <Text className="font-qs-medium text-sm text-dark">minute(s)</Text>
+                <View style={{ paddingRight: 8 }}>
+                  <Text className="font-qs-medium text-sm text-typography-500">minute(s)</Text>
+                </View>
               </Input>
               <FormControlError>
                 <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
@@ -493,12 +500,11 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
                 }}>
                 <View
                   style={{
-                    borderWidth: 1,
-                    borderColor: '#d3d3d3',
-                    borderRadius: 4,
                     borderStyle: 'dashed',
-                    marginHorizontal: -28,
-                  }}>
+                    borderTopWidth: 1,
+                    borderBottomWidth: 1,
+                  }}
+                  className="-mx-7 border-outline-200">
                   <WebView
                     originWhitelist={['*']}
                     style={{ height }}
@@ -507,7 +513,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
                     injectedJavaScript="window.ReactNativeWebView.postMessage(document.body.scrollHeight)"
                     onMessage={onWebViewMessage}
                     source={{
-                      html: `<head><meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0"></head><body>${formData?.instructions}<style>${editorCSS}</style></body>`,
+                      html: `<head><meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0"></head><body class="${ifLight('light', 'dark')}">${formData?.instructions}<style>${editorCSS}</style></body>`,
                     }}
                   />
                 </View>
@@ -522,7 +528,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
               className="mt-4 h-11 rounded-xl bg-warning-400"
               onPress={handleCreateRecipe}>
               {loading ? <ButtonSpinner color={'white'} /> : null}
-              <ButtonText className="text-md ml-4 font-medium">
+              <ButtonText className="text-md ml-4 font-medium text-warning-50">
                 {id ? 'Update' : 'Create'} Recipe
               </ButtonText>
             </Button>
@@ -533,7 +539,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
         style={{
           display: openRichText ? 'flex' : 'none',
           position: 'absolute',
-          backgroundColor: 'rgb(250 249 251)',
+          backgroundColor: ifLight('rgb(250 249 251)', 'rgb(40 44 61)'),
           top: insets.top,
           left: 0,
           right: 0,
@@ -546,12 +552,20 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
             onPress={() => {
               closeRichText();
             }}>
-            <Ionicons name="chevron-down" size={22} color={'rgb(42 48 81)'} />
+            <Ionicons
+              name="chevron-down"
+              size={22}
+              color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+            />
           </TouchableOpacity>
           <Text className="font-qs-bold text-2xl text-dark">Instructions</Text>
           <View className="mr-7 w-10 items-end">
             {saveIndicator ? (
-              <Ionicons size={24} name="save-outline" color={'rgb(42 48 81)'} />
+              <Ionicons
+                size={24}
+                name="save-outline"
+                color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+              />
             ) : null}
           </View>
         </View>

@@ -6,7 +6,7 @@ import { Stack, SplashScreen } from 'expo-router';
 
 import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
-import { GlobalProvider } from '~/context/GlobalProvider';
+import { GlobalProvider, useGlobalContext } from '~/context/GlobalProvider';
 import { GluestackUIProvider } from '~/components/ui/gluestack-ui-provider';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -32,14 +32,21 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <BottomSheetModalProvider>
         <GlobalProvider>
-          <GluestackUIProvider>
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="(stack)" options={{ headerShown: false }} />
-            </Stack>
-          </GluestackUIProvider>
+          <App />
         </GlobalProvider>
       </BottomSheetModalProvider>
     </GestureHandlerRootView>
+  );
+}
+
+function App() {
+  const { colorMode } = useGlobalContext();
+  return (
+    <GluestackUIProvider mode={colorMode}>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(stack)" options={{ headerShown: false }} />
+      </Stack>
+    </GluestackUIProvider>
   );
 }

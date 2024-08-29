@@ -2,10 +2,12 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Dimensions, Image } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useGlobalContext } from '~/context/GlobalProvider';
 
 const windowWidth = Dimensions.get('window').width;
 
 const ListRecipe = ({ recipes }: { recipes: any[] }) => {
+  const { ifLight } = useGlobalContext();
   return (
     <View>
       {recipes?.length > 0 ? (
@@ -21,7 +23,7 @@ const ListRecipe = ({ recipes }: { recipes: any[] }) => {
               }}
               activeOpacity={0.75}
               style={{ width: (windowWidth - 72) / 2 }}
-              className="flex flex-col overflow-hidden rounded-xl bg-white shadow-md">
+              className="bg-back flex flex-col overflow-hidden rounded-xl shadow-md">
               <Image
                 source={{ uri: recipe?.thumbnail }}
                 style={{ width: (windowWidth - 72) / 2 }}
@@ -31,7 +33,7 @@ const ListRecipe = ({ recipes }: { recipes: any[] }) => {
                 <Text className="mb-4 font-qs-semibold text-lg text-dark">{recipe?.name}</Text>
                 <View className="flex flex-row items-center justify-between">
                   <View className="flex flex-row items-center gap-1 ">
-                    <Ionicons name="star" size={20} color={'#FB954B'} />
+                    <Ionicons name="star" size={20} color={ifLight('#FB954B', 'rgb(231 120 40)')} />
                     <Text className="font-qs-medium text-dark">
                       {recipe?.rating
                         ? recipe.rating.toFixed(1)

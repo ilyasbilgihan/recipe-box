@@ -50,12 +50,10 @@ const FollowListTrigger = ({
   title: string;
   checkFollow: any;
 }) => {
-  const { session } = useGlobalContext();
-  const [open, setOpen] = useState(false);
+  const { session, ifLight } = useGlobalContext();
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const handlePresentModalPress = useCallback(() => {
-    setOpen(true);
     bottomSheetModalRef.current?.present();
   }, []);
 
@@ -96,7 +94,11 @@ const FollowListTrigger = ({
       <BottomSheet ref={bottomSheetModalRef} snapPoints={['50%', '75%']}>
         <View className="flex flex-col gap-4 px-7">
           <View>
-            <Text className="mt-4 font-qs-bold text-2xl text-dark">{title}</Text>
+            <Text
+              style={{ color: ifLight('rgb(42 48 81)', 'rgb(228 230 255)') }}
+              className="mt-4 font-qs-bold text-2xl">
+              {title}
+            </Text>
           </View>
           <GHScrollView style={{ marginBottom: 20 }}>
             <View className="gap-4">
@@ -119,11 +121,15 @@ const FollowListTrigger = ({
                               className="h-16 w-16 rounded-xl bg-outline-100"
                             />
                             <View>
-                              <Text className="font-qs-semibold text-lg text-dark">
+                              <Text
+                                style={{ color: ifLight('rgb(42 48 81)', 'rgb(228 230 255)') }}
+                                className="font-qs-semibold text-lg">
                                 @{item.username}
                               </Text>
                               {item?.name ? (
-                                <Text className="font-qs-medium text-typography-500">
+                                <Text
+                                  style={{ color: ifLight('rgb(42 48 81)', 'rgb(228 230 255)') }}
+                                  className="font-qs-medium">
                                   {item.name}
                                 </Text>
                               ) : null}
@@ -133,17 +139,23 @@ const FollowListTrigger = ({
                         <View>
                           {item.id == session?.user.id ? null : item.followers.length > 0 ? (
                             <Button
-                              className=" h-10 rounded-lg border border-sky-500 bg-light"
+                              style={{ borderColor: ifLight('rgb(13 166 242)', 'rgb(50 180 244)') }}
+                              className=" h-10 rounded-lg border bg-light"
                               onPress={() => {
                                 handleUnfollow(item.id);
                               }}>
-                              <ButtonText className="text-md font-medium text-sky-500">
+                              <ButtonText
+                                style={{ color: ifLight('rgb(13 166 242)', 'rgb(50 180 244)') }}
+                                className="text-md font-medium">
                                 Following
                               </ButtonText>
                             </Button>
                           ) : (
                             <Button
-                              className=" h-10 rounded-lg bg-sky-500 "
+                              style={{
+                                backgroundColor: ifLight('rgb(13 166 242)', 'rgb(50 180 244)'),
+                              }}
+                              className="h-10 rounded-lg "
                               onPress={() => {
                                 handleFollow(item.id);
                               }}>

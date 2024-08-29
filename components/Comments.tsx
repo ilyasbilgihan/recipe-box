@@ -16,7 +16,7 @@ const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) 
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
-  const { session } = useGlobalContext();
+  const { session, ifLight } = useGlobalContext();
 
   const toast = useCustomToast();
 
@@ -105,7 +105,7 @@ const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) 
     <View>
       {parentId == null ? (
         <View className="mb-4 gap-4">
-          <Textarea className="bg-white">
+          <Textarea>
             <TextareaInput
               numberOfLines={5}
               defaultValue={content}
@@ -118,12 +118,12 @@ const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) 
             />
           </Textarea>
           <Button
-            className="h-10 w-1/2 rounded-lg bg-sky-500"
+            className="h-10 w-1/2 rounded-lg bg-info-500"
             onPress={() => {
               handleAddComment({ content });
             }}>
             {/* {loading ? <ButtonSpinner color={'white'} /> : null} */}
-            <ButtonText className="text-md font-medium">Add Comment</ButtonText>
+            <ButtonText className="text-md font-medium text-info-0">Add Comment</ButtonText>
           </Button>
         </View>
       ) : null}
@@ -144,8 +144,8 @@ const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) 
         </View>
       ) : (
         <View className="items-center py-8">
-          <Ionicons name="logo-snapchat" size={24} color={'#3d3d3d'} />
-          <Text className="font-qs-medium text-lg">No comments yet.</Text>
+          <Ionicons name="logo-snapchat" size={24} color={ifLight('#3d3d3d', 'rgb(122 124 149)')} />
+          <Text className="font-qs-medium text-lg text-dark">No comments yet.</Text>
         </View>
       )}
     </View>

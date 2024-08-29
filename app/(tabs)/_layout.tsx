@@ -5,16 +5,16 @@ import { Ionicons } from '@expo/vector-icons';
 import { useGlobalContext } from '~/context/GlobalProvider';
 
 export default function TabLayout() {
-  const { session } = useGlobalContext();
+  const { session, ifLight } = useGlobalContext();
 
   if (!session) return <Redirect href="/auth" />;
   return (
     <Tabs
       initialRouteName="index"
       backBehavior="history"
-      sceneContainerStyle={{ backgroundColor: '#FAF9FB' }}
+      sceneContainerStyle={{ backgroundColor: ifLight('#FAF9FB', '#282c3d') }}
       screenOptions={{
-        tabBarActiveTintColor: '#FCA020',
+        tabBarActiveTintColor: ifLight('#FCA020', 'rgb(231 120 40)'),
         tabBarInactiveTintColor: '#9FA1AF',
         tabBarIconStyle: {
           paddingVertical: 0,
@@ -25,6 +25,8 @@ export default function TabLayout() {
         },
         tabBarStyle: {
           height: 60,
+          borderColor: ifLight('#FAF9FB', 'transparent'),
+          backgroundColor: ifLight('#FAF9FB', 'rgb(52 54 79)'),
         },
       }}>
       <Tabs.Screen

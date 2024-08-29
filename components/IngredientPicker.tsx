@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, Alert, BackHandler } from 'react-native';
+import { View, Text, Image, TouchableOpacity, TextInput, BackHandler } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ScrollView as GHScrollView } from 'react-native-gesture-handler';
 
@@ -27,11 +27,12 @@ import {
   SelectPortal,
   SelectTrigger,
 } from './ui/select';
-import { Input } from './ui/input';
+import { Input, InputField } from './ui/input';
 import { Button, ButtonText } from './ui/button';
 import ImagePickerInput from './ImagePickerInput';
 import { ImagePickerAsset } from 'expo-image-picker';
 import useCustomToast from './useCustomToast';
+import { useGlobalContext } from '~/context/GlobalProvider';
 
 type RecipeIngredient = {
   ingredient_id: string | undefined;
@@ -74,6 +75,7 @@ const IngredientPicker = ({
     bottomSheetModalRef.current?.present();
   }, []);
 
+  const { ifLight } = useGlobalContext();
   const toast = useCustomToast();
 
   const [filteredIngredients, setFilteredIngredients] = useState<Ingredient[]>([]);
@@ -125,7 +127,7 @@ const IngredientPicker = ({
         <FormControlLabel className="mb-1">
           <FormControlLabelText>Ingredients</FormControlLabelText>
         </FormControlLabel>
-        <Input className="flex h-fit w-full flex-col gap-2 bg-white p-2">
+        <Input className="bg-back flex h-fit w-full flex-col gap-2 p-2">
           <View className="p-2">
             {selectedIngredients.length > 0 ? (
               selectedIngredients.map((ingredient, index) => (
@@ -134,7 +136,7 @@ const IngredientPicker = ({
                   className="flex w-full flex-row items-center justify-between gap-2">
                   <View className="flex flex-1 flex-row items-center gap-2">
                     <Image source={{ uri: ingredient.image }} style={{ width: 50, height: 50 }} />
-                    <Text className="flex-1 flex-wrap font-qs-semibold text-lg">
+                    <Text className="flex-wrap font-qs-semibold text-lg text-dark">
                       {ingredient.name}
                     </Text>
                     <Text className="font-qs-medium text-dark">
@@ -143,7 +145,6 @@ const IngredientPicker = ({
                   </View>
                   <TouchableOpacity
                     activeOpacity={0.75}
-                    className="px-4 "
                     onPress={() => {
                       setSelectedIngredients(selectedIngredients.filter((_, i) => i !== index));
                     }}>
@@ -157,8 +158,8 @@ const IngredientPicker = ({
               </Text>
             )}
           </View>
-          <Button className="w-full rounded-md bg-sky-600" onPress={handlePresentModalPress}>
-            <ButtonText className="text-md font-medium">Add Ingredient</ButtonText>
+          <Button className="w-full rounded-md bg-info-500" onPress={handlePresentModalPress}>
+            <ButtonText className="text-md font-medium text-info-0">Add Ingredient</ButtonText>
           </Button>
         </Input>
         <FormControlError>
@@ -171,32 +172,48 @@ const IngredientPicker = ({
         footerComponent={(props) => (
           <BottomSheetFooter {...props} bottomInset={20} style={{ paddingHorizontal: 28 }}>
             <Button
-              style={{ backgroundColor: 'rgb(2 132 199)' }}
+              style={{ backgroundColor: ifLight('rgb(13 166 242)', 'rgb(50 180 244)') }}
               className="rounded-lg"
               onPress={() => {
                 bottomSheetModalRef.current?.dismiss();
                 setNewIngredientModal(true);
               }}>
-              <ButtonText className="text-md font-medium text-light">New Ingredient</ButtonText>
+              <ButtonText
+                style={{ color: ifLight('rgb(199 235 252)', 'rgb(5 64 93)') }}
+                className="text-md font-medium">
+                New Ingredient
+              </ButtonText>
             </Button>
           </BottomSheetFooter>
         )}>
         <View className="flex flex-col ">
           <FormControl className="px-7 pt-4">
             <FormControlLabel className="mb-1">
-              <FormControlLabelText>Search Ingredient</FormControlLabelText>
+              <FormControlLabelText style={{ color: ifLight('rgb(42 48 81)', 'rgb(228 230 255)') }}>
+                Search Ingredient
+              </FormControlLabelText>
             </FormControlLabel>
             <View
-              style={{ borderColor: '#D3D3D3', borderWidth: 1 }}
-              className="flex h-10 flex-row items-center justify-between rounded bg-white  px-3">
+              style={{
+                backgroundColor: ifLight('rgb(255 255 255)', 'rgb(52 54 79)'),
+                borderColor: ifLight('#D3D3D3', 'transparent'),
+                borderWidth: 1,
+              }}
+              className="flex  h-10 flex-row items-center justify-between rounded px-3 dark:focus:border-stone-800">
               <TextInput
+                style={{ color: ifLight('rgb(115 115 115)', 'rgb(212 212 212)') }}
                 className="flex-1"
+                placeholderTextColor={ifLight('rgb(140 140 140)', 'rgb(163 163 163)')}
                 defaultValue={searchTerm}
                 onChange={(e) => setSearchTerm(e.nativeEvent.text)}
                 placeholder="Flour"
               />
               <View className="flex h-10 items-center justify-center">
-                <Ionicons name="search-sharp" size={16} color={'#737373'} />
+                <Ionicons
+                  name="search-sharp"
+                  size={16}
+                  color={ifLight('rgb(140 140 140)', 'rgb(163 163 163)')}
+                />
               </View>
             </View>
             <FormControlError>
@@ -215,10 +232,16 @@ const IngredientPicker = ({
                     }}
                     activeOpacity={0.75}
                     key={item.id || item.name}
-                    style={{ backgroundColor: index % 2 === 1 ? '#E6E6E6' : '' }}
+                    style={{
+                      backgroundColor: index % 2 === 1 ? ifLight('#e6e6e6', 'rgb(52 54 79)') : '',
+                    }}
                     className="flex flex-row items-center gap-4 rounded-md p-2">
                     <Image source={{ uri: item.image }} style={{ width: 50, height: 50 }} />
-                    <Text className="font-qs-medium text-dark">{item.name}</Text>
+                    <Text
+                      style={{ color: ifLight('rgb(42 48 81)', 'rgb(228 230 255)') }}
+                      className="font-qs-medium">
+                      {item.name}
+                    </Text>
                   </TouchableOpacity>
                 )
               )}
@@ -246,7 +269,10 @@ const IngredientPicker = ({
                 onValueChange={(value) => {
                   setUnit(value);
                 }}>
-                <SelectTrigger className="bg-white" variant="outline" size="md">
+                <SelectTrigger
+                  className="bg-back dark:border-transparent dark:focus:border-stone-800"
+                  variant="outline"
+                  size="md">
                   <SelectInput className="flex-1" placeholder="Unit" />
                   <View className="px-4">
                     <Ionicons name="chevron-down" size={14} color={'#737373'} />
@@ -264,8 +290,8 @@ const IngredientPicker = ({
                   </SelectContent>
                 </SelectPortal>
               </Select>
-              <Input className="flex flex-row items-center justify-between bg-white px-3">
-                <TextInput
+              <Input className="flex flex-row items-center justify-between">
+                <InputField
                   className="flex-1"
                   keyboardType="numeric"
                   defaultValue={amount}

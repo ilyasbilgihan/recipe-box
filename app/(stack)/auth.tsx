@@ -18,6 +18,7 @@ import { Input, InputField } from '~/components/ui/input';
 import { Box } from '~/components/ui/box';
 import { ButtonSpinner, ButtonText, Button } from '~/components/ui/button';
 import useCustomToast from '~/components/useCustomToast';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SignIn = () => {
   const [formState, setFormState] = useState('login');
@@ -33,7 +34,7 @@ const SignIn = () => {
 
   const { t } = useTranslation();
 
-  const { signIn, signUp } = useGlobalContext();
+  const { ifLight } = useGlobalContext();
 
   async function signInWithEmail() {
     if (formData.email === '' || formData.password === '') {
@@ -41,10 +42,11 @@ const SignIn = () => {
       return;
     }
     setLoading(true);
-    await signIn({
+    const { error } = await supabase.auth.signInWithPassword({
       email: formData.email,
       password: formData.password,
     });
+    if (error) toast.error(error.message);
 
     router.push('/');
     setLoading(false);
@@ -136,121 +138,124 @@ const SignIn = () => {
   };
 
   return (
-    <ScrollView>
-      <View className="flex w-full flex-1 items-center justify-between px-7 font-qs-medium ">
-        <Image source={require('~/assets/images/splash.webp')} className="my-12 h-64 w-64" />
-        <Box className="flex w-full gap-3 pb-12">
-          <FormControl>
-            <FormControlLabel className="mb-1">
-              <FormControlLabelText>{t('email')}</FormControlLabelText>
-            </FormControlLabel>
-            <Input className="bg-white">
-              <InputField
-                type="text"
-                defaultValue={formData.email}
-                onChange={(e) => setField('email', e.nativeEvent.text)}
-                placeholder="janedoe@mail.com"
-              />
-            </Input>
-            <FormControlError>
-              <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-          {formState === 'register' && (
-            <Animated.View
-              style={{
-                top,
-              }}>
-              <FormControl>
-                <FormControlLabel className="mb-1">
-                  <FormControlLabelText>{t('username')}</FormControlLabelText>
-                </FormControlLabel>
-                <Input className="bg-white">
-                  <InputField
-                    type="text"
-                    defaultValue={formData.username}
-                    onChange={(e) => setField('username', e.nativeEvent.text)}
-                    placeholder="jane_doe"
-                  />
-                </Input>
-                <FormControlError>
-                  <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
-                </FormControlError>
-              </FormControl>
-            </Animated.View>
-          )}
-          <FormControl>
-            <FormControlLabel className="mb-1">
-              <FormControlLabelText>{t('password')}</FormControlLabelText>
-            </FormControlLabel>
-            <Input className="bg-white">
-              <InputField
-                type="password"
-                defaultValue={formData.password}
-                onChange={(e) => setField('password', e.nativeEvent.text)}
-                placeholder="********"
-              />
-            </Input>
-            <FormControlError>
-              <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
-            </FormControlError>
-          </FormControl>
-          {formState === 'register' && (
-            <Animated.View
-              style={{
-                top,
-              }}>
-              <FormControl>
-                <FormControlLabel className="mb-1">
-                  <FormControlLabelText>{t('confirm_password')}</FormControlLabelText>
-                </FormControlLabel>
-                <Input className="bg-white">
-                  <InputField
-                    type="password"
-                    defaultValue={formData.confirm_password}
-                    onChange={(e) => setField('confirm_password', e.nativeEvent.text)}
-                    placeholder="********"
-                  />
-                </Input>
-                <FormControlError>
-                  <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
-                </FormControlError>
-              </FormControl>
-            </Animated.View>
-          )}
-          <Button
-            disabled={loading}
-            className="mt-4 h-11 rounded-xl  bg-warning-400"
-            onPress={handleAuth}>
-            {loading ? <ButtonSpinner color={'white'} /> : null}
-            <ButtonText className="text-md ml-4 font-medium">
-              {formState === 'login' ? t('login') : t('register')}
-            </ButtonText>
-          </Button>
-
-          <TouchableOpacity
-            onPress={() => {
-              if (formState === 'login') {
-                top.value = withSpring(top.value + 48);
-                setFormState('register');
-                navigation.setOptions({
-                  title: t('register'),
-                });
-              } else {
-                top.value = withSpring(top.value - 48);
-                setFormState('login');
-                navigation.setOptions({
-                  title: t('login'),
-                });
-              }
-            }}>
-            <Text className="font-qs-medium">
-              {formState === 'login' ? t('no_account_yet') : t('already_have_an_account')}
-            </Text>
-          </TouchableOpacity>
-        </Box>
+    <SafeAreaView>
+      <View className="h-16 flex-row items-center justify-center px-7">
+        <Text className="font-qs-bold text-2xl text-dark">
+          {formState === 'login' ? t('login') : t('register')}
+        </Text>
       </View>
-    </ScrollView>
+      <ScrollView>
+        <View className="flex w-full flex-1 items-center justify-between px-7 font-qs-medium ">
+          <Image source={require('~/assets/images/splash.webp')} className="my-12 h-64 w-64" />
+          <Box className="flex w-full gap-3 pb-12">
+            <FormControl>
+              <FormControlLabel className="mb-1">
+                <FormControlLabelText>{t('email')}</FormControlLabelText>
+              </FormControlLabel>
+              <Input>
+                <InputField
+                  type="text"
+                  defaultValue={formData.email}
+                  onChange={(e) => setField('email', e.nativeEvent.text)}
+                  placeholder="janedoe@mail.com"
+                />
+              </Input>
+              <FormControlError>
+                <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
+              </FormControlError>
+            </FormControl>
+            {formState === 'register' && (
+              <Animated.View
+                style={{
+                  top,
+                }}>
+                <FormControl>
+                  <FormControlLabel className="mb-1">
+                    <FormControlLabelText>{t('username')}</FormControlLabelText>
+                  </FormControlLabel>
+                  <Input>
+                    <InputField
+                      type="text"
+                      defaultValue={formData.username}
+                      onChange={(e) => setField('username', e.nativeEvent.text)}
+                      placeholder="jane_doe"
+                    />
+                  </Input>
+                  <FormControlError>
+                    <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
+                  </FormControlError>
+                </FormControl>
+              </Animated.View>
+            )}
+            <FormControl>
+              <FormControlLabel className="mb-1">
+                <FormControlLabelText>{t('password')}</FormControlLabelText>
+              </FormControlLabel>
+              <Input>
+                <InputField
+                  type="password"
+                  defaultValue={formData.password}
+                  onChange={(e) => setField('password', e.nativeEvent.text)}
+                  placeholder="********"
+                />
+              </Input>
+              <FormControlError>
+                <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
+              </FormControlError>
+            </FormControl>
+            {formState === 'register' && (
+              <Animated.View
+                style={{
+                  top,
+                }}>
+                <FormControl>
+                  <FormControlLabel className="mb-1">
+                    <FormControlLabelText>{t('confirm_password')}</FormControlLabelText>
+                  </FormControlLabel>
+                  <Input>
+                    <InputField
+                      type="password"
+                      defaultValue={formData.confirm_password}
+                      onChange={(e) => setField('confirm_password', e.nativeEvent.text)}
+                      placeholder="********"
+                    />
+                  </Input>
+                  <FormControlError>
+                    <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
+                  </FormControlError>
+                </FormControl>
+              </Animated.View>
+            )}
+            <Button
+              disabled={loading}
+              className="mt-4 h-11 rounded-xl  bg-warning-400"
+              onPress={handleAuth}>
+              {loading ? (
+                <ButtonSpinner color={ifLight('rgb(250 249 251)', 'rgb(108 56 19)')} />
+              ) : null}
+              <ButtonText className="text-md ml-4 font-medium text-warning-50">
+                {formState === 'login' ? t('login') : t('register')}
+              </ButtonText>
+            </Button>
+
+            <TouchableOpacity
+              onPress={() => {
+                if (formState === 'login') {
+                  top.value = withSpring(top.value + 48);
+                  setFormState('register');
+                } else {
+                  top.value = withSpring(top.value - 48);
+                  setFormState('login');
+                }
+              }}>
+              <Text className="font-qs-medium text-dark">
+                {formState === 'login' ? t('no_account_yet') : t('already_have_an_account')}
+              </Text>
+            </TouchableOpacity>
+          </Box>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

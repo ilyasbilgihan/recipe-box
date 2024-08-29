@@ -1,5 +1,6 @@
 export const editorCSS = `@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap'); 
-body.gray{background-color: #FAF9FB;}
+body.light{background-color: #FAF9FB; color: rgb(42 48 81)}
+body.dark{background-color: rgb(40 44 61); color: #FAF9FB}
 *{
 font-family: "Quicksand", sans-serif;
 font-optical-sizing: auto;

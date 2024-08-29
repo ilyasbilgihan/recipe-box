@@ -1,24 +1,20 @@
 import React, { PropsWithChildren, useContext, useEffect, useState } from 'react';
 
-import {
-  Session,
-  SignInWithPasswordCredentials,
-  SignUpWithPasswordCredentials,
-} from '@supabase/supabase-js';
+import { Session } from '@supabase/supabase-js';
 import { supabase } from '~/utils/supabase';
 export interface GlobalContextValue {
+  colorMode: 'light' | 'dark' | undefined | null;
+  ifLight: (a: any, b: any) => any;
+  setColorMode: React.Dispatch<React.SetStateAction<'light' | 'dark' | undefined | null>>;
   session: Session | null;
-  loading: boolean;
-  signIn: (credentials: SignInWithPasswordCredentials) => void;
-  signUp: (credentials: SignUpWithPasswordCredentials) => void;
 }
-import useCustomToast from '~/components/useCustomToast';
 
 const GlobalContext = React.createContext<GlobalContextValue>({} as GlobalContextValue);
 
 export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [colorMode, setColorMode] = useState<'light' | 'dark' | undefined | null>('dark');
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -29,25 +25,12 @@ export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
     });
   }, []);
 
-  const toast = useCustomToast();
-
-  const signIn = async (credentials: SignInWithPasswordCredentials) => {
-    setLoading(true);
-    const { data, error } = await supabase.auth.signInWithPassword(credentials);
-
-    if (error) toast.error(error.message);
-    setLoading(false);
+  const ifLight = (a: any, b: any) => {
+    return colorMode == 'light' ? a : b;
   };
-  async function signUp(credentials: SignUpWithPasswordCredentials) {
-    setLoading(true);
-    const { data, error } = await supabase.auth.signUp(credentials);
-
-    if (error) toast.error(error.message);
-    setLoading(false);
-  }
 
   return (
-    <GlobalContext.Provider value={{ session, loading, signIn, signUp }}>
+    <GlobalContext.Provider value={{ colorMode, ifLight, setColorMode, session }}>
       {props.children}
     </GlobalContext.Provider>
   );

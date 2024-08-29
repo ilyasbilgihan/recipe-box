@@ -23,8 +23,7 @@ type Follow =
   | undefined;
 
 const Profile = () => {
-  const { session } = useGlobalContext();
-  const navigation = useNavigation();
+  const { session, ifLight } = useGlobalContext();
   const { id } = useLocalSearchParams();
   const [profile, setProfile] = useState<any>(null);
   const [recipes, setRecipes] = useState<any>([]);
@@ -162,7 +161,11 @@ const Profile = () => {
             {!id || session?.user.id === id ? (
               <View className="ml-auto">
                 <TouchableOpacity activeOpacity={0.75} onPress={() => router.push('/settings')}>
-                  <Ionicons size={24} name="settings-outline" color={'rgb(42 48 81)'} />
+                  <Ionicons
+                    size={24}
+                    name="settings-outline"
+                    color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                  />
                 </TouchableOpacity>
               </View>
             ) : null}
@@ -207,42 +210,59 @@ const Profile = () => {
             {id && id !== session?.user.id ? (
               follow.followers?.find((follower) => follower.id === session?.user.id) ? (
                 <Button
-                  className="mt-3 h-10 w-1/2 rounded-lg border border-sky-500 bg-light "
+                  className="mt-3 h-10 w-1/2 rounded-lg border border-info-500 bg-light "
                   onPress={handleFollow}>
-                  <ButtonText className="text-md font-medium text-sky-500">Following</ButtonText>
+                  <ButtonText className="text-md font-medium text-info-500">Following</ButtonText>
                 </Button>
               ) : (
-                <Button className="mt-3 h-10 w-1/2 rounded-lg bg-sky-500" onPress={handleFollow}>
+                <Button className="mt-3 h-10 w-1/2 rounded-lg bg-info-500" onPress={handleFollow}>
                   <ButtonText className="text-md font-medium">Follow</ButtonText>
                 </Button>
               )
             ) : null}
           </View>
         </View>
-        <View className="mx-7 mb-8 mt-4 flex-row justify-between border-b-2 border-outline-200 pb-3 pt-2">
+        <View
+          className={`mx-7 mb-8 mt-4 flex-row justify-between border-b-2 pb-3 pt-2 ${ifLight('border-outline-200', 'border-back')}`}>
           <View className="relative flex-1 items-center">
             {tab === 'recipe' ? (
               <>
-                <Ionicons name="grid" size={24} color={'rgb(42 48 81)'} />
+                <Ionicons
+                  name="grid"
+                  size={24}
+                  color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                />
                 <View style={{ height: 2 }} className="absolute -bottom-3.5 w-1/2 bg-dark"></View>
               </>
             ) : (
               <TouchableOpacity onPress={() => setTab('recipe')}>
-                <Ionicons name="grid-outline" size={24} color={'rgb(42 48 81)'} />
+                <Ionicons
+                  name="grid-outline"
+                  size={24}
+                  color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                />
               </TouchableOpacity>
             )}
           </View>
           <View className="relative flex-1 items-center">
             {tab === 'liked' ? (
               <>
-                <Ionicons name="heart" size={24} color={'rgb(239 68 68)'} />
+                <Ionicons
+                  name="heart"
+                  size={24}
+                  color={ifLight('rgb(239 68 68)', 'rgb(230 53 53)')}
+                />
                 <View
                   style={{ height: 2 }}
-                  className="absolute -bottom-3.5 w-1/2 bg-red-500"></View>
+                  className="absolute -bottom-3.5 w-1/2 bg-error-500"></View>
               </>
             ) : (
               <TouchableOpacity onPress={() => setTab('liked')}>
-                <Ionicons name="heart-outline" size={24} color={'rgb(42 48 81)'} />
+                <Ionicons
+                  name="heart-outline"
+                  size={24}
+                  color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                />
               </TouchableOpacity>
             )}
           </View>
@@ -250,14 +270,22 @@ const Profile = () => {
             <View className="relative flex-1 items-center">
               {tab === 'bookmark' ? (
                 <>
-                  <Ionicons name="bookmark" size={24} color={'#FCA020'} />
+                  <Ionicons
+                    name="bookmark"
+                    size={24}
+                    color={ifLight('rgb(251 149 75)', 'rgb(231 120 40)')}
+                  />
                   <View
                     style={{ height: 2 }}
                     className="absolute -bottom-3.5 w-1/2 bg-warning-400"></View>
                 </>
               ) : (
                 <TouchableOpacity onPress={() => setTab('bookmark')}>
-                  <Ionicons name="bookmark-outline" size={24} color={'rgb(42 48 81)'} />
+                  <Ionicons
+                    name="bookmark-outline"
+                    size={24}
+                    color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                  />
                 </TouchableOpacity>
               )}
             </View>
@@ -266,14 +294,22 @@ const Profile = () => {
             <View className="relative flex-1 items-center">
               {tab === 'draft' ? (
                 <>
-                  <Ionicons name="receipt" size={24} color={'rgb(2 132 199)'} />
+                  <Ionicons
+                    name="receipt"
+                    size={24}
+                    color={ifLight('rgb(13 166 242)', 'rgb(50 180 244)')}
+                  />
                   <View
                     style={{ height: 2 }}
-                    className="absolute -bottom-3.5 w-1/2 bg-sky-600"></View>
+                    className="absolute -bottom-3.5 w-1/2 bg-info-500"></View>
                 </>
               ) : (
                 <TouchableOpacity onPress={() => setTab('draft')}>
-                  <Ionicons name="receipt-outline" size={24} color={'rgb(42 48 81)'} />
+                  <Ionicons
+                    name="receipt-outline"
+                    size={24}
+                    color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                  />
                 </TouchableOpacity>
               )}
             </View>
