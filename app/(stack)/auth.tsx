@@ -5,6 +5,7 @@ import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
 import { useGlobalContext } from '~/context/GlobalProvider';
 
 import { supabase } from '~/utils/supabase';
+import { useTranslation } from 'react-i18next';
 
 import {
   FormControl,
@@ -29,6 +30,8 @@ const SignIn = () => {
   const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
   const toast = useCustomToast();
+
+  const { t } = useTranslation();
 
   const { signIn, signUp } = useGlobalContext();
 
@@ -139,7 +142,7 @@ const SignIn = () => {
         <Box className="flex w-full gap-3 pb-12">
           <FormControl>
             <FormControlLabel className="mb-1">
-              <FormControlLabelText>Email</FormControlLabelText>
+              <FormControlLabelText>{t('email')}</FormControlLabelText>
             </FormControlLabel>
             <Input className="bg-white">
               <InputField
@@ -160,7 +163,7 @@ const SignIn = () => {
               }}>
               <FormControl>
                 <FormControlLabel className="mb-1">
-                  <FormControlLabelText>Username</FormControlLabelText>
+                  <FormControlLabelText>{t('username')}</FormControlLabelText>
                 </FormControlLabel>
                 <Input className="bg-white">
                   <InputField
@@ -178,7 +181,7 @@ const SignIn = () => {
           )}
           <FormControl>
             <FormControlLabel className="mb-1">
-              <FormControlLabelText>Password</FormControlLabelText>
+              <FormControlLabelText>{t('password')}</FormControlLabelText>
             </FormControlLabel>
             <Input className="bg-white">
               <InputField
@@ -199,7 +202,7 @@ const SignIn = () => {
               }}>
               <FormControl>
                 <FormControlLabel className="mb-1">
-                  <FormControlLabelText>Confirm Password</FormControlLabelText>
+                  <FormControlLabelText>{t('confirm_password')}</FormControlLabelText>
                 </FormControlLabel>
                 <Input className="bg-white">
                   <InputField
@@ -221,7 +224,7 @@ const SignIn = () => {
             onPress={handleAuth}>
             {loading ? <ButtonSpinner color={'white'} /> : null}
             <ButtonText className="text-md ml-4 font-medium">
-              {formState === 'login' ? 'Login' : 'Register'}
+              {formState === 'login' ? t('login') : t('register')}
             </ButtonText>
           </Button>
 
@@ -231,20 +234,18 @@ const SignIn = () => {
                 top.value = withSpring(top.value + 48);
                 setFormState('register');
                 navigation.setOptions({
-                  title: 'Register',
+                  title: t('register'),
                 });
               } else {
                 top.value = withSpring(top.value - 48);
                 setFormState('login');
                 navigation.setOptions({
-                  title: 'Login',
+                  title: t('login'),
                 });
               }
             }}>
             <Text className="font-qs-medium">
-              {formState === 'login'
-                ? "Don't you have an account yet?"
-                : 'Already have an account?'}
+              {formState === 'login' ? t('no_account_yet') : t('already_have_an_account')}
             </Text>
           </TouchableOpacity>
         </Box>

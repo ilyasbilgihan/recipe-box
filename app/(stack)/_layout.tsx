@@ -2,15 +2,17 @@ import { StatusBar, View, Text, TouchableOpacity } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { supabase } from '~/utils/supabase';
 import { Ionicons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 
 export default function StackLayout() {
+  const { t } = useTranslation();
   return (
     <>
       <Stack screenOptions={{ contentStyle: { backgroundColor: '#FAF9FB' } }}>
         <Stack.Screen
           name="auth"
           options={{
-            title: 'Login',
+            title: t('login'),
             headerShadowVisible: false,
             headerStyle: {
               backgroundColor: '#FAF9FB',

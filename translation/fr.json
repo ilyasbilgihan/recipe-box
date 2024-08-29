@@ -1,9 +1,10 @@
 {
-  "button": {
-    "french": "Changer la langue en français",
-    "english": "Changer la langue en anglais",
-    "turkish": "Changer la langue en turc"
-  },
-  "getStarted": "Ouvrez le code de cet écran :",
-  "changeCode": "Modifiez n'importe quel texte, enregistrez le fichier et votre application sera automatiquement mise à jour."
+  "email": "e-mail",
+  "username": "Nom d'utilisateur",
+  "login": "Se connecter",
+  "register": "S'inscrire",
+  "password": "Mot de passe",
+  "confirm_password": "Confirmer le mot de passe",
+  "no_account_yet": "Pas encore de compte?",
+  "already_have_an_account": "Vous avez déjà un compte?"
 }

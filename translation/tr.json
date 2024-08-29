@@ -1,9 +1,10 @@
 {
-  "button": {
-    "french": "Dili Fransızcaya Çevir",
-    "english": "Dili Ingilizceye Çevir",
-    "turkish": "Dili Türkçeyle Çevir"
-  },
-  "getStarted": "Bu sayfa için aşağıdaki dosyayı aç",
-  "changeCode": "İstediğin yazıyı değiştir ve kaydet. Uygulama otomatik yenilenir."
+  "email": "E-posta",
+  "username": "Kullanıcı adı",
+  "login": "Giriş Yap",
+  "register": "Kayıt Ol",
+  "password": "Sifre",
+  "confirm_password": "Sifreyi Onayla",
+  "no_account_yet": "Henüz bir hesabın yok mu?",
+  "already_have_an_account": "Zaten bir hesabın mı var?"
 }
