@@ -163,7 +163,7 @@ const RecipeDetail = () => {
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <LazyImage
           background
-          className="bg-warning-400"
+          className="bg-back"
           source={{ uri: recipe?.thumbnail }}
           style={{
             width: windowWidth,

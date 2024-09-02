@@ -27,20 +27,22 @@ const LazyImage = ({ background, ...props }: any) => {
         />
       );
     } else {
-      return (
-        <ImageBackground
-          {...props}
-          onLoadStart={handleLoadStart}
-          onLoadEnd={handleLoadEnd}
-          onLoad={handleLoad}>
-          {props.children}
-        </ImageBackground>
-      );
+      if (props.source.uri) {
+        return (
+          <ImageBackground
+            {...props}
+            onLoadStart={handleLoadStart}
+            onLoadEnd={handleLoadEnd}
+            onLoad={handleLoad}>
+            {props.children}
+          </ImageBackground>
+        );
+      }
     }
   }, [props.source]);
 
   return (
-    <View className={`${props.className} relative items-center justify-center`}>
+    <View style={props.style} className={`${props.className} relative items-center justify-center`}>
       {loading && <ActivityIndicator color="#FCA020" size="large" className="absolute z-10" />}
       {memorizedImage}
     </View>

@@ -2,10 +2,13 @@ import React, { PropsWithChildren, useContext, useEffect, useState } from 'react
 
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '~/utils/supabase';
+
+type Mode = 'light' | 'dark' | undefined;
+
 export interface GlobalContextValue {
-  colorMode: 'light' | 'dark' | undefined | null;
+  colorMode: Mode;
   ifLight: (a: any, b: any) => any;
-  setColorMode: React.Dispatch<React.SetStateAction<'light' | 'dark' | undefined | null>>;
+  setColorMode: React.Dispatch<React.SetStateAction<Mode>>;
   session: Session | null;
 }
 
@@ -13,7 +16,7 @@ const GlobalContext = React.createContext<GlobalContextValue>({} as GlobalContex
 
 export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
   const [session, setSession] = useState<Session | null>(null);
-  const [colorMode, setColorMode] = useState<'light' | 'dark' | undefined | null>('dark');
+  const [colorMode, setColorMode] = useState<Mode>('dark');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
