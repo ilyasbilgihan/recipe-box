@@ -188,7 +188,7 @@ const RecipeDetail = () => {
               <Ionicons
                 size={22}
                 name="chevron-back"
-                color={ifLight('rgb(250 249 251)', 'rgb(228 230 255)')}
+                color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
               />
             </TouchableOpacity>
             <View className="items-end gap-4">
@@ -207,7 +207,11 @@ const RecipeDetail = () => {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    <Ionicons name="create" size={24} color={'rgb(250 249 251)'} />
+                    <Ionicons
+                      name="create"
+                      size={24}
+                      color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
+                    />
                   </TouchableOpacity>
                 ) : null}
                 <TouchableOpacity
@@ -225,13 +229,13 @@ const RecipeDetail = () => {
                     <Ionicons
                       name="bookmark"
                       size={24}
-                      color={ifLight('rgb(250 249 251)', 'rgb(228 230 255)')}
+                      color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
                     />
                   ) : (
                     <Ionicons
                       name="bookmark-outline"
                       size={24}
-                      color={ifLight('rgb(250 249 251)', 'rgb(228 230 255)')}
+                      color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
                     />
                   )}
                 </TouchableOpacity>
@@ -249,16 +253,16 @@ const RecipeDetail = () => {
                 <Ionicons
                   name="time"
                   size={24}
-                  color={ifLight('rgb(250 249 251)', 'rgb(228 230 255)')}
+                  color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
                 />
                 <View className="items-center">
                   <Text
-                    style={{ color: ifLight('rgb(250 249 251)', 'rgb(228 230 255)') }}
+                    style={{ color: ifLight('rgb(250 249 251)', 'rgb(238 240 255)') }}
                     className="font-qs-semibold">
                     {recipe?.duration}
                   </Text>
                   <Text
-                    style={{ color: ifLight('rgb(250 249 251)', 'rgb(228 230 255)') }}
+                    style={{ color: ifLight('rgb(250 249 251)', 'rgb(238 240 255)') }}
                     className="font-qs-medium">
                     min
                   </Text>
@@ -287,7 +291,7 @@ const RecipeDetail = () => {
                   backgroundColor: 'rgba(42, 48, 81, 0.5)',
                 }}></View>
               <Text
-                style={{ fontSize: 36, color: 'rgb(228 230 255)' }}
+                style={{ fontSize: 36, color: 'rgb(238 240 255)' }}
                 className="font-qs-semibold">
                 {recipe.name}
               </Text>
@@ -364,7 +368,7 @@ const RecipeDetail = () => {
             <Ionicons
               name="pricetags-outline"
               size={24}
-              color={ifLight('rgb(42 48 81)', 'rgb(250 249 251)')}
+              color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
             />
             <Text className="font-qs-semibold text-2xl text-dark">
               Ingredients{' '}
@@ -376,7 +380,7 @@ const RecipeDetail = () => {
             className="py-4"
             renderItem={({ item }) => (
               <View
-                className="flex-col items-center justify-center rounded-2xl border-2 border-dashed border-outline-300 px-2"
+                className="flex-col items-center justify-center rounded-2xl border-2 border-dashed border-dark px-2"
                 style={{ width: (windowWidth - 72) / 2.5, paddingVertical: 12 }}
                 key={item.id}>
                 <View>
@@ -403,7 +407,7 @@ const RecipeDetail = () => {
           <Ionicons
             name="footsteps-outline"
             size={24}
-            color={ifLight('rgb(42 48 81)', 'rgb(250 249 251)')}
+            color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
           />
           <Text className="font-qs-semibold text-2xl text-dark">Instructions</Text>
         </View>
@@ -428,7 +432,7 @@ const RecipeDetail = () => {
               <Ionicons
                 name="chatbubbles-outline"
                 size={24}
-                color={ifLight('rgb(42 48 81)', 'rgb(250 249 251)')}
+                color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
               />
               <Text className="font-qs-semibold text-2xl text-dark">Comments</Text>
             </View>

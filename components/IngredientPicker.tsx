@@ -127,7 +127,7 @@ const IngredientPicker = ({
         <FormControlLabel className="mb-1">
           <FormControlLabelText>Ingredients</FormControlLabelText>
         </FormControlLabel>
-        <Input className="bg-back flex h-fit w-full flex-col gap-2 p-2">
+        <Input className="flex h-fit w-full flex-col gap-2 bg-back p-2">
           <View className="p-2">
             {selectedIngredients.length > 0 ? (
               selectedIngredients.map((ingredient, index) => (
@@ -189,7 +189,7 @@ const IngredientPicker = ({
         <View className="flex flex-col ">
           <FormControl className="px-7 pt-4">
             <FormControlLabel className="mb-1">
-              <FormControlLabelText style={{ color: ifLight('rgb(42 48 81)', 'rgb(228 230 255)') }}>
+              <FormControlLabelText style={{ color: ifLight('rgb(42 48 81)', 'rgb(238 240 255)') }}>
                 Search Ingredient
               </FormControlLabelText>
             </FormControlLabel>
@@ -238,7 +238,7 @@ const IngredientPicker = ({
                     className="flex flex-row items-center gap-4 rounded-md p-2">
                     <Image source={{ uri: item.image }} style={{ width: 50, height: 50 }} />
                     <Text
-                      style={{ color: ifLight('rgb(42 48 81)', 'rgb(228 230 255)') }}
+                      style={{ color: ifLight('rgb(42 48 81)', 'rgb(238 240 255)') }}
                       className="font-qs-medium">
                       {item.name}
                     </Text>

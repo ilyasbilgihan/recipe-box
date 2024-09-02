@@ -164,7 +164,7 @@ const Profile = () => {
                   <Ionicons
                     size={24}
                     name="settings-outline"
-                    color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                    color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
                   />
                 </TouchableOpacity>
               </View>
@@ -230,7 +230,7 @@ const Profile = () => {
                 <Ionicons
                   name="grid"
                   size={24}
-                  color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                  color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
                 />
                 <View style={{ height: 2 }} className="absolute -bottom-3.5 w-1/2 bg-dark"></View>
               </>
@@ -239,7 +239,7 @@ const Profile = () => {
                 <Ionicons
                   name="grid-outline"
                   size={24}
-                  color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                  color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
                 />
               </TouchableOpacity>
             )}
@@ -261,7 +261,7 @@ const Profile = () => {
                 <Ionicons
                   name="heart-outline"
                   size={24}
-                  color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                  color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
                 />
               </TouchableOpacity>
             )}
@@ -284,7 +284,7 @@ const Profile = () => {
                   <Ionicons
                     name="bookmark-outline"
                     size={24}
-                    color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                    color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
                   />
                 </TouchableOpacity>
               )}
@@ -308,7 +308,7 @@ const Profile = () => {
                   <Ionicons
                     name="receipt-outline"
                     size={24}
-                    color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                    color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
                   />
                 </TouchableOpacity>
               )}
@@ -321,7 +321,7 @@ const Profile = () => {
             recipe: (
               <>
                 <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                  Shared Recipes ({recipes.length})
+                  Shared ({recipes.length})
                 </Text>
                 <ListRecipe recipes={recipes} />
               </>
@@ -329,7 +329,7 @@ const Profile = () => {
             liked: (
               <>
                 <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                  Liked Recipes ({likedRecipes.length})
+                  Liked ({likedRecipes.length})
                 </Text>
                 <ListRecipe recipes={likedRecipes} />
               </>
@@ -337,7 +337,7 @@ const Profile = () => {
             bookmark: (
               <>
                 <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                  Bookmarked Recipes ({bookmarkedRecipes.length})
+                  Bookmarked ({bookmarkedRecipes.length})
                 </Text>
                 <ListRecipe recipes={bookmarkedRecipes} />
               </>
@@ -345,7 +345,7 @@ const Profile = () => {
             draft: (
               <>
                 <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                  Draft Recipes ({draftRecipes.length})
+                  Draft ({draftRecipes.length})
                 </Text>
                 <ListRecipe recipes={draftRecipes} />
               </>

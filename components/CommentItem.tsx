@@ -183,7 +183,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
               <Ionicons
                 size={18}
                 name="ellipsis-horizontal"
-                color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
               />
             </SelectTrigger>
             <SelectPortal>
@@ -245,7 +245,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                 <Ionicons
                   name="chevron-up"
                   size={22}
-                  color={userVote == 1 ? 'rgb(21 128 61)' : ifLight('#3d3d3d', 'rgb(228 230 255)')}
+                  color={userVote == 1 ? 'rgb(21 128 61)' : ifLight('#3d3d3d', 'rgb(238 240 255)')}
                 />
               </TouchableOpacity>
               <Text className="font-qs-semibold text-dark">
@@ -260,7 +260,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                 <Ionicons
                   name="chevron-down"
                   size={22}
-                  color={userVote == -1 ? 'rgb(220 38 38)' : ifLight('#3d3d3d', 'rgb(228 230 255)')}
+                  color={userVote == -1 ? 'rgb(220 38 38)' : ifLight('#3d3d3d', 'rgb(238 240 255)')}
                 />
               </TouchableOpacity>
             </View>

@@ -15,7 +15,7 @@ export default function TabLayout() {
       sceneContainerStyle={{ backgroundColor: ifLight('#FAF9FB', '#282c3d') }}
       screenOptions={{
         tabBarActiveTintColor: ifLight('#FCA020', 'rgb(231 120 40)'),
-        tabBarInactiveTintColor: '#9FA1AF',
+        tabBarInactiveTintColor: ifLight('#9FA1AF', 'rgb(238 240 255)'),
         tabBarIconStyle: {
           paddingVertical: 0,
         },

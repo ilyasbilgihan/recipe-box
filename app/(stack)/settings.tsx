@@ -138,7 +138,7 @@ const Profile = () => {
               <Ionicons
                 size={24}
                 name="chevron-back"
-                color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
               />
             </TouchableOpacity>
             <Text className="font-qs-bold text-2xl text-dark">Settings</Text>

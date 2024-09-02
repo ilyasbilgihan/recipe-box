@@ -95,7 +95,7 @@ const FollowListTrigger = ({
         <View className="flex flex-col gap-4 px-7">
           <View>
             <Text
-              style={{ color: ifLight('rgb(42 48 81)', 'rgb(228 230 255)') }}
+              style={{ color: ifLight('rgb(42 48 81)', 'rgb(238 240 255)') }}
               className="mt-4 font-qs-bold text-2xl">
               {title}
             </Text>
@@ -122,13 +122,13 @@ const FollowListTrigger = ({
                             />
                             <View>
                               <Text
-                                style={{ color: ifLight('rgb(42 48 81)', 'rgb(228 230 255)') }}
+                                style={{ color: ifLight('rgb(42 48 81)', 'rgb(238 240 255)') }}
                                 className="font-qs-semibold text-lg">
                                 @{item.username}
                               </Text>
                               {item?.name ? (
                                 <Text
-                                  style={{ color: ifLight('rgb(42 48 81)', 'rgb(228 230 255)') }}
+                                  style={{ color: ifLight('rgb(42 48 81)', 'rgb(238 240 255)') }}
                                   className="font-qs-medium">
                                   {item.name}
                                 </Text>

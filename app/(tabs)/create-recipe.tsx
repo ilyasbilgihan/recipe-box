@@ -555,7 +555,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
             <Ionicons
               name="chevron-down"
               size={22}
-              color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+              color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
             />
           </TouchableOpacity>
           <Text className="font-qs-bold text-2xl text-dark">Instructions</Text>
@@ -564,7 +564,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
               <Ionicons
                 size={24}
                 name="save-outline"
-                color={ifLight('rgb(42 48 81)', 'rgb(228 230 255)')}
+                color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
               />
             ) : null}
           </View>

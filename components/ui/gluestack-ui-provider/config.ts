@@ -162,7 +162,7 @@ export const config = {
   dark: vars({
     /* Custom */
     '--color-light': '40 44 61',
-    '--color-dark': '228 230 255',
+    '--color-dark': '238 240 255',
     '--color-back': '52 54 79',
 
     '--color-primary-0': '130 130 130',
