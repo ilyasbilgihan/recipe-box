@@ -1,5 +1,6 @@
 {
-  "email": "e-mail",
+  "current_language": "Français",
+  "email": "E-mail",
   "username": "Nom d'utilisateur",
   "login": "Se connecter",
   "register": "S'inscrire",

@@ -10,13 +10,14 @@ export interface GlobalContextValue {
   ifLight: (a: any, b: any) => any;
   setColorMode: React.Dispatch<React.SetStateAction<Mode>>;
   session: Session | null;
+  toggleColorMode: () => void;
 }
 
 const GlobalContext = React.createContext<GlobalContextValue>({} as GlobalContextValue);
 
 export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
   const [session, setSession] = useState<Session | null>(null);
-  const [colorMode, setColorMode] = useState<Mode>('dark');
+  const [colorMode, setColorMode] = useState<Mode>('light');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -28,12 +29,17 @@ export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
     });
   }, []);
 
+  const toggleColorMode = async () => {
+    let targetMode = colorMode === 'light' ? 'dark' : 'light';
+    setColorMode(targetMode as Mode);
+  };
+
   const ifLight = (a: any, b: any) => {
     return colorMode == 'light' ? a : b;
   };
 
   return (
-    <GlobalContext.Provider value={{ colorMode, ifLight, setColorMode, session }}>
+    <GlobalContext.Provider value={{ colorMode, ifLight, setColorMode, session, toggleColorMode }}>
       {props.children}
     </GlobalContext.Provider>
   );

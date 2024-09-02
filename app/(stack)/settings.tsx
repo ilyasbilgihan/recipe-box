@@ -1,53 +1,60 @@
-import React, { useEffect, useState } from 'react';
-import { View, ScrollView, RefreshControl, TouchableOpacity, Text } from 'react-native';
-import { router } from 'expo-router';
-
-import { supabase, uploadImageToSupabaseBucket, deleteImage } from '~/utils/supabase';
-import useImagePicker from '~/utils/useImagePicker';
-import { useGlobalContext } from '~/context/GlobalProvider';
-
-import {
-  FormControl,
-  FormControlError,
-  FormControlErrorText,
-  FormControlLabel,
-  FormControlLabelText,
-} from '~/components/ui/form-control';
-import { Input, InputField } from '~/components/ui/input';
-import { Box } from '~/components/ui/box';
-import { ButtonSpinner, ButtonText, Button } from '~/components/ui/button';
-import { Textarea, TextareaInput } from '~/components/ui/textarea';
-import LazyImage from '~/components/LazyImage';
-import useCustomToast from '~/components/useCustomToast';
-import { Ionicons } from '@expo/vector-icons';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, ScrollView, TouchableOpacity, Text } from 'react-native';
+import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const Profile = () => {
-  const { session, ifLight } = useGlobalContext();
-  const [formData, setFormData] = useState({
-    name: '',
-    location: '',
-    profession: '',
-    bio: '',
-    profile_image: '',
+import { supabase } from '~/utils/supabase';
+import { useGlobalContext } from '~/context/GlobalProvider';
+
+import { Ionicons } from '@expo/vector-icons';
+import { ButtonText, Button } from '~/components/ui/button';
+import LazyImage from '~/components/LazyImage';
+import { Switch } from '~/components/ui/switch';
+import {
+  Select,
+  SelectBackdrop,
+  SelectContent,
+  SelectDragIndicator,
+  SelectDragIndicatorWrapper,
+  SelectItem,
+  SelectPortal,
+  SelectTrigger,
+} from '~/components/ui/select';
+import { useTranslation } from 'react-i18next';
+
+type Counts = {
+  recipe: number | null;
+  user: number | null;
+  category: number | null;
+  ingredient: number | null;
+};
+
+const languages = [
+  { name: 'English', code: 'en' },
+  { name: 'Français', code: 'fr' },
+  { name: 'Türkçe', code: 'tr' },
+];
+
+const Settings = () => {
+  const { session, ifLight, toggleColorMode, colorMode } = useGlobalContext();
+  const [user, setUser] = useState<any>(null);
+  const [counts, setCounts] = useState<Counts>({
+    recipe: 0,
+    user: 0,
+    category: 0,
+    ingredient: 0,
   });
 
-  const { image, setImage, pickImage } = useImagePicker();
-  const [loading, setLoading] = useState(false);
-  const [tempImage, setTempImage] = useState('');
-  const toast = useCustomToast();
+  const { t, i18n } = useTranslation();
 
-  const [refreshing, setRefreshing] = React.useState(false);
+  useFocusEffect(
+    useCallback(() => {
+      fetchUserDetails();
+      fetchCounts();
+    }, [])
+  );
 
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true);
-    fetchProfile();
-    setLoading(false);
-    setImage(undefined);
-    setRefreshing(false);
-  }, []);
-
-  const fetchProfile = async () => {
+  const fetchUserDetails = async () => {
     const { data, error } = await supabase
       .from('profile')
       .select('*')
@@ -55,80 +62,41 @@ const Profile = () => {
       .single();
 
     if (error) {
-      console.log('error', error);
-      return;
+      console.log('fetchUserDetails error', error);
     }
 
-    if (data) {
-      if (data.profile_image !== null || data.profile_image) {
-        setTempImage(data.profile_image.split('profile_images/')[1]);
-      }
-      setFormData({
-        name: data.name,
-        location: data.location,
-        profession: data.profession,
-        bio: data.bio,
-        profile_image: data.profile_image || '',
-      });
-    }
-  };
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
-  const setField = (field: string, value: string) => {
-    setFormData({ ...formData, [field]: value });
+    setUser(data);
   };
 
-  const handleProfileUpdate = async () => {
-    setLoading(true);
+  const fetchCounts = async () => {
+    const { count: unconfirmedCount } = await supabase
+      .from('recipe')
+      .select('*', { count: 'estimated', head: true })
+      .neq('status', 'confirmed');
 
-    let uploadedImageUrl = null;
-    if (image !== undefined) {
-      const { url, error } = await uploadImageToSupabaseBucket('profile_images', image);
-      if (error) {
-        toast.error('Image upload error ' + error.message);
-      } else {
-        uploadedImageUrl = url;
-      }
-    }
-
-    // if there is a new image or user wants to delete own image
-    if (uploadedImageUrl || formData.profile_image == '') {
-      // delete image from bucket
-      if (tempImage) {
-        const { error } = await deleteImage('profile_images/' + tempImage);
-        if (error) {
-          toast.error('Delete image error ' + error.message);
-        }
-      }
-    }
-
-    const { error } = await supabase
+    const { count: userCount } = await supabase
       .from('profile')
-      .update({
-        name: formData.name,
-        location: formData.location,
-        profession: formData.profession,
-        bio: formData.bio,
-        profile_image: uploadedImageUrl ? uploadedImageUrl : formData.profile_image,
-      })
-      .eq('id', session?.user.id);
+      .select('*', { count: 'estimated', head: true });
 
-    if (error) {
-      toast.error('Something went wrong. ' + error.message);
-      setLoading(false);
-      return;
-    }
+    const { count: categoryCount } = await supabase
+      .from('category')
+      .select('*', { count: 'estimated', head: true });
 
-    setLoading(false);
-    toast.success('Profile updated successfully');
-    router.push('/profile');
+    const { count: ingredientCount } = await supabase
+      .from('ingredient')
+      .select('*', { count: 'estimated', head: true });
+
+    setCounts({
+      recipe: unconfirmedCount,
+      user: userCount,
+      category: categoryCount,
+      ingredient: ingredientCount,
+    });
   };
 
   return (
     <SafeAreaView>
-      <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+      <ScrollView>
         <View className="flex w-full flex-1 px-7 font-qs-medium ">
           <View className="h-16 flex-row items-center justify-between">
             <TouchableOpacity
@@ -142,119 +110,167 @@ const Profile = () => {
               />
             </TouchableOpacity>
             <Text className="font-qs-bold text-2xl text-dark">Settings</Text>
+            <View className="w-6"></View>
+          </View>
+          <View className="my-5 flex flex-col items-center gap-4">
+            <LazyImage
+              source={
+                user?.profile_image
+                  ? { uri: user?.profile_image }
+                  : require('~/assets/images/no-image.png')
+              }
+              className="h-24 w-24 rounded-full bg-outline-100"
+            />
+            <View className="items-center gap-1.5">
+              <Text className="font-qs-semibold text-2xl text-dark">
+                {user?.name || '@' + user?.username}
+              </Text>
+              <Text className="font-qs-medium text-dark">{user?.email}</Text>
+            </View>
+            <Button
+              className="mt-4 h-11 rounded-full bg-dark"
+              onPress={() => {
+                router.push('/profile-detail');
+              }}>
+              <ButtonText className="font-qs-medium text-sm font-semibold text-light">
+                Edit profile
+              </ButtonText>
+            </Button>
+          </View>
+          {user?.role === 'admin' || user?.role === 'moderator' ? (
+            <>
+              <Text className="mb-2 ml-4 font-qs-medium text-dark">Management</Text>
+              <View className="mb-7 rounded-xl bg-back shadow-hard-3">
+                <TouchableOpacity activeOpacity={0.5} className="flex-row items-center gap-3 p-4">
+                  <Ionicons
+                    size={24}
+                    name="document-text-outline"
+                    color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
+                  />
+                  <Text className="font-qs-semibold text-dark">Confirm Recipes</Text>
+                  <View className="ml-auto rounded-xl bg-error-400 px-4 py-1">
+                    <Text className="font-qs-medium text-error-50">{counts?.recipe}</Text>
+                  </View>
+                </TouchableOpacity>
+                <View className="h-px w-full bg-outline-50"></View>
+                <TouchableOpacity activeOpacity={0.5} className="flex-row items-center gap-3 p-4">
+                  <Ionicons
+                    size={24}
+                    name="people-outline"
+                    color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
+                  />
+                  <Text className="font-qs-semibold text-dark">Users</Text>
+                  <View className="ml-auto rounded-xl bg-info-400 px-4 py-1">
+                    <Text className="font-qs-medium text-info-50">{counts?.user}</Text>
+                  </View>
+                </TouchableOpacity>
+                <View className="h-px w-full bg-outline-50"></View>
+                <TouchableOpacity activeOpacity={0.5} className="flex-row items-center gap-3 p-4">
+                  <Ionicons
+                    size={24}
+                    name="funnel-outline"
+                    color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
+                  />
+                  <Text className="font-qs-semibold text-dark">Categories</Text>
+                  <View className="ml-auto rounded-xl bg-warning-400 px-4 py-1">
+                    <Text className="font-qs-medium text-warning-50">{counts?.category}</Text>
+                  </View>
+                </TouchableOpacity>
+                <View className="h-px w-full bg-outline-50"></View>
+                <TouchableOpacity activeOpacity={0.5} className="flex-row items-center gap-3 p-4">
+                  <Ionicons
+                    size={24}
+                    name="pricetags-outline"
+                    color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
+                  />
+                  <Text className="font-qs-semibold text-dark">Ingredients</Text>
+                  <View className="ml-auto rounded-xl bg-success-400 px-4 py-1">
+                    <Text className="font-qs-medium text-success-50">{counts?.ingredient}</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+            </>
+          ) : null}
+          <Text className="mb-2 ml-4 font-qs-medium text-dark">Preferences</Text>
+          <View className="mb-7 rounded-xl bg-back shadow-hard-3">
             <TouchableOpacity
+              activeOpacity={0.5}
+              onPress={() => {
+                toggleColorMode();
+              }}
+              className="flex-row items-center gap-3 p-4">
+              <Ionicons
+                size={24}
+                name="moon-outline"
+                color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
+              />
+              <Text className="font-qs-semibold text-dark">Dark Mode</Text>
+              <Switch
+                trackColor={{
+                  false: ifLight('rgb(238 240 255)', 'rgb(40 44 61)'),
+                  true: ifLight('rgb(238 240 255)', 'rgb(40 44 61)'),
+                }}
+                defaultValue={colorMode === 'dark'}
+                value={colorMode === 'dark'}
+                onToggle={() => {
+                  toggleColorMode();
+                }}
+                className="-my-4 ml-auto"
+                thumbColor={'rgb(253 254 254)'}
+              />
+            </TouchableOpacity>
+            <View className="h-px w-full bg-outline-50"></View>
+            <Select
+              onValueChange={(value) => {
+                i18n.changeLanguage(value);
+              }}>
+              <View className="flex-row items-center p-4">
+                <SelectTrigger className="w-full gap-3 border-0" variant="outline" size="md">
+                  <Ionicons
+                    size={24}
+                    name="language-outline"
+                    color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
+                  />
+                  <Text className="font-qs-semibold text-dark">Language</Text>
+                  <View className="ml-auto">
+                    <Text className="font-qs-medium text-sm text-dark">
+                      {t('current_language')}
+                    </Text>
+                  </View>
+                </SelectTrigger>
+              </View>
+              <SelectPortal>
+                <SelectBackdrop />
+                <SelectContent>
+                  <SelectDragIndicatorWrapper>
+                    <SelectDragIndicator />
+                  </SelectDragIndicatorWrapper>
+                  {languages.map(({ name, code }) => (
+                    <SelectItem key={code} label={name} value={code} />
+                  ))}
+                </SelectContent>
+              </SelectPortal>
+            </Select>
+            <View className="h-px w-full bg-outline-50"></View>
+            <TouchableOpacity
+              activeOpacity={0.75}
               onPress={() => {
                 supabase.auth.signOut();
                 router.push('/auth');
-              }}>
+              }}
+              className="flex-row items-center gap-3 rounded-b-xl bg-error-500 p-4">
               <Ionicons
                 size={24}
                 name="log-out-outline"
-                color={ifLight('rgb(230 53 53)', 'rgb(239 68 68)')}
+                color={ifLight('rgb(254 226 226)', 'rgb(127 29 29)')}
               />
+              <Text className="font-qs-semibold text-error-50">Logout</Text>
             </TouchableOpacity>
           </View>
-          <View className="my-12 flex flex-col items-center gap-3">
-            <TouchableOpacity onPress={pickImage}>
-              <LazyImage
-                source={
-                  image
-                    ? { uri: image.uri }
-                    : formData.profile_image
-                      ? { uri: formData.profile_image }
-                      : require('~/assets/images/no-image.png')
-                }
-                className="h-32 w-32 rounded-full bg-outline-100"
-              />
-            </TouchableOpacity>
-            {formData.profile_image || image ? (
-              <TouchableOpacity
-                onPress={() => {
-                  setField('profile_image', '');
-                  setImage(undefined);
-                }}>
-                <Text className="font-qs-medium font-semibold text-error-500">Remove Image</Text>
-              </TouchableOpacity>
-            ) : null}
-          </View>
-          <Box className="flex w-full gap-3 pb-12">
-            <FormControl>
-              <FormControlLabel className="mb-1">
-                <FormControlLabelText>Name</FormControlLabelText>
-              </FormControlLabel>
-              <Input>
-                <InputField
-                  type="text"
-                  defaultValue={formData.name}
-                  onChange={(e) => setField('name', e.nativeEvent.text)}
-                  placeholder="Jane Doe"
-                />
-              </Input>
-              <FormControlError>
-                <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
-              </FormControlError>
-            </FormControl>
-            <FormControl>
-              <FormControlLabel className="mb-1">
-                <FormControlLabelText>Location</FormControlLabelText>
-              </FormControlLabel>
-              <Input>
-                <InputField
-                  type="text"
-                  defaultValue={formData.location}
-                  onChange={(e) => setField('location', e.nativeEvent.text)}
-                  placeholder="İstanbul, Türkiye"
-                />
-              </Input>
-              <FormControlError>
-                <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
-              </FormControlError>
-            </FormControl>
-            <FormControl>
-              <FormControlLabel className="mb-1">
-                <FormControlLabelText>Profession</FormControlLabelText>
-              </FormControlLabel>
-              <Input>
-                <InputField
-                  type="text"
-                  defaultValue={formData.profession}
-                  onChange={(e) => setField('profession', e.nativeEvent.text)}
-                  placeholder="Cook"
-                />
-              </Input>
-              <FormControlError>
-                <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
-              </FormControlError>
-            </FormControl>
-            <FormControl>
-              <FormControlLabel>
-                <FormControlLabelText>Bio</FormControlLabelText>
-              </FormControlLabel>
-              <Textarea>
-                <TextareaInput
-                  numberOfLines={5}
-                  defaultValue={formData.bio}
-                  onChange={(e) => setField('bio', e.nativeEvent.text)}
-                  textAlignVertical="top"
-                  placeholder="Once upon a time..."
-                  className="p-3"
-                />
-              </Textarea>
-            </FormControl>
-            <Button
-              disabled={loading}
-              className="mt-4 h-11 rounded-xl bg-warning-400"
-              onPress={handleProfileUpdate}>
-              {loading ? (
-                <ButtonSpinner color={ifLight('rgb(250 249 251)', 'rgb(108 56 19)')} />
-              ) : null}
-              <ButtonText className="text-md ml-4 font-medium">Save</ButtonText>
-            </Button>
-          </Box>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-export default Profile;
+export default Settings;

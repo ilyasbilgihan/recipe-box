@@ -23,7 +23,7 @@ const ListRecipe = ({ recipes }: { recipes: any[] }) => {
               }}
               activeOpacity={0.75}
               style={{ width: (windowWidth - 72) / 2 }}
-              className="bg-back flex flex-col overflow-hidden rounded-xl shadow-md">
+              className="flex flex-col overflow-hidden rounded-xl bg-back shadow-hard-3">
               <Image
                 source={{ uri: recipe?.thumbnail }}
                 style={{ width: (windowWidth - 72) / 2 }}

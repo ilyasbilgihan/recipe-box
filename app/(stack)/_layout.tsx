@@ -19,6 +19,13 @@ export default function StackLayout() {
           }}
         />
         <Stack.Screen
+          name="profile-detail"
+          options={{
+            title: 'Profile Detail',
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
           name="settings"
           options={{
             title: 'Settings',
