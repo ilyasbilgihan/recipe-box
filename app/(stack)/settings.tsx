@@ -157,23 +157,28 @@ const Settings = () => {
                     <Text className="font-qs-medium text-error-50">{counts?.recipe}</Text>
                   </View>
                 </TouchableOpacity>
-                <View className="h-px w-full bg-outline-50"></View>
-                <TouchableOpacity
-                  onPress={() => {
-                    router.push('/(stack)/(admin)/manage-users');
-                  }}
-                  activeOpacity={0.5}
-                  className="flex-row items-center gap-3 p-4">
-                  <Ionicons
-                    size={24}
-                    name="people-outline"
-                    color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
-                  />
-                  <Text className="font-qs-semibold text-dark">Users</Text>
-                  <View className="ml-auto rounded-xl bg-info-400 px-4 py-1">
-                    <Text className="font-qs-medium text-info-50">{counts?.user}</Text>
-                  </View>
-                </TouchableOpacity>
+                {user?.role === 'admin' ? (
+                  <>
+                    <View className="h-px w-full bg-outline-50"></View>
+                    <TouchableOpacity
+                      onPress={() => {
+                        router.push('/(stack)/(admin)/manage-users');
+                      }}
+                      activeOpacity={0.5}
+                      className="flex-row items-center gap-3 p-4">
+                      <Ionicons
+                        size={24}
+                        name="people-outline"
+                        color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
+                      />
+                      <Text className="font-qs-semibold text-dark">Users</Text>
+                      <View className="ml-auto rounded-xl bg-info-400 px-4 py-1">
+                        <Text className="font-qs-medium text-info-50">{counts?.user}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  </>
+                ) : null}
+
                 <View className="h-px w-full bg-outline-50"></View>
                 <TouchableOpacity
                   onPress={() => {
