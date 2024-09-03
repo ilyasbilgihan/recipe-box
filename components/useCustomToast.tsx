@@ -35,11 +35,7 @@ const useCustomToast = () => {
             <Toast
               nativeID={toastId}
               className="w-full flex-row items-center gap-4 bg-success-500 px-5 py-3 shadow-soft-1">
-              <Ionicons
-                name="checkmark-circle"
-                size={24}
-                color={ifLight('rgb(202 255 232)', 'rgb(20 83 45)')}
-              />
+              <Ionicons name="checkmark-circle" size={24} color={'rgb(202 255 232)'} />
               <View
                 style={{ borderLeftWidth: 1, paddingLeft: 12 }}
                 className="flex-1 border-success-50">
@@ -64,11 +60,7 @@ const useCustomToast = () => {
             <Toast
               nativeID={toastId}
               className="w-full flex-row items-center gap-4 bg-error-500 px-5 py-3 shadow-soft-1">
-              <Ionicons
-                name="close-circle"
-                size={24}
-                color={ifLight('rgb(254 226 226)', 'rgb(127 29 29)')}
-              />
+              <Ionicons name="close-circle" size={24} color={'rgb(254 226 226)'} />
               <View
                 style={{ borderLeftWidth: 1, paddingLeft: 12 }}
                 className="flex-1 border-error-50">
@@ -93,11 +85,7 @@ const useCustomToast = () => {
             <Toast
               nativeID={toastId}
               className="w-full flex-row items-center gap-4 bg-warning-400 px-5 py-3 shadow-soft-1">
-              <Ionicons
-                name="alert-circle"
-                size={24}
-                color={ifLight('rgb(255 249 245)', 'rgb(108 56 19)')}
-              />
+              <Ionicons name="alert-circle" size={24} color={'rgb(255 249 245)'} />
               <View
                 style={{ borderLeftWidth: 1, paddingLeft: 12 }}
                 className="flex-1 border-warning-50">

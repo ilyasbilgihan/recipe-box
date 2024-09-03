@@ -12,46 +12,25 @@ export default function StackLayout() {
     <>
       <Stack screenOptions={{ contentStyle: { backgroundColor: ifLight('#FAF9FB', '#282c3d') } }}>
         <Stack.Screen
-          name="auth"
-          options={{
-            title: t('login'),
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="profile-detail"
-          options={{
-            title: 'Profile Detail',
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="settings"
-          options={{
-            title: 'Settings',
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="recipe/[id]"
+          name="confirm-recipe"
           options={{
             headerShown: false,
           }}
         />
         <Stack.Screen
-          name="profile/[id]"
+          name="manage-users"
           options={{
             headerShown: false,
           }}
         />
         <Stack.Screen
-          name="edit-recipe/[id]"
+          name="manage-categories"
           options={{
             headerShown: false,
           }}
         />
         <Stack.Screen
-          name="(admin)"
+          name="manage-ingredients"
           options={{
             headerShown: false,
           }}

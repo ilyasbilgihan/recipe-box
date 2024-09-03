@@ -208,7 +208,7 @@ export const config = {
 
     /* Error */
     '--color-error-0': '83 19 19',
-    '--color-error-50': '127 29 29',
+    '--color-error-50': '254 226 226',
     '--color-error-100': '153 27 27',
     '--color-error-200': '185 28 28',
     '--color-error-300': '220 38 38',
@@ -217,12 +217,12 @@ export const config = {
     '--color-error-600': '248 113 113',
     '--color-error-700': '252 165 165',
     '--color-error-800': '254 202 202',
-    '--color-error-900': '254 226 226',
+    '--color-error-900': '127 29 29',
     '--color-error-950': '254 233 233',
 
     /* Success */
     '--color-success-0': '27 50 36',
-    '--color-success-50': '20 83 45',
+    '--color-success-50': '202 255 232',
     '--color-success-100': '22 101 52',
     '--color-success-200': '32 111 62',
     '--color-success-300': '42 121 72',
@@ -231,12 +231,12 @@ export const config = {
     '--color-success-600': '102 181 132',
     '--color-success-700': '132 211 162',
     '--color-success-800': '162 241 192',
-    '--color-success-900': '202 255 232',
+    '--color-success-900': '20 83 45',
     '--color-success-950': '228 255 244',
 
     /* Warning */
     '--color-warning-0': '84 45 18',
-    '--color-warning-50': '108 56 19',
+    '--color-warning-50': '255 249 245',
     '--color-warning-100': '130 68 23',
     '--color-warning-200': '180 90 26',
     '--color-warning-300': '215 108 31',
@@ -245,12 +245,12 @@ export const config = {
     '--color-warning-600': '253 173 116',
     '--color-warning-700': '254 205 170',
     '--color-warning-800': '255 231 213',
-    '--color-warning-900': '255 249 245',
+    '--color-warning-900': '108 56 19',
     '--color-warning-950': '255 253 251',
 
     /* Info */
     '--color-info-0': '3 38 56',
-    '--color-info-50': '5 64 93',
+    '--color-info-50': '199 235 252',
     '--color-info-100': '7 90 131',
     '--color-info-200': '9 115 168',
     '--color-info-300': '11 141 205',
@@ -259,7 +259,7 @@ export const config = {
     '--color-info-600': '87 194 246',
     '--color-info-700': '124 207 248',
     '--color-info-800': '162 221 250',
-    '--color-info-900': '199 235 252',
+    '--color-info-900': '5 64 93',
     '--color-info-950': '236 248 254',
 
     /* Typography */

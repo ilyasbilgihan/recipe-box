@@ -72,7 +72,7 @@ const Settings = () => {
     const { count: unconfirmedCount } = await supabase
       .from('recipe')
       .select('*', { count: 'estimated', head: true })
-      .neq('status', 'confirmed');
+      .eq('status', 'idle');
 
     const { count: userCount } = await supabase
       .from('profile')
@@ -141,7 +141,12 @@ const Settings = () => {
             <>
               <Text className="mb-2 ml-4 font-qs-medium text-dark">Management</Text>
               <View className="mb-7 rounded-xl bg-back shadow-hard-3">
-                <TouchableOpacity activeOpacity={0.5} className="flex-row items-center gap-3 p-4">
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push('/(stack)/(admin)/confirm-recipe');
+                  }}
+                  activeOpacity={0.5}
+                  className="flex-row items-center gap-3 p-4">
                   <Ionicons
                     size={24}
                     name="document-text-outline"
@@ -153,7 +158,12 @@ const Settings = () => {
                   </View>
                 </TouchableOpacity>
                 <View className="h-px w-full bg-outline-50"></View>
-                <TouchableOpacity activeOpacity={0.5} className="flex-row items-center gap-3 p-4">
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push('/(stack)/(admin)/manage-users');
+                  }}
+                  activeOpacity={0.5}
+                  className="flex-row items-center gap-3 p-4">
                   <Ionicons
                     size={24}
                     name="people-outline"
@@ -165,7 +175,12 @@ const Settings = () => {
                   </View>
                 </TouchableOpacity>
                 <View className="h-px w-full bg-outline-50"></View>
-                <TouchableOpacity activeOpacity={0.5} className="flex-row items-center gap-3 p-4">
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push('/(stack)/(admin)/manage-categories');
+                  }}
+                  activeOpacity={0.5}
+                  className="flex-row items-center gap-3 p-4">
                   <Ionicons
                     size={24}
                     name="funnel-outline"
@@ -177,7 +192,12 @@ const Settings = () => {
                   </View>
                 </TouchableOpacity>
                 <View className="h-px w-full bg-outline-50"></View>
-                <TouchableOpacity activeOpacity={0.5} className="flex-row items-center gap-3 p-4">
+                <TouchableOpacity
+                  onPress={() => {
+                    router.push('/(stack)/(admin)/manage-ingredients');
+                  }}
+                  activeOpacity={0.5}
+                  className="flex-row items-center gap-3 p-4">
                   <Ionicons
                     size={24}
                     name="pricetags-outline"
@@ -260,11 +280,7 @@ const Settings = () => {
                 router.push('/auth');
               }}
               className="flex-row items-center gap-3 rounded-b-xl bg-error-500 p-4">
-              <Ionicons
-                size={24}
-                name="log-out-outline"
-                color={ifLight('rgb(254 226 226)', 'rgb(127 29 29)')}
-              />
+              <Ionicons size={24} name="log-out-outline" color={'rgb(254 226 226)'} />
               <Text className="font-qs-semibold text-error-50">Logout</Text>
             </TouchableOpacity>
           </View>
