@@ -123,7 +123,7 @@ const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) 
               handleAddComment({ content });
             }}>
             {/* {loading ? <ButtonSpinner color={'white'} /> : null} */}
-            <ButtonText className="text-md font-medium text-info-0">Add Comment</ButtonText>
+            <ButtonText className="text-md font-medium text-info-50">Add Comment</ButtonText>
           </Button>
         </View>
       ) : null}

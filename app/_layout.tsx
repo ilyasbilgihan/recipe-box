@@ -30,11 +30,9 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <BottomSheetModalProvider>
-        <GlobalProvider>
-          <App />
-        </GlobalProvider>
-      </BottomSheetModalProvider>
+      <GlobalProvider>
+        <App />
+      </GlobalProvider>
     </GestureHandlerRootView>
   );
 }
@@ -43,10 +41,12 @@ function App() {
   const { colorMode } = useGlobalContext();
   return (
     <GluestackUIProvider mode={colorMode}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(stack)" options={{ headerShown: false }} />
-      </Stack>
+      <BottomSheetModalProvider>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(stack)" options={{ headerShown: false }} />
+        </Stack>
+      </BottomSheetModalProvider>
     </GluestackUIProvider>
   );
 }

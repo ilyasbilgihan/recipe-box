@@ -159,7 +159,7 @@ const IngredientPicker = ({
             )}
           </View>
           <Button className="w-full rounded-md bg-info-500" onPress={handlePresentModalPress}>
-            <ButtonText className="text-md font-medium text-info-0">Add Ingredient</ButtonText>
+            <ButtonText className="text-md font-medium text-info-50">Add Ingredient</ButtonText>
           </Button>
         </Input>
         <FormControlError>

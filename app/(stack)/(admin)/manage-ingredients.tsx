@@ -15,11 +15,11 @@ const ManageIngredients = () => {
   const { ifLight } = useGlobalContext();
   useFocusEffect(
     useCallback(() => {
-      fetchUnconfirmedRecipes();
+      fetchIngredients();
     }, [])
   );
 
-  const fetchUnconfirmedRecipes = async () => {
+  const fetchIngredients = async () => {
     const { data, error } = await supabase.from('ingredient').select('*');
     if (data) {
       setIngredients(data);
@@ -43,6 +43,9 @@ const ManageIngredients = () => {
             </TouchableOpacity>
             <Text className="font-qs-bold text-2xl text-dark">Settings</Text>
             <View className="w-6"></View>
+          </View>
+          <View>
+            <Text>{JSON.stringify(ingredients, null, 2)}</Text>
           </View>
         </View>
       </ScrollView>

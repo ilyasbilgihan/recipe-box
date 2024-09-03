@@ -231,9 +231,7 @@ const SignIn = () => {
               disabled={loading}
               className="mt-4 h-11 rounded-xl  bg-warning-400"
               onPress={handleAuth}>
-              {loading ? (
-                <ButtonSpinner color={ifLight('rgb(250 249 251)', 'rgb(108 56 19)')} />
-              ) : null}
+              {loading ? <ButtonSpinner color="rgb(255 249 245)" /> : null}
               <ButtonText className="text-md ml-4 font-medium text-warning-50">
                 {formState === 'login' ? t('login') : t('register')}
               </ButtonText>

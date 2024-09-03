@@ -44,6 +44,9 @@ const ManageCategories = () => {
             <Text className="font-qs-bold text-2xl text-dark">Settings</Text>
             <View className="w-6"></View>
           </View>
+          <View>
+            <Text>{JSON.stringify(categories, null, 2)}</Text>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
