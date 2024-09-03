@@ -1,7 +1,9 @@
 import React, { PropsWithChildren, useContext, useEffect, useState } from 'react';
 
+import { getItem, setItem } from '~/core/storage';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '~/utils/supabase';
+import { useTranslation } from 'react-i18next';
 
 type Mode = 'light' | 'dark' | undefined;
 
@@ -11,6 +13,7 @@ export interface GlobalContextValue {
   setColorMode: React.Dispatch<React.SetStateAction<Mode>>;
   session: Session | null;
   toggleColorMode: () => void;
+  setLanguage: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const GlobalContext = React.createContext<GlobalContextValue>({} as GlobalContextValue);
@@ -18,6 +21,8 @@ const GlobalContext = React.createContext<GlobalContextValue>({} as GlobalContex
 export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
   const [session, setSession] = useState<Session | null>(null);
   const [colorMode, setColorMode] = useState<Mode>('light');
+  const { i18n } = useTranslation();
+  const [language, setLanguage] = useState<string>('en');
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -27,11 +32,32 @@ export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
+    getColorMode();
+    getLanguage();
   }, []);
+
+  useEffect(() => {
+    setItem('language', language);
+  }, [language]);
+
+  const getLanguage = async () => {
+    const item = await getItem('language');
+    if (item) {
+      i18n.changeLanguage(item as string);
+    }
+  };
+
+  const getColorMode = async () => {
+    const item = await getItem('colorMode');
+    if (item) {
+      setColorMode(item as Mode);
+    }
+  };
 
   const toggleColorMode = async () => {
     let targetMode = colorMode === 'light' ? 'dark' : 'light';
     setColorMode(targetMode as Mode);
+    setItem('colorMode', targetMode);
   };
 
   const ifLight = (a: any, b: any) => {
@@ -39,7 +65,8 @@ export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
   };
 
   return (
-    <GlobalContext.Provider value={{ colorMode, ifLight, setColorMode, session, toggleColorMode }}>
+    <GlobalContext.Provider
+      value={{ colorMode, ifLight, setColorMode, session, toggleColorMode, setLanguage }}>
       {props.children}
     </GlobalContext.Provider>
   );

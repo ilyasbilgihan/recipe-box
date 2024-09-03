@@ -36,7 +36,7 @@ const languages = [
 ];
 
 const Settings = () => {
-  const { session, ifLight, toggleColorMode, colorMode } = useGlobalContext();
+  const { session, ifLight, toggleColorMode, colorMode, setLanguage } = useGlobalContext();
   const [user, setUser] = useState<any>(null);
   const [counts, setCounts] = useState<Counts>({
     recipe: 0,
@@ -223,6 +223,7 @@ const Settings = () => {
             <Select
               onValueChange={(value) => {
                 i18n.changeLanguage(value);
+                setLanguage(value);
               }}>
               <View className="flex-row items-center p-4">
                 <SelectTrigger className="w-full gap-3 border-0" variant="outline" size="md">

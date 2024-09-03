@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity } from 'react-native';
-import { router, useNavigation } from 'expo-router';
+import { Redirect, router, useNavigation } from 'expo-router';
 import Animated, { useSharedValue, withSpring } from 'react-native-reanimated';
 import { useGlobalContext } from '~/context/GlobalProvider';
 
@@ -21,6 +21,9 @@ import useCustomToast from '~/components/useCustomToast';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SignIn = () => {
+  const { session, ifLight } = useGlobalContext();
+  if (session) return <Redirect href="/" />;
+
   const [formState, setFormState] = useState('login');
   const [formData, setFormData] = useState({
     email: '',
@@ -33,8 +36,6 @@ const SignIn = () => {
   const toast = useCustomToast();
 
   const { t } = useTranslation();
-
-  const { ifLight } = useGlobalContext();
 
   async function signInWithEmail() {
     if (formData.email === '' || formData.password === '') {
@@ -121,7 +122,7 @@ const SignIn = () => {
 
     setLoading(false);
 
-    router.push('/');
+    //router.push('/');
   }
 
   const setField = (field: string, value: string) => {
