@@ -57,10 +57,6 @@ export default function StackLayout() {
           }}
         />
       </Stack>
-      <StatusBar
-        backgroundColor={ifLight('#FAF9FB', '#282c3d')}
-        barStyle={ifLight('dark-content', 'light-content')}
-      />
     </>
   );
 }
