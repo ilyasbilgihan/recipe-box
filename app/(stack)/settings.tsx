@@ -140,7 +140,7 @@ const Settings = () => {
           {user?.role === 'admin' || user?.role === 'moderator' ? (
             <>
               <Text className="mb-2 ml-4 font-qs-medium text-dark">Management</Text>
-              <View className="mb-7 rounded-xl bg-back shadow-hard-3">
+              <View className="mb-7 rounded-xl bg-back shadow-soft-5">
                 <TouchableOpacity
                   onPress={() => {
                     router.push('/(stack)/(admin)/confirm-recipe');
@@ -217,7 +217,7 @@ const Settings = () => {
             </>
           ) : null}
           <Text className="mb-2 ml-4 font-qs-medium text-dark">Preferences</Text>
-          <View className="mb-7 rounded-xl bg-back shadow-hard-3">
+          <View className="mb-7 rounded-xl bg-back shadow-soft-5">
             <TouchableOpacity
               activeOpacity={0.5}
               onPress={() => {

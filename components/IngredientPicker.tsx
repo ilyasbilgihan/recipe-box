@@ -172,50 +172,35 @@ const IngredientPicker = ({
         footerComponent={(props) => (
           <BottomSheetFooter {...props} bottomInset={20} style={{ paddingHorizontal: 28 }}>
             <Button
-              style={{ backgroundColor: ifLight('rgb(13 166 242)', 'rgb(50 180 244)') }}
-              className="rounded-lg"
+              className="rounded-lg bg-info-500"
               onPress={() => {
                 bottomSheetModalRef.current?.dismiss();
                 setNewIngredientModal(true);
               }}>
-              <ButtonText
-                style={{ color: ifLight('rgb(199 235 252)', 'rgb(5 64 93)') }}
-                className="text-md font-medium">
-                New Ingredient
-              </ButtonText>
+              <ButtonText className="text-md font-medium text-info-50">New Ingredient</ButtonText>
             </Button>
           </BottomSheetFooter>
         )}>
         <View className="flex flex-col ">
           <FormControl className="px-7 pt-4">
             <FormControlLabel className="mb-1">
-              <FormControlLabelText style={{ color: ifLight('rgb(42 48 81)', 'rgb(238 240 255)') }}>
-                Search Ingredient
-              </FormControlLabelText>
+              <FormControlLabelText className="text-dark">Search Ingredient</FormControlLabelText>
             </FormControlLabel>
-            <View
-              style={{
-                backgroundColor: ifLight('rgb(255 255 255)', 'rgb(52 54 79)'),
-                borderColor: ifLight('#D3D3D3', 'transparent'),
-                borderWidth: 1,
-              }}
-              className="flex  h-10 flex-row items-center justify-between rounded px-3 dark:focus:border-stone-800">
-              <TextInput
-                style={{ color: ifLight('rgb(115 115 115)', 'rgb(212 212 212)') }}
+            <Input className="flex h-10 flex-row items-center justify-between rounded">
+              <InputField
                 className="flex-1"
-                placeholderTextColor={ifLight('rgb(140 140 140)', 'rgb(163 163 163)')}
                 defaultValue={searchTerm}
                 onChange={(e) => setSearchTerm(e.nativeEvent.text)}
                 placeholder="Flour"
               />
-              <View className="flex h-10 items-center justify-center">
+              <View className="flex h-10 w-10 items-center justify-center">
                 <Ionicons
                   name="search-sharp"
                   size={16}
                   color={ifLight('rgb(140 140 140)', 'rgb(163 163 163)')}
                 />
               </View>
-            </View>
+            </Input>
             <FormControlError>
               <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
             </FormControlError>
@@ -237,11 +222,7 @@ const IngredientPicker = ({
                     }}
                     className="flex flex-row items-center gap-4 rounded-md p-2">
                     <Image source={{ uri: item.image }} style={{ width: 50, height: 50 }} />
-                    <Text
-                      style={{ color: ifLight('rgb(42 48 81)', 'rgb(238 240 255)') }}
-                      className="font-qs-medium">
-                      {item.name}
-                    </Text>
+                    <Text className="font-qs-medium text-dark">{item.name}</Text>
                   </TouchableOpacity>
                 )
               )}
@@ -362,15 +343,12 @@ const IngredientPicker = ({
             </Text>
             <View className="mt-4 flex flex-col gap-2">
               <FormControl>
-                <FormControlLabel className="mb-1">
-                  <FormControlLabelText>Ingredient Name</FormControlLabelText>
-                </FormControlLabel>
-                <Input className="flex flex-row items-center justify-between bg-white px-3">
-                  <TextInput
+                <Input className="flex flex-row items-center justify-between">
+                  <InputField
                     className="flex-1"
                     defaultValue={ingredientName}
                     onChange={(e) => setIngredientName(e.nativeEvent.text)}
-                    placeholder="Garlic"
+                    placeholder="Name"
                   />
                 </Input>
                 <FormControlError>

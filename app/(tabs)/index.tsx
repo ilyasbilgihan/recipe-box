@@ -152,7 +152,7 @@ recipe `}
               <TouchableOpacity
                 onPress={() => setSelectedCategory(item.id)}
                 style={{ borderRadius: 20 }}
-                className={`${selectedCategory == item.id ? 'bg-warning-400' : 'bg-back'} justify-center px-6 py-2  shadow-md`}>
+                className={`${selectedCategory == item.id ? 'bg-warning-400' : 'bg-back'} justify-center px-6 py-2  shadow-soft-5`}>
                 <Text
                   className={`${selectedCategory == item.id ? ' text-warning-50' : 'text-dark'} font-qs-semibold`}>
                   {item?.name}
