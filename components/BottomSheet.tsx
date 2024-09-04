@@ -67,6 +67,7 @@ const BottomSheet = forwardRef<
       backgroundStyle={{ backgroundColor: ifLight('rgb(250 249 251)', 'rgb(40 44 61)') }}
       backdropComponent={CustomBackdrop}
       ref={ref}
+      handleIndicatorStyle={{ backgroundColor: ifLight('rgb(42 48 81)', 'rgb(162 163 163)') }}
       index={1}
       footerComponent={footerComponent}
       snapPoints={snapPts}

@@ -160,7 +160,7 @@ const formControlLabelStyle = tva({
 });
 
 const formControlLabelTextStyle = tva({
-  base: 'font-medium text-typography-900',
+  base: 'font-medium text-typography-900 font-qs-semibold text-dark',
   variants: {
     isTruncated: {
       true: 'web:truncate',

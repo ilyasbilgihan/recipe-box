@@ -201,9 +201,11 @@ const Profile = () => {
             {profile?.name && (
               <Text className="font-qs-bold text-xl text-dark">{profile?.name}</Text>
             )}
-            {profile?.name && <Text className="-mt-1 font-qs-medium">{profile?.profession}</Text>}
+            {profile?.profession && (
+              <Text className="-mt-1 font-qs-medium text-dark">{profile?.profession}</Text>
+            )}
             {profile?.bio && (
-              <Text numberOfLines={4} className="my-2 font-qs-medium text-lg leading-6">
+              <Text numberOfLines={4} className="my-2 font-qs-medium text-lg leading-6 text-dark">
                 {profile?.bio}
               </Text>
             )}

@@ -13,9 +13,9 @@ const ToastContainer = ({ children }: { children: React.ReactNode }) => {
         height: Dimensions.get('screen').height,
         width: Dimensions.get('screen').width,
         alignItems: 'center',
-        justifyContent: 'flex-end',
+        justifyContent: 'flex-start',
         paddingHorizontal: 28,
-        paddingBottom: 88,
+        paddingTop: 40,
       }}>
       {children}
     </View>
@@ -27,7 +27,7 @@ const useCustomToast = () => {
   const toast = useToast();
   const success = (message: string) => {
     toast.show({
-      placement: 'bottom',
+      placement: 'top',
       render: ({ id }) => {
         const toastId = 'toast-' + id;
         return (
@@ -52,7 +52,7 @@ const useCustomToast = () => {
 
   const error = (message: string) => {
     toast.show({
-      placement: 'bottom',
+      placement: 'top',
       render: ({ id }) => {
         const toastId = 'toast-' + id;
         return (
@@ -77,7 +77,7 @@ const useCustomToast = () => {
 
   const warning = (message: string) => {
     toast.show({
-      placement: 'bottom',
+      placement: 'top',
       render: ({ id }) => {
         const toastId = 'toast-' + id;
         return (
