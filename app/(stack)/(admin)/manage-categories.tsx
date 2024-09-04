@@ -66,7 +66,11 @@ const ManageCategories = () => {
       let err: any = null;
       const { error } = await supabase
         .from('category')
-        .update({ name: category?.name, special: category?.special, visible: category?.visible })
+        .update({
+          name: category?.name,
+          special: category?.special,
+          selectable: category?.selectable,
+        })
         .eq('id', category?.id);
       err = error;
 
@@ -228,17 +232,17 @@ const ManageCategories = () => {
                 </Input>
               </FormControl>
               <View className="mt-4 flex-row gap-3">
-                <Text className="font-qs-semibold text-dark opacity-80">Visible</Text>
+                <Text className="font-qs-semibold text-dark opacity-80">Selectable</Text>
                 <Switch
                   trackColor={{
                     false: ifLight('rgb(238 240 255)', 'rgb(52 54 79)'),
                     true: ifLight('rgb(238 240 255)', 'rgb(52 54 79)'),
                   }}
                   onToggle={() => {
-                    setCategory({ ...category, visible: !category.visible });
+                    setCategory({ ...category, selectable: !category.selectable });
                   }}
-                  defaultValue={category?.visible}
-                  value={category?.visible}
+                  defaultValue={category?.selectable}
+                  value={category?.selectable}
                   className="-my-3.5"
                   thumbColor={'rgb(253 254 254)'}
                 />

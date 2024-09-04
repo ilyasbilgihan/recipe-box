@@ -99,7 +99,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
     const { data, error } = await supabase
       .from('category')
       .select('*')
-      .eq('visible', true)
+      .eq('selectable', true)
       .order('id', { ascending: true });
 
     if (error) {
