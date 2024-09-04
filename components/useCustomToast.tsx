@@ -117,6 +117,10 @@ const useCustomToast = () => {
     }
   };
 
+  const dismisAll = () => {
+    toast.closeAll();
+  };
+
   const confirmToast = ({
     title,
     message,
@@ -149,7 +153,7 @@ const useCustomToast = () => {
             }}>
             <Toast
               nativeID={uniqueToastId}
-              className="w-full max-w-[386px] flex-row gap-4 bg-light p-4 shadow-hard-2">
+              className="w-full max-w-[386px] flex-row gap-4 bg-light p-4 shadow-soft-2">
               <View className="hidden h-11 w-11 items-center justify-center min-[400px]:flex">
                 {icon}
               </View>
@@ -187,6 +191,6 @@ const useCustomToast = () => {
     });
   };
 
-  return { success, error, warning, confirm };
+  return { success, error, warning, confirm, dismisAll };
 };
 export default useCustomToast;
