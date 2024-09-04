@@ -99,7 +99,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
     const { data, error } = await supabase
       .from('category')
       .select('*')
-      .neq('id', 1)
+      .eq('visible', true)
       .order('id', { ascending: true });
 
     if (error) {
@@ -527,7 +527,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
               disabled={loading}
               className="mt-4 h-11 rounded-xl bg-warning-400"
               onPress={handleCreateRecipe}>
-              {loading ? <ButtonSpinner color={'white'} /> : null}
+              {loading ? <ButtonSpinner color={'rgb(255 249 245)'} /> : null}
               <ButtonText className="text-md ml-4 font-medium text-warning-50">
                 {id ? 'Update' : 'Create'} Recipe
               </ButtonText>

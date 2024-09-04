@@ -60,6 +60,7 @@ export default function Home() {
     const { data, error } = await supabase
       .from('category')
       .select('*')
+      .eq('special', true)
       .order('id', { ascending: true });
 
     if (error) {
