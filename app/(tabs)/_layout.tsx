@@ -14,6 +14,7 @@ export default function TabLayout() {
       backBehavior="history"
       sceneContainerStyle={{ backgroundColor: ifLight('#FAF9FB', '#282c3d') }}
       screenOptions={{
+        tabBarHideOnKeyboard: true,
         tabBarActiveTintColor: ifLight('#FCA020', 'rgb(231 120 40)'),
         tabBarInactiveTintColor: ifLight('#9FA1AF', 'rgb(238 240 255)'),
         tabBarIconStyle: {

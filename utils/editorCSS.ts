@@ -1,4 +1,8 @@
+import { Dimensions } from 'react-native';
+
 export const editorCSS = `@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap'); 
+body{max-width: ${Dimensions.get('window').width - 56}px;}
+p{width: 100%; word-break: break-word; text-wrap: balance; }
 body.light{background-color: #FAF9FB; color: rgb(42 48 81)}
 body.dark{background-color: rgb(40 44 61); color: #FAF9FB}
 *{

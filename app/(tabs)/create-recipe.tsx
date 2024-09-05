@@ -58,7 +58,7 @@ type Category = {
 };
 
 const CreateRecipe = ({ id = null, recipe }: any) => {
-  const { session, ifLight } = useGlobalContext();
+  const { session, ifLight, colorMode } = useGlobalContext();
   const navigation = useNavigation();
 
   const [refreshing, setRefreshing] = React.useState(false);
@@ -144,6 +144,21 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
         backgroundColor: '#FAF9FB',
         marginHorizontal: 12,
       },
+      toolbar: {
+        toolbarBody: {
+          backgroundColor: ifLight('rgb(255 255 255)', 'rgb(40 44 61)'),
+          borderColor: ifLight('rgb(255 255 255)', 'rgb(82 84 109)'),
+        },
+        toolbarButton: {
+          backgroundColor: ifLight('rgb(255 255 255)', 'rgb(40 44 61)'),
+        },
+        icon: {
+          backgroundColor: ifLight('rgb(255 255 255)', 'rgb(40 44 61)'),
+        },
+        iconActive: {
+          backgroundColor: ifLight('rgb(230 230 230)', 'rgb(52 54 79)'),
+        },
+      },
     },
     initialContent: formData.instructions,
     onChange: async () => {
@@ -172,6 +187,17 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
         )
     );
   }, []);
+
+  useEffect(() => {
+    // inject css
+    editor.injectCSS(
+      editorCSS +
+        ifLight(
+          ' body{background-color: #FAF9FB; color: rgb(42 48 81)}',
+          ' body{background-color: rgb(40 44 61); color: #FAF9FB}'
+        )
+    );
+  }, [colorMode]);
 
   const closeRichText = () => {
     editor.blur();
