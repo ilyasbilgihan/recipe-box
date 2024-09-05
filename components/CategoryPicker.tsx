@@ -31,19 +31,22 @@ const CategoryPicker = ({
   categories,
   selectedCategories,
   setSelectedCategories,
+  disabled,
 }: {
   categories: Category[];
   selectedCategories: Category[];
   setSelectedCategories: React.Dispatch<React.SetStateAction<Category[]>>;
+  disabled?: boolean;
 }) => {
   const { ifLight } = useGlobalContext();
 
   return (
-    <FormControl>
+    <FormControl style={disabled ? { opacity: 0.4 } : {}}>
       <FormControlLabel className="mb-1">
         <FormControlLabelText>Category</FormControlLabelText>
       </FormControlLabel>
       <Select
+        isDisabled={disabled}
         onValueChange={(value) => {
           let isExist = selectedCategories.find(({ id }) => id === +value);
           if (!isExist) {
@@ -54,14 +57,15 @@ const CategoryPicker = ({
           }
           console.log('category changed -> ', value);
         }}>
-        <View className="bg-back flex flex-row items-center rounded-md border border-outline-200 dark:border-transparent dark:focus:border-stone-800">
+        <View className="flex flex-row items-center rounded-md border border-outline-200 bg-back dark:border-transparent dark:focus:border-stone-800">
           <View className="flex flex-1 flex-row flex-wrap gap-2  p-3 text-typography-600">
             {selectedCategories.length > 0 ? (
               selectedCategories.map(({ id, name }) => (
                 <TouchableOpacity
                   style={{ zIndex: 10 }}
-                  activeOpacity={0.75}
+                  activeOpacity={disabled ? 1 : 0.75}
                   onPress={(e) => {
+                    if (disabled) return;
                     let filtered = selectedCategories.filter((item) => item.id !== id);
                     setSelectedCategories(filtered);
                   }}

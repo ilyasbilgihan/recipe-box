@@ -8,15 +8,19 @@ const ImagePickerInput = ({
   image,
   pickImage,
   defaultImage,
+  disabled,
 }: {
   image: ImagePicker.ImagePickerAsset | undefined;
   pickImage: () => void;
   defaultImage?: string;
+  disabled?: boolean;
 }) => {
   return (
     <TouchableOpacity
-      onPress={pickImage}
-      activeOpacity={0.75}
+      onPress={() => {
+        !disabled && pickImage();
+      }}
+      activeOpacity={disabled ? 1 : 0.75}
       className="flex aspect-square w-full border-spacing-2 items-center justify-center overflow-hidden rounded border border-dashed border-outline-200">
       {image ? (
         <Image

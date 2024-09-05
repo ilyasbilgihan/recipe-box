@@ -19,6 +19,8 @@ const EditRecipe = () => {
   const { id } = useLocalSearchParams();
   const [recipe, setRecipe] = React.useState<{
     name: string;
+    owner: string;
+    variation_of: string;
     duration: string;
     instructions: string;
     thumbnail: string;
@@ -26,6 +28,8 @@ const EditRecipe = () => {
     ingredients: RecipeIngredient[];
   }>({
     name: '',
+    owner: '',
+    variation_of: '',
     duration: '',
     instructions: '',
     thumbnail: '',
@@ -37,7 +41,7 @@ const EditRecipe = () => {
     const { data, error } = await supabase
       .from('recipe')
       .select(
-        '*, recipe_ingredient(*, ingredient(name, image)), recipe_category(category(id,name))'
+        '*, owner:profile(id), recipe_ingredient(*, ingredient(name, image)), recipe_category(category(id,name))'
       )
       .eq('id', id)
       .single();
@@ -65,6 +69,8 @@ const EditRecipe = () => {
       });
       setRecipe({
         name: data.name,
+        owner: data.owner,
+        variation_of: data.variation_of,
         duration: '' + data.duration,
         instructions: data.instructions,
         thumbnail: data.thumbnail || '',

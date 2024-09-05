@@ -246,11 +246,12 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
     const { data: newRecipe, error } = await supabase
       .from('recipe')
       .insert({
-        name: formData.name,
+        name: formData.name + (id ? ' - ' + session?.user.id : ''),
         duration: formData.duration,
         instructions: formData.instructions,
         thumbnail: uploadedImageUrl ? uploadedImageUrl : formData.thumbnail,
         owner_id: session?.user.id,
+        variation_of: id ? id : null,
       })
       .select('id')
       .single();
@@ -373,14 +374,18 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
     let uploadedImageUrl = await handleUploadImage();
 
     let upserted_id = null;
-    if (!id) {
-      upserted_id = await handleInsertRecipe(uploadedImageUrl);
+    if (id) {
+      if (session?.user.id === recipe?.owner?.id) {
+        upserted_id = await handleUpdateRecipe(uploadedImageUrl);
+      } else {
+        upserted_id = await handleInsertRecipe(uploadedImageUrl);
+      }
     } else {
-      upserted_id = await handleUpdateRecipe(uploadedImageUrl);
+      upserted_id = await handleInsertRecipe(uploadedImageUrl);
     }
 
     if (upserted_id) {
-      if (id) {
+      if (id && session?.user.id === recipe?.owner?.id) {
         // delete old ingredients and categories
         const { error: delIngErr } = await supabase
           .from('recipe_ingredient')
@@ -447,16 +452,31 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
     <SafeAreaView>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View className="h-16 flex-row items-center justify-center px-7">
-          <Text className="font-qs-bold text-2xl text-dark">{id ? 'Edit' : 'Create'} Recipe</Text>
+          <Text className="font-qs-bold text-2xl text-dark">
+            {id
+              ? session?.user.id == recipe?.owner.id
+                ? recipe?.variation_of
+                  ? 'Edit Variation'
+                  : 'Edit Recipe'
+                : 'Add Variation'
+              : 'Create Recipe'}
+          </Text>
         </View>
         <View className="flex w-full flex-1 items-center justify-between px-8">
           <Box className="flex w-full gap-3 pb-7">
             {/* Recipe Name */}
-            <FormControl>
+
+            <FormControl
+              style={
+                recipe?.variation_of || session?.user.id !== recipe?.owner.id
+                  ? { opacity: 0.4 }
+                  : {}
+              }>
               <FormControlLabel className="mb-1">
                 <FormControlLabelText>Recipe Name</FormControlLabelText>
               </FormControlLabel>
-              <Input>
+              <Input
+                isReadOnly={recipe?.variation_of !== null || session?.user.id !== recipe?.owner.id}>
                 <InputField
                   type="text"
                   defaultValue={formData.name}
@@ -469,11 +489,17 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
               </FormControlError>
             </FormControl>
             {/* Thumbnail */}
-            <FormControl>
+            <FormControl
+              style={
+                recipe?.variation_of !== null || session?.user.id !== recipe?.owner.id
+                  ? { opacity: 0.4 }
+                  : {}
+              }>
               <FormControlLabel className="mb-1">
                 <FormControlLabelText>Thumbnail</FormControlLabelText>
               </FormControlLabel>
               <ImagePickerInput
+                disabled={recipe?.variation_of !== null || session?.user.id !== recipe?.owner.id}
                 defaultImage={formData.thumbnail}
                 image={image}
                 pickImage={pickImage}
@@ -482,6 +508,13 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
                 <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
               </FormControlError>
             </FormControl>
+            {/* Category */}
+            <CategoryPicker
+              disabled={recipe?.variation_of !== null || session?.user.id !== recipe?.owner.id}
+              categories={categories}
+              selectedCategories={selectedCategories}
+              setSelectedCategories={setSelectedCategories}
+            />
             {/* Duration */}
             <FormControl>
               <FormControlLabel className="mb-1">
@@ -502,12 +535,6 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
                 <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
               </FormControlError>
             </FormControl>
-            {/* Category */}
-            <CategoryPicker
-              categories={categories}
-              selectedCategories={selectedCategories}
-              setSelectedCategories={setSelectedCategories}
-            />
             {/* Ingredients */}
             <IngredientPicker
               ingredients={ingredients}
@@ -561,7 +588,13 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
               onPress={handleCreateRecipe}>
               {loading ? <ButtonSpinner color={'rgb(255 249 245)'} /> : null}
               <ButtonText className="text-md ml-4 font-medium text-warning-50">
-                {id ? 'Update' : 'Create'} Recipe
+                {id
+                  ? session?.user.id == recipe?.owner.id
+                    ? recipe?.variation_of
+                      ? 'Edit Variation'
+                      : 'Edit Recipe'
+                    : 'Add Variation'
+                  : 'Create Recipe'}
               </ButtonText>
             </Button>
           </Box>
