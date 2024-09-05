@@ -28,6 +28,8 @@ const RecipeDetail = () => {
 
   const { session, ifLight } = useGlobalContext();
 
+  const webViewRef = useRef<WebView | null>(null);
+
   useFocusEffect(
     useCallback(() => {
       console.log('hey');
@@ -36,12 +38,17 @@ const RecipeDetail = () => {
 
       fetchRecipe();
       checkBookmark();
-
       // This will run when screen is `blured` or unmounted.
       return () => {
         StatusBar.setHidden(false);
       };
     }, [])
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      webViewRef.current?.reload();
+    }, [recipe])
   );
 
   const fetchRecipe = async () => {
@@ -193,27 +200,26 @@ const RecipeDetail = () => {
             </TouchableOpacity>
             <View className="items-end gap-4">
               <View className="flex-row gap-4">
-                {session?.user.id === recipe?.owner_id ? (
-                  <TouchableOpacity
-                    activeOpacity={0.75}
-                    onPress={() => {
-                      router.push(`/edit-recipe/${recipe?.id}`);
-                    }}
-                    style={{
-                      backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                      width: 48,
-                      height: 48,
-                      borderRadius: 24,
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                    }}>
-                    <Ionicons
-                      name="create"
-                      size={24}
-                      color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
-                    />
-                  </TouchableOpacity>
-                ) : null}
+                <TouchableOpacity
+                  activeOpacity={0.75}
+                  onPress={() => {
+                    router.push(`/edit-recipe/${recipe?.id}`);
+                  }}
+                  style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    width: 48,
+                    height: 48,
+                    borderRadius: 24,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Ionicons
+                    name={session?.user.id === recipe?.owner_id ? 'create' : 'git-branch-outline'}
+                    size={24}
+                    color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
+                  />
+                </TouchableOpacity>
+
                 <TouchableOpacity
                   activeOpacity={0.75}
                   onPress={handleBookmark}
@@ -291,7 +297,7 @@ const RecipeDetail = () => {
                   backgroundColor: 'rgba(42, 48, 81, 0.5)',
                 }}></View>
               <Text
-                style={{ fontSize: 36, color: 'rgb(238 240 255)' }}
+                style={{ fontSize: 36, color: ifLight('rgb(250 249 251)', 'rgb(238 240 255)') }}
                 className="font-qs-semibold">
                 {recipe.name}
               </Text>
@@ -414,10 +420,12 @@ const RecipeDetail = () => {
         <View>
           {recipe.instructions ? (
             <WebView
+              ref={webViewRef}
               originWhitelist={['*']}
               style={{ height }}
               scrollEnabled={false}
               nestedScrollEnabled={false}
+              setBuiltInZoomControls={false}
               injectedJavaScript="window.ReactNativeWebView.postMessage(document.body.scrollHeight)"
               onMessage={onWebViewMessage}
               source={{
