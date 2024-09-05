@@ -123,16 +123,13 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
     }
   };
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     setLoading(false);
-    fetchIngredients();
+    await fetchIngredients();
+    await fetchCategories();
     resetFields();
-    fetchCategories();
-    setSelectedIngredients(recipe?.ingredients || []);
-    setNewIngredients([]);
     setRefreshing(false);
-    editor.setContent(`<p>Click to add your <strong>instructions</strong></p>`);
   }, []);
 
   const editor = useEditorBridge({
@@ -175,10 +172,24 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
     },
   });
 
-  useEffect(() => {
-    fetchIngredients();
-    fetchCategories();
-    // inject css
+  useFocusEffect(
+    useCallback(() => {
+      fetchIngredients();
+      fetchCategories();
+
+      webViewRef.current?.reload();
+      // inject css
+      injectCSS();
+    }, [])
+  );
+  useFocusEffect(
+    useCallback(() => {
+      // inject css
+      injectCSS();
+    }, [colorMode])
+  );
+
+  const injectCSS = () => {
     editor.injectCSS(
       editorCSS +
         ifLight(
@@ -186,20 +197,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
           ' body{background-color: rgb(40 44 61); color: #FAF9FB}'
         )
     );
-  }, []);
-
-  useFocusEffect(
-    useCallback(() => {
-      // inject css
-      editor.injectCSS(
-        editorCSS +
-          ifLight(
-            ' body{background-color: #FAF9FB; color: rgb(42 48 81)}',
-            ' body{background-color: rgb(40 44 61); color: #FAF9FB}'
-          )
-      );
-    }, [colorMode])
-  );
+  };
 
   const closeRichText = () => {
     editor.blur();
@@ -417,6 +415,8 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
     setLoading(false);
   };
 
+  const webViewRef = useRef<WebView>(null);
+
   const resetFields = () => {
     setFormData({
       name: recipe?.name || '',
@@ -425,12 +425,15 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
         recipe?.instructions || '<p>Click to add your <strong>instructions</strong></p>',
       thumbnail: recipe?.thumbnail || '',
     });
-    editor.setContent('<p>Click to add your <strong>instructions</strong></p>');
-    setSelectedCategories([]);
+    setSelectedCategories(recipe?.categories || []);
     setHeight(50);
     setSelectedIngredients(recipe?.ingredients || []);
     setNewIngredients([]);
+    editor.setContent(
+      formData.instructions || `<p>Click to add your <strong>instructions</strong></p>`
+    );
     setImage(undefined);
+    webViewRef.current?.reload();
   };
 
   const [height, setHeight] = useState(50);
@@ -534,6 +537,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
                   }}
                   className="-mx-7 border-outline-200">
                   <WebView
+                    ref={webViewRef}
                     originWhitelist={['*']}
                     style={{ height }}
                     scrollEnabled={false}
