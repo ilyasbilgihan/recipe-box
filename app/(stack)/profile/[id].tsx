@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { View, Text } from 'react-native';
-import { useFocusEffect, useLocalSearchParams, useNavigation, router } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, router } from 'expo-router';
+
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { RefreshControl, ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
@@ -28,13 +29,17 @@ const Profile = () => {
   const [profile, setProfile] = useState<any>(null);
   const [recipes, setRecipes] = useState<any>([]);
   const [likedRecipes, setLikedRecipes] = useState<any>([]);
-  const [draftRecipes, setDraftRecipes] = useState<any>([]);
+  const [idleRecipes, setIdleRecipes] = useState<any>([]);
+  const [rejectedRecipes, setRejectedRecipes] = useState<any>([]);
   const [bookmarkedRecipes, setBookmarkedRecipes] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [follow, setFollow] = useState<{ followers: Follow; following: Follow }>({
     followers: undefined,
     following: undefined,
   });
+
+  const [tab, setTab] = useState<'recipe' | 'liked' | 'bookmark' | 'draft'>('recipe');
+  const [draftTab, setDraftTab] = useState<'idle' | 'rejected'>('idle');
 
   useFocusEffect(
     useCallback(() => {
@@ -57,7 +62,8 @@ const Profile = () => {
       console.log('error', error);
     } else {
       let all = [...data.recipe];
-      setDraftRecipes(all.filter((item) => item.status != 'confirmed'));
+      setIdleRecipes(all.filter((item) => item.status == 'idle'));
+      setRejectedRecipes(all.filter((item) => item.status == 'rejected'));
       setRecipes(all.filter((item) => item.status == 'confirmed'));
 
       if (data?.profile_image) {
@@ -91,8 +97,6 @@ const Profile = () => {
       setLikedRecipes(data.map((item) => item.recipe));
     }
   };
-
-  const [tab, setTab] = useState<'recipe' | 'liked' | 'draft' | 'bookmark'>('recipe');
 
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = React.useCallback(() => {
@@ -346,10 +350,73 @@ const Profile = () => {
             ),
             draft: (
               <>
-                <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                  Draft ({draftRecipes.length})
-                </Text>
-                <ListRecipe recipes={draftRecipes} />
+                <View
+                  className={`mx-7 mb-8 flex-row justify-between border-b-2 pb-3 pt-2 ${ifLight('border-outline-200', 'border-back')}`}>
+                  <View className="relative flex-1 items-center">
+                    {draftTab === 'idle' ? (
+                      <>
+                        <Ionicons
+                          name="hourglass"
+                          size={24}
+                          color={ifLight('rgb(52 131 82)', 'rgb(72 151 102)')}
+                        />
+                        <View
+                          style={{ height: 2 }}
+                          className="absolute -bottom-3.5 w-1/2 bg-success-500"></View>
+                      </>
+                    ) : (
+                      <TouchableOpacity onPress={() => setDraftTab('idle')}>
+                        <Ionicons
+                          name="hourglass-outline"
+                          size={24}
+                          color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                  <View className="relative flex-1 items-center">
+                    {draftTab === 'rejected' ? (
+                      <>
+                        <Ionicons
+                          name="alert-circle"
+                          size={24}
+                          color={ifLight('rgb(239 68 68)', 'rgb(230 53 53)')}
+                        />
+                        <View
+                          style={{ height: 2 }}
+                          className="absolute -bottom-3.5 w-1/2 bg-error-500"></View>
+                      </>
+                    ) : (
+                      <TouchableOpacity onPress={() => setDraftTab('rejected')}>
+                        <Ionicons
+                          name="alert-circle-outline"
+                          size={24}
+                          color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
+                        />
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                </View>
+                {
+                  {
+                    idle: (
+                      <>
+                        <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
+                          Idle ({idleRecipes.length})
+                        </Text>
+                        <ListRecipe recipes={idleRecipes} />
+                      </>
+                    ),
+                    rejected: (
+                      <>
+                        <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
+                          Rejected ({rejectedRecipes.length})
+                        </Text>
+                        <ListRecipe recipes={rejectedRecipes} />
+                      </>
+                    ),
+                  }[draftTab]
+                }
               </>
             ),
           }[tab]

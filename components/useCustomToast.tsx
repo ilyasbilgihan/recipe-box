@@ -25,9 +25,10 @@ const ToastContainer = ({ children }: { children: React.ReactNode }) => {
 const useCustomToast = () => {
   const { ifLight } = useGlobalContext();
   const toast = useToast();
-  const success = (message: string) => {
+  const success = (message: string, duration = 5000) => {
     toast.show({
       placement: 'top',
+      duration,
       render: ({ id }) => {
         const toastId = 'toast-' + id;
         return (
@@ -50,9 +51,10 @@ const useCustomToast = () => {
     });
   };
 
-  const error = (message: string) => {
+  const error = (message: string, duration = 5000) => {
     toast.show({
       placement: 'top',
+      duration,
       render: ({ id }) => {
         const toastId = 'toast-' + id;
         return (
@@ -75,9 +77,10 @@ const useCustomToast = () => {
     });
   };
 
-  const warning = (message: string) => {
+  const warning = (message: string, duration = 5000) => {
     toast.show({
       placement: 'top',
+      duration,
       render: ({ id }) => {
         const toastId = 'toast-' + id;
         return (

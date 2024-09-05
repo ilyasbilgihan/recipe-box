@@ -1,8 +1,9 @@
-import { View, Text } from 'react-native';
-import React, { useCallback } from 'react';
+import { View, Text, Alert } from 'react-native';
+import React, { useCallback, useEffect } from 'react';
 import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import CreateRecipe from '~/app/(tabs)/create-recipe';
 import { supabase } from '~/utils/supabase';
+import useCustomToast from '~/components/useCustomToast';
 
 type RecipeIngredient = {
   ingredient_id: string | undefined;
@@ -13,6 +14,8 @@ type RecipeIngredient = {
 };
 
 const EditRecipe = () => {
+  const toast = useCustomToast();
+
   const { id } = useLocalSearchParams();
   const [recipe, setRecipe] = React.useState<{
     name: string;
@@ -68,8 +71,13 @@ const EditRecipe = () => {
         categories: categories,
         ingredients: ingredients,
       });
-      console.log('edit data ing -> ', ingredients);
-      console.log('edit data cat -> ', categories);
+
+      if (data.status === 'rejected') {
+        toast.error('This recipe offer is rejected', 3000);
+        setTimeout(() => {
+          toast.warning(data.reject_reason, 10000);
+        }, 3100);
+      }
     }
   };
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   ScrollView,
@@ -9,7 +9,7 @@ import {
   Platform,
   BackHandler,
 } from 'react-native';
-import { router, useNavigation } from 'expo-router';
+import { router, useFocusEffect, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ImagePickerAsset } from 'expo-image-picker';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -188,16 +188,18 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
     );
   }, []);
 
-  useEffect(() => {
-    // inject css
-    editor.injectCSS(
-      editorCSS +
-        ifLight(
-          ' body{background-color: #FAF9FB; color: rgb(42 48 81)}',
-          ' body{background-color: rgb(40 44 61); color: #FAF9FB}'
-        )
-    );
-  }, [colorMode]);
+  useFocusEffect(
+    useCallback(() => {
+      // inject css
+      editor.injectCSS(
+        editorCSS +
+          ifLight(
+            ' body{background-color: #FAF9FB; color: rgb(42 48 81)}',
+            ' body{background-color: rgb(40 44 61); color: #FAF9FB}'
+          )
+      );
+    }, [colorMode])
+  );
 
   const closeRichText = () => {
     editor.blur();
@@ -598,7 +600,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
         <View style={{ flex: 1, width: '100%' }}>
           {editor ? (
             <>
-              <RichText editor={editor} />
+              <RichText setBuiltInZoomControls={false} editor={editor} />
               <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{
