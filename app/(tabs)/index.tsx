@@ -93,7 +93,7 @@ export default function Home() {
       .from('sorted_recipe')
       .select('*')
       .eq('status', 'confirmed') // we already fetching confirmed recipes but not for the current authenticated user.
-      .is('variation_of', null)
+      .is('alternative_of', null)
       .eq('category_id', selectedCategory)
       .order('created_at', { ascending: false })
       .limit(5);

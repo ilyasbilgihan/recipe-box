@@ -73,13 +73,13 @@ const RecipeDetail = () => {
         setRating(rated.rating);
       }
 
-      const { data: variation_of } = await supabase
+      const { data: alternative_of } = await supabase
         .from('recipe')
         .select('name')
-        .eq('id', data.variation_of)
+        .eq('id', data.alternative_of)
         .single();
 
-      setRecipe({ ...data, variation_of: variation_of?.name });
+      setRecipe({ ...data, alternative_of: alternative_of?.name });
     }
   };
 
@@ -306,7 +306,7 @@ const RecipeDetail = () => {
               <Text
                 style={{ fontSize: 36, color: ifLight('rgb(250 249 251)', 'rgb(238 240 255)') }}
                 className="font-qs-semibold">
-                {recipe.variation_of || recipe.name}
+                {recipe.alternative_of || recipe.name}
               </Text>
             </View>
           </View>

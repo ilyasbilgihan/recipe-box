@@ -28,7 +28,7 @@ const Profile = () => {
   const { id } = useLocalSearchParams();
   const [profile, setProfile] = useState<any>(null);
   const [recipes, setRecipes] = useState<any>([]);
-  const [variations, setVariations] = useState<any>([]);
+  const [alternatives, setAlternatives] = useState<any>([]);
   const [likedRecipes, setLikedRecipes] = useState<any>([]);
   const [idleRecipes, setIdleRecipes] = useState<any>([]);
   const [rejectedRecipes, setRejectedRecipes] = useState<any>([]);
@@ -40,7 +40,7 @@ const Profile = () => {
   });
 
   const [tab, setTab] = useState<'recipe' | 'liked' | 'bookmark' | 'draft'>('recipe');
-  const [draftTab, setDraftTab] = useState<'idle' | 'rejected' | 'variation'>('idle');
+  const [draftTab, setDraftTab] = useState<'idle' | 'rejected' | 'alternative'>('idle');
 
   useFocusEffect(
     useCallback(() => {
@@ -66,8 +66,8 @@ const Profile = () => {
       setIdleRecipes(all.filter((item) => item.status == 'idle'));
       setRejectedRecipes(all.filter((item) => item.status == 'rejected'));
       let listRecipes = all.filter((item) => item.status == 'confirmed');
-      setRecipes(listRecipes.filter((item) => item.variation_of == null));
-      setVariations(listRecipes.filter((item) => item.variation_of != null));
+      setRecipes(listRecipes.filter((item) => item.alternative_of == null));
+      setAlternatives(listRecipes.filter((item) => item.alternative_of != null));
 
       if (data?.profile_image) {
         data.profile_image = data?.profile_image;
@@ -400,7 +400,7 @@ const Profile = () => {
                     )}
                   </View>
                   <View className="relative flex-1 items-center">
-                    {draftTab === 'variation' ? (
+                    {draftTab === 'alternative' ? (
                       <>
                         <Ionicons
                           name="git-branch"
@@ -412,7 +412,7 @@ const Profile = () => {
                           className="absolute -bottom-3.5 w-1/2 bg-violet-800 dark:bg-violet-500 "></View>
                       </>
                     ) : (
-                      <TouchableOpacity onPress={() => setDraftTab('variation')}>
+                      <TouchableOpacity onPress={() => setDraftTab('alternative')}>
                         <Ionicons
                           name="git-branch-outline"
                           size={24}
@@ -440,12 +440,12 @@ const Profile = () => {
                         <ListRecipe recipes={rejectedRecipes} />
                       </>
                     ),
-                    variation: (
+                    alternative: (
                       <>
                         <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                          Variations ({variations.length})
+                          Alternatives ({alternatives.length})
                         </Text>
-                        <ListRecipe recipes={variations} />
+                        <ListRecipe recipes={alternatives} />
                       </>
                     ),
                   }[draftTab]

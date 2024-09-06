@@ -251,7 +251,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
         instructions: formData.instructions,
         thumbnail: uploadedImageUrl ? uploadedImageUrl : formData.thumbnail,
         owner_id: session?.user.id,
-        variation_of: id ? id : null,
+        alternative_of: id ? id : null,
       })
       .select('id')
       .single();
@@ -455,10 +455,10 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
           <Text className="font-qs-bold text-2xl text-dark">
             {id
               ? session?.user.id == recipe?.owner.id
-                ? recipe?.variation_of
-                  ? 'Edit Variation'
+                ? recipe?.alternative_of
+                  ? 'Edit Alternative'
                   : 'Edit Recipe'
-                : 'Add Variation'
+                : 'Add Alternative'
               : 'Create Recipe'}
           </Text>
         </View>
@@ -468,7 +468,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
 
             <FormControl
               style={
-                recipe?.variation_of || session?.user.id !== recipe?.owner.id
+                recipe?.alternative_of || session?.user.id !== recipe?.owner.id
                   ? { opacity: 0.4 }
                   : {}
               }>
@@ -476,7 +476,9 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
                 <FormControlLabelText>Recipe Name</FormControlLabelText>
               </FormControlLabel>
               <Input
-                isReadOnly={recipe?.variation_of !== null || session?.user.id !== recipe?.owner.id}>
+                isReadOnly={
+                  recipe?.alternative_of !== null || session?.user.id !== recipe?.owner.id
+                }>
                 <InputField
                   type="text"
                   defaultValue={formData.name}
@@ -491,7 +493,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
             {/* Thumbnail */}
             <FormControl
               style={
-                recipe?.variation_of !== null || session?.user.id !== recipe?.owner.id
+                recipe?.alternative_of !== null || session?.user.id !== recipe?.owner.id
                   ? { opacity: 0.4 }
                   : {}
               }>
@@ -499,7 +501,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
                 <FormControlLabelText>Thumbnail</FormControlLabelText>
               </FormControlLabel>
               <ImagePickerInput
-                disabled={recipe?.variation_of !== null || session?.user.id !== recipe?.owner.id}
+                disabled={recipe?.alternative_of !== null || session?.user.id !== recipe?.owner.id}
                 defaultImage={formData.thumbnail}
                 image={image}
                 pickImage={pickImage}
@@ -510,7 +512,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
             </FormControl>
             {/* Category */}
             <CategoryPicker
-              disabled={recipe?.variation_of !== null || session?.user.id !== recipe?.owner.id}
+              disabled={recipe?.alternative_of !== null || session?.user.id !== recipe?.owner.id}
               categories={categories}
               selectedCategories={selectedCategories}
               setSelectedCategories={setSelectedCategories}
@@ -590,10 +592,10 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
               <ButtonText className="text-md ml-4 font-medium text-warning-50">
                 {id
                   ? session?.user.id == recipe?.owner.id
-                    ? recipe?.variation_of
-                      ? 'Edit Variation'
+                    ? recipe?.alternative_of
+                      ? 'Edit Alternative'
                       : 'Edit Recipe'
-                    : 'Add Variation'
+                    : 'Add Alternative'
                   : 'Create Recipe'}
               </ButtonText>
             </Button>

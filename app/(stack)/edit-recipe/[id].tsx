@@ -20,7 +20,7 @@ const EditRecipe = () => {
   const [recipe, setRecipe] = React.useState<{
     name: string;
     owner: string;
-    variation_of: string;
+    alternative_of: string;
     duration: string;
     instructions: string;
     thumbnail: string;
@@ -29,7 +29,7 @@ const EditRecipe = () => {
   }>({
     name: '',
     owner: '',
-    variation_of: '',
+    alternative_of: '',
     duration: '',
     instructions: '',
     thumbnail: '',
@@ -70,7 +70,7 @@ const EditRecipe = () => {
       setRecipe({
         name: data.name,
         owner: data.owner,
-        variation_of: data.variation_of,
+        alternative_of: data.alternative_of,
         duration: '' + data.duration,
         instructions: data.instructions,
         thumbnail: data.thumbnail || '',
