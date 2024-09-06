@@ -72,7 +72,7 @@ const Settings = () => {
     const { count: unconfirmedCount } = await supabase
       .from('recipe')
       .select('*', { count: 'estimated', head: true })
-      .eq('status', 'idle');
+      .eq('status', 'pending');
 
     const { count: userCount } = await supabase
       .from('profile')
@@ -109,7 +109,7 @@ const Settings = () => {
                 color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
               />
             </TouchableOpacity>
-            <Text className="font-qs-bold text-2xl text-dark">Settings</Text>
+            <Text className="font-qs-bold text-2xl text-dark">{t('settings')}</Text>
             <View className="w-6"></View>
           </View>
           <View className="my-5 flex flex-col items-center gap-4">
@@ -133,13 +133,13 @@ const Settings = () => {
                 router.push('/profile-detail');
               }}>
               <ButtonText className="font-qs-medium text-sm font-semibold text-light">
-                Edit profile
+                {t('edit_profile')}
               </ButtonText>
             </Button>
           </View>
           {user?.role === 'admin' || user?.role === 'moderator' ? (
             <>
-              <Text className="mb-2 ml-4 font-qs-medium text-dark">Management</Text>
+              <Text className="mb-2 ml-4 font-qs-medium text-dark">{t('management')}</Text>
               <View className="mb-7 rounded-xl bg-back shadow-soft-5">
                 <TouchableOpacity
                   onPress={() => {
@@ -152,7 +152,7 @@ const Settings = () => {
                     name="document-text-outline"
                     color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
                   />
-                  <Text className="font-qs-semibold text-dark">Confirm Recipes</Text>
+                  <Text className="font-qs-semibold text-dark">{t('confirm_recipes')}</Text>
                   <View className="ml-auto rounded-xl bg-error-400 px-4 py-1">
                     <Text className="font-qs-medium text-error-50">{counts?.recipe}</Text>
                   </View>
@@ -171,7 +171,7 @@ const Settings = () => {
                         name="people-outline"
                         color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
                       />
-                      <Text className="font-qs-semibold text-dark">Users</Text>
+                      <Text className="font-qs-semibold text-dark">{t('users')}</Text>
                       <View className="ml-auto rounded-xl bg-info-400 px-4 py-1">
                         <Text className="font-qs-medium text-info-50">{counts?.user}</Text>
                       </View>
@@ -191,7 +191,7 @@ const Settings = () => {
                     name="funnel-outline"
                     color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
                   />
-                  <Text className="font-qs-semibold text-dark">Categories</Text>
+                  <Text className="font-qs-semibold text-dark">{t('categories')}</Text>
                   <View className="ml-auto rounded-xl bg-warning-400 px-4 py-1">
                     <Text className="font-qs-medium text-warning-50">{counts?.category}</Text>
                   </View>
@@ -208,7 +208,7 @@ const Settings = () => {
                     name="pricetags-outline"
                     color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
                   />
-                  <Text className="font-qs-semibold text-dark">Ingredients</Text>
+                  <Text className="font-qs-semibold text-dark">{t('ingredients')}</Text>
                   <View className="ml-auto rounded-xl bg-success-400 px-4 py-1">
                     <Text className="font-qs-medium text-success-50">{counts?.ingredient}</Text>
                   </View>
@@ -216,7 +216,7 @@ const Settings = () => {
               </View>
             </>
           ) : null}
-          <Text className="mb-2 ml-4 font-qs-medium text-dark">Preferences</Text>
+          <Text className="mb-2 ml-4 font-qs-medium text-dark">{t('preferences')}</Text>
           <View className="mb-7 rounded-xl bg-back shadow-soft-5">
             <TouchableOpacity
               activeOpacity={0.5}
@@ -229,7 +229,7 @@ const Settings = () => {
                 name="moon-outline"
                 color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
               />
-              <Text className="font-qs-semibold text-dark">Dark Mode</Text>
+              <Text className="font-qs-semibold text-dark">{t('dark_mode')}</Text>
               <Switch
                 trackColor={{
                   false: ifLight('rgb(238 240 255)', 'rgb(40 44 61)'),
@@ -257,7 +257,7 @@ const Settings = () => {
                     name="language-outline"
                     color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
                   />
-                  <Text className="font-qs-semibold text-dark">Language</Text>
+                  <Text className="font-qs-semibold text-dark">{t('language')}</Text>
                   <View className="ml-auto">
                     <Text className="font-qs-medium text-sm text-dark">
                       {t('current_language')}
@@ -286,7 +286,7 @@ const Settings = () => {
               }}
               className="flex-row items-center gap-3 rounded-b-xl bg-error-500 p-4">
               <Ionicons size={24} name="log-out-outline" color={'rgb(254 226 226)'} />
-              <Text className="font-qs-semibold text-error-50">Logout</Text>
+              <Text className="font-qs-semibold text-error-50">{t('logout')}</Text>
             </TouchableOpacity>
           </View>
         </View>

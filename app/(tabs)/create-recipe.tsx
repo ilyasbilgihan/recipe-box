@@ -36,6 +36,7 @@ import ImagePickerInput from '~/components/ImagePickerInput';
 import IngredientPicker from '~/components/IngredientPicker';
 import CategoryPicker from '~/components/CategoryPicker';
 import useCustomToast from '~/components/useCustomToast';
+import { useTranslation } from 'react-i18next';
 
 type Ingredient = {
   id?: string;
@@ -57,6 +58,7 @@ type Category = {
 };
 
 const CreateRecipe = ({ id = null, recipe }: any) => {
+  const { t } = useTranslation();
   const { session, ifLight, colorMode } = useGlobalContext();
   const navigation = useNavigation();
 
@@ -68,7 +70,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
   const [formData, setFormData] = useState({
     name: recipe?.name || '',
     duration: recipe?.duration || '',
-    instructions: recipe?.instructions || '<p>Click to add your <strong>instructions</strong></p>',
+    instructions: recipe?.instructions || t('click_to_add'),
     thumbnail: recipe?.thumbnail || '',
   });
   const { image, setImage, pickImage } = useImagePicker();
@@ -425,17 +427,14 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
     setFormData({
       name: recipe?.name || '',
       duration: recipe?.duration || '',
-      instructions:
-        recipe?.instructions || '<p>Click to add your <strong>instructions</strong></p>',
+      instructions: recipe?.instructions || t('click_to_add'),
       thumbnail: recipe?.thumbnail || '',
     });
     setSelectedCategories(recipe?.categories || []);
     setHeight(50);
     setSelectedIngredients(recipe?.ingredients || []);
     setNewIngredients([]);
-    editor.setContent(
-      formData.instructions || `<p>Click to add your <strong>instructions</strong></p>`
-    );
+    editor.setContent(formData.instructions || t('click_to_add'));
     setImage(undefined);
     webViewRef.current?.reload();
   };
@@ -455,10 +454,10 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
             {id
               ? session?.user.id == recipe?.owner.id
                 ? recipe?.alternative_of
-                  ? 'Edit Alternative'
-                  : 'Edit Recipe'
-                : 'Add Alternative'
-              : 'Create Recipe'}
+                  ? t('edit_alternative')
+                  : t('edit_recipe')
+                : t('add_alternative')
+              : t('create_recipe')}
           </Text>
         </View>
         <View className="flex w-full flex-1 items-center justify-between px-8">
@@ -472,7 +471,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
                   : {}
               }>
               <FormControlLabel className="mb-1">
-                <FormControlLabelText>Recipe Name</FormControlLabelText>
+                <FormControlLabelText>{t('recipe_name')}</FormControlLabelText>
               </FormControlLabel>
               <Input
                 isReadOnly={
@@ -483,7 +482,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
                   type="text"
                   defaultValue={formData.name}
                   onChange={(e) => setField('name', e.nativeEvent.text)}
-                  placeholder="Spicy Ramen Noodle"
+                  placeholder={t('recipe_name_placeholder')}
                 />
               </Input>
               <FormControlError>
@@ -493,7 +492,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
             {/* Thumbnail */}
             <FormControl>
               <FormControlLabel className="mb-1">
-                <FormControlLabelText>Thumbnail</FormControlLabelText>
+                <FormControlLabelText>{t('recipe_thumbnail')}</FormControlLabelText>
               </FormControlLabel>
               <ImagePickerInput
                 defaultImage={formData.thumbnail}
@@ -517,7 +516,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
             {/* Duration */}
             <FormControl>
               <FormControlLabel className="mb-1">
-                <FormControlLabelText>Duration</FormControlLabelText>
+                <FormControlLabelText>{t('recipe_duration')}</FormControlLabelText>
               </FormControlLabel>
               <Input className="flex-row items-center">
                 <InputField
@@ -527,7 +526,9 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
                   placeholder="0"
                 />
                 <View style={{ paddingRight: 8 }}>
-                  <Text className="font-qs-medium text-sm text-typography-500">minute(s)</Text>
+                  <Text className="font-qs-medium text-sm text-typography-500">
+                    {t('minute_long')}
+                  </Text>
                 </View>
               </Input>
               <FormControlError>
@@ -546,7 +547,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
             {/* Instructions */}
             <FormControl>
               <FormControlLabel className="mb-1">
-                <FormControlLabelText>Instructions</FormControlLabelText>
+                <FormControlLabelText>{t('instructions')}</FormControlLabelText>
               </FormControlLabel>
 
               <TouchableOpacity

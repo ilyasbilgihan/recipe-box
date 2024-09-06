@@ -3,8 +3,10 @@ import { Tabs, Redirect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useGlobalContext } from '~/context/GlobalProvider';
+import { useTranslation } from 'react-i18next';
 
 export default function TabLayout() {
+  const { t } = useTranslation();
   const { session, ifLight } = useGlobalContext();
 
   if (!session) return <Redirect href="/auth" />;
@@ -33,7 +35,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: t('home'),
           tabBarIcon: ({ color, focused }) =>
             !focused ? (
               <Ionicons size={22} name="home-outline" color={color} />
@@ -46,7 +48,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="feed"
         options={{
-          title: 'Feed',
+          title: t('feed'),
           tabBarIcon: ({ color, focused }) =>
             !focused ? (
               <Ionicons size={22} name="compass-outline" color={color} />
@@ -59,7 +61,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="create-recipe"
         options={{
-          title: 'Create Recipe',
+          title: t('create_recipe'),
           tabBarIcon: ({ color, focused }) =>
             !focused ? (
               <Ionicons size={22} name="restaurant-outline" color={color} />
@@ -72,7 +74,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile/index"
         options={{
-          title: 'Profile',
+          title: t('profile'),
           tabBarIcon: ({ color, focused }) =>
             !focused ? (
               <Ionicons size={22} name="person-outline" color={color} />

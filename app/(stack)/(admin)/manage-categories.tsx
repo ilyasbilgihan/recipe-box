@@ -18,8 +18,10 @@ import { FormControl, FormControlLabel, FormControlLabelText } from '~/component
 import { Input, InputField } from '~/components/ui/input';
 import useCustomToast from '~/components/useCustomToast';
 import { Modal, ModalBackdrop, ModalBody, ModalContent, ModalFooter } from '~/components/ui/modal';
+import { useTranslation } from 'react-i18next';
 
 const ManageCategories = () => {
+  const { t } = useTranslation();
   const toast = useCustomToast();
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<any>([]);
@@ -97,7 +99,7 @@ const ManageCategories = () => {
 
   const handleDeleteCategory = async () => {
     toast.confirm({
-      title: 'Are you sure you want to delete this category?',
+      title: t('dynamic_delete_confirm', { item: 'category' }),
       message: category?.name,
       icon: <Ionicons name="trash-outline" size={20} />,
       handler: async () => {
@@ -150,7 +152,7 @@ const ManageCategories = () => {
                 color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
               />
             </TouchableOpacity>
-            <Text className="font-qs-bold text-2xl text-dark">Categories</Text>
+            <Text className="font-qs-bold text-2xl text-dark">{t('categories')}</Text>
             <TouchableOpacity
               onPress={() => {
                 setCategoryName('');
@@ -195,7 +197,9 @@ const ManageCategories = () => {
               onPress={() => {
                 handleDeleteCategory();
               }}>
-              <ButtonText className="text-md font-medium text-error-50">Delete Category</ButtonText>
+              <ButtonText className="text-md font-medium text-error-50">
+                {t('delete_category')}
+              </ButtonText>
             </Button>
           </BottomSheetFooter>
         )}
@@ -206,21 +210,21 @@ const ManageCategories = () => {
             <Text
               style={{ color: ifLight('rgb(42 48 81)', 'rgb(238 240 255)') }}
               className="flex-1 font-qs-bold text-2xl">
-              Category Detail
+              {t('category_details')}
             </Text>
             <Button
               disabled={loading}
               className="h-11 rounded-xl bg-info-400"
               onPress={handleUpdateCategory}>
               {loading ? <ButtonSpinner className="mr-2" color={'rgb(199 235 252)'} /> : null}
-              <ButtonText className="text-md font-medium text-info-50">Save Changes</ButtonText>
+              <ButtonText className="text-md font-medium text-info-50">{t('save')}</ButtonText>
             </Button>
           </View>
           <GHScrollView style={{ marginBottom: 196 }}>
             <View className="mb-8 px-7">
               <FormControl>
                 <FormControlLabel className="mb-1">
-                  <FormControlLabelText>Category Name</FormControlLabelText>
+                  <FormControlLabelText>{t('category_name')}</FormControlLabelText>
                 </FormControlLabel>
                 <Input>
                   <InputField
@@ -229,12 +233,12 @@ const ManageCategories = () => {
                     onChange={(e) => {
                       setCategory({ ...category, name: e.nativeEvent.text });
                     }}
-                    placeholder="Vegetarian"
+                    placeholder={t('category_placeholder')}
                   />
                 </Input>
               </FormControl>
               <View className="mt-4 flex-row gap-3">
-                <Text className="font-qs-semibold text-dark opacity-80">Selectable</Text>
+                <Text className="font-qs-semibold text-dark opacity-80">{t('selectable')}</Text>
                 <Switch
                   trackColor={{
                     false: ifLight('rgb(238 240 255)', 'rgb(52 54 79)'),
@@ -250,7 +254,7 @@ const ManageCategories = () => {
                 />
               </View>
               <View className="mt-4 flex-row gap-3">
-                <Text className="font-qs-semibold text-dark opacity-80">Special</Text>
+                <Text className="font-qs-semibold text-dark opacity-80">{t('special')}</Text>
                 <Switch
                   trackColor={{
                     false: ifLight('rgb(238 240 255)', 'rgb(52 54 79)'),
@@ -267,7 +271,7 @@ const ManageCategories = () => {
               </View>
             </View>
             <Text className="px-7 font-qs-semibold text-xl text-dark">
-              Recipes with this category
+              {t('recipes_with_this_category')}
             </Text>
             {category?.recipes?.length > 0 ? (
               <View className="gap-3 px-7 pb-7 pt-4">
@@ -303,7 +307,7 @@ const ManageCategories = () => {
                   color={ifLight('#3d3d3d', 'rgb(122 124 149)')}
                 />
                 <Text className="px-14 text-center font-qs-medium text-dark dark:opacity-80">
-                  There are no recipes with this category yet
+                  {t('no_recipes_with_this_category')}
                 </Text>
               </View>
             )}
@@ -315,16 +319,16 @@ const ManageCategories = () => {
         <ModalContent className="max-w-[375px] bg-light">
           <ModalBody className="mb-5 " contentContainerClassName="">
             <Text className="font-qs-medium text-xl text-typography-600">
-              You're going to create a category
+              {t('creating_category')}
             </Text>
-            <Text className="text text-left font-qs text-typography-500">Please provide name</Text>
+            <Text className="text text-left font-qs text-typography-500">{t('provide_name')}</Text>
             <View className="mt-4 flex flex-col gap-2">
               <Input className="flex flex-row items-center justify-between">
                 <InputField
                   className="flex-1"
                   defaultValue={categoryName}
                   onChange={(e) => setCategoryName(e.nativeEvent.text)}
-                  placeholder="Vegetarian"
+                  placeholder={t('category_placeholder')}
                 />
               </Input>
             </View>
@@ -338,7 +342,7 @@ const ManageCategories = () => {
                 setModal(false);
               }}
               className="flex-grow">
-              <ButtonText>Cancel</ButtonText>
+              <ButtonText>{t('cancel')}</ButtonText>
             </Button>
             <Button
               onPress={() => {
@@ -346,7 +350,7 @@ const ManageCategories = () => {
               }}
               size="sm"
               className="flex-grow">
-              <ButtonText>Confirm</ButtonText>
+              <ButtonText>{t('confirm')}</ButtonText>
             </Button>
           </ModalFooter>
         </ModalContent>

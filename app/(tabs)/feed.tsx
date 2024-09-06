@@ -7,8 +7,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { supabase } from '~/utils/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import ListRecipe from '~/components/ListRecipe';
+import { useTranslation } from 'react-i18next';
 
 const Bookmark = () => {
+  const { t } = useTranslation();
   const { session } = useGlobalContext();
   const navigation = useNavigation();
   const [recipes, setRecipes] = useState<any>([]);
@@ -49,7 +51,9 @@ const Bookmark = () => {
     <SafeAreaView>
       <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View className="h-16 flex-row items-center justify-center px-7">
-          <Text className="font-qs-bold text-2xl text-dark">Your Feed ({recipes?.length})</Text>
+          <Text className="font-qs-bold text-2xl text-dark">
+            {t('your_feed')} ({recipes?.length})
+          </Text>
         </View>
         <ListRecipe recipes={recipes} />
       </ScrollView>

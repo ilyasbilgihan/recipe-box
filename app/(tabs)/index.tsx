@@ -19,6 +19,7 @@ import ListRecipe from '~/components/ListRecipe';
 const windowWidth = Dimensions.get('window').width;
 import { router, useFocusEffect } from 'expo-router';
 import LazyImage from '~/components/LazyImage';
+import { useTranslation } from 'react-i18next';
 
 const userQuery = supabase.from('profile').select(`
   id,
@@ -106,6 +107,7 @@ export default function Home() {
     }
   };
 
+  const { t } = useTranslation();
   return (
     <>
       <SafeAreaView>
@@ -139,12 +141,24 @@ export default function Home() {
               require(`~/assets/images/welcome-dark.webp`)
             )}
             style={{ width: windowWidth, aspectRatio: 2 / 1, paddingHorizontal: 28 }}>
-            <Text className="ml-auto mt-4 text-right font-qs text-3xl text-light">
-              <Text className="text-right font-qs-bold">Find</Text>
-              {` your food
-recipe `}
-              <Text className="font-qs-bold">easily</Text>
-            </Text>
+            <View className="mt-4">
+              {
+                // @ts-ignore
+                t('welcome', { returnObjects: true }).map((row, i) => {
+                  return (
+                    <Text className="text-right" key={'row-' + i}>
+                      {row.map((col: any, j: any) => (
+                        <Text
+                          className={`${col.bold ? 'font-qs-bold' : 'font-qs'} text-3xl text-light`}
+                          key={'cell-' + i + 'x' + j}>
+                          {col.text}
+                        </Text>
+                      ))}
+                    </Text>
+                  );
+                })
+              }
+            </View>
           </ImageBackground>
           <FlatList
             data={categories}

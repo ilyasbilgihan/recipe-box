@@ -24,6 +24,7 @@ import {
   SelectPortal,
   SelectTrigger,
 } from '~/components/ui/select';
+import { useTranslation } from 'react-i18next';
 
 const roleDetail = {
   admin: { colorLight: 'rgb(192 132 252)', colorDark: 'rgb(168 85 247)', name: 'Admin' },
@@ -33,6 +34,7 @@ const roleDetail = {
 };
 
 const ManageUsers = () => {
+  const { t } = useTranslation();
   const [profiles, setProfiles] = useState<any>([]);
   const [profile, setProfile] = useState<any>();
   const { ifLight } = useGlobalContext();
@@ -85,7 +87,7 @@ const ManageUsers = () => {
                 color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
               />
             </TouchableOpacity>
-            <Text className="font-qs-bold text-2xl text-dark">Manage Users</Text>
+            <Text className="font-qs-bold text-2xl text-dark">{t('manage_users')}</Text>
             <View className="w-6"></View>
           </View>
           <View className="gap-4 pb-8">
@@ -152,7 +154,9 @@ const ManageUsers = () => {
               onPress={() => {
                 console.log('handle delete profile');
               }}>
-              <ButtonText className="text-md font-medium text-error-50">Delete User</ButtonText>
+              <ButtonText className="text-md font-medium text-error-50">
+                {t('delete_user')}
+              </ButtonText>
             </Button>
           </BottomSheetFooter>
         )}
@@ -163,7 +167,7 @@ const ManageUsers = () => {
             <Text
               style={{ color: ifLight('rgb(42 48 81)', 'rgb(238 240 255)') }}
               className="mt-4 font-qs-bold text-2xl">
-              User Details
+              {t('user_details')}
             </Text>
           </View>
           <GHScrollView style={{ marginBottom: 20 }}>
@@ -186,7 +190,7 @@ const ManageUsers = () => {
               </View>
             </View>
             <View className="my-12">
-              <Text className="mb-2 font-qs-semibold text-dark opacity-80">Change Role</Text>
+              <Text className="mb-2 font-qs-semibold text-dark opacity-80">{t('change_role')}</Text>
               <Select
                 onValueChange={(value) => {
                   handleRoleChange(value);

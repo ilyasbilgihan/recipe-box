@@ -13,6 +13,7 @@ import ListRecipe from '~/components/ListRecipe';
 import { Button, ButtonText } from '~/components/ui/button';
 import LazyImage from '~/components/LazyImage';
 import FollowListTrigger from '~/components/FollowList';
+import { useTranslation } from 'react-i18next';
 
 type Follow =
   | {
@@ -24,13 +25,14 @@ type Follow =
   | undefined;
 
 const Profile = () => {
+  const { t } = useTranslation();
   const { session, ifLight } = useGlobalContext();
   const { id } = useLocalSearchParams();
   const [profile, setProfile] = useState<any>(null);
   const [recipes, setRecipes] = useState<any>([]);
   const [alternatives, setAlternatives] = useState<any>([]);
   const [likedRecipes, setLikedRecipes] = useState<any>([]);
-  const [idleRecipes, setIdleRecipes] = useState<any>([]);
+  const [pendingRecipes, setIdleRecipes] = useState<any>([]);
   const [rejectedRecipes, setRejectedRecipes] = useState<any>([]);
   const [bookmarkedRecipes, setBookmarkedRecipes] = useState<any>([]);
   const [loading, setLoading] = useState(false);
@@ -40,7 +42,7 @@ const Profile = () => {
   });
 
   const [tab, setTab] = useState<'recipe' | 'liked' | 'bookmark' | 'draft'>('recipe');
-  const [draftTab, setDraftTab] = useState<'idle' | 'rejected' | 'alternative'>('idle');
+  const [draftTab, setDraftTab] = useState<'pending' | 'rejected' | 'alternative'>('pending');
 
   useFocusEffect(
     useCallback(() => {
@@ -63,7 +65,7 @@ const Profile = () => {
       console.log('error', error);
     } else {
       let all = [...data.recipe];
-      setIdleRecipes(all.filter((item) => item.status == 'idle'));
+      setIdleRecipes(all.filter((item) => item.status == 'pending'));
       setRejectedRecipes(all.filter((item) => item.status == 'rejected'));
       let listRecipes = all.filter((item) => item.status == 'confirmed');
       setRecipes(listRecipes.filter((item) => item.alternative_of == null));
@@ -190,14 +192,14 @@ const Profile = () => {
 
             <View className="flex-col items-center ">
               <Text className="font-qs-bold text-lg text-dark">{recipes.length || '0'}</Text>
-              <Text className="font-qs-medium text-dark">recipes</Text>
+              <Text className="font-qs-medium text-dark">{t('recipes')}</Text>
             </View>
             <FollowListTrigger list={follow.followers} checkFollow={checkFollow} title="Followers">
               <View className="flex-col items-center ">
                 <Text className="font-qs-bold text-lg text-dark">
                   {follow.followers?.length || '0'}
                 </Text>
-                <Text className="font-qs-medium text-dark">followers</Text>
+                <Text className="font-qs-medium text-dark">{t('followers')}</Text>
               </View>
             </FollowListTrigger>
             <FollowListTrigger list={follow.following} checkFollow={checkFollow} title="Following">
@@ -205,7 +207,7 @@ const Profile = () => {
                 <Text className="font-qs-bold text-lg text-dark">
                   {follow.following?.length || '0'}
                 </Text>
-                <Text className="font-qs-medium text-dark">following</Text>
+                <Text className="font-qs-medium text-dark">{t('following')}</Text>
               </View>
             </FollowListTrigger>
           </View>
@@ -226,11 +228,13 @@ const Profile = () => {
                 <Button
                   className="mt-3 h-10 w-1/2 rounded-lg border border-info-500 bg-light "
                   onPress={handleFollow}>
-                  <ButtonText className="text-md font-medium text-info-500">Following</ButtonText>
+                  <ButtonText className="text-md font-medium text-info-500">
+                    {t('following')}
+                  </ButtonText>
                 </Button>
               ) : (
                 <Button className="mt-3 h-10 w-1/2 rounded-lg bg-info-500" onPress={handleFollow}>
-                  <ButtonText className="text-md font-medium">Follow</ButtonText>
+                  <ButtonText className="text-md font-medium">{t('follow')}</ButtonText>
                 </Button>
               )
             ) : null}
@@ -335,7 +339,7 @@ const Profile = () => {
             recipe: (
               <>
                 <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                  Shared ({recipes.length || '0'})
+                  {t('shared')} ({recipes.length || '0'})
                 </Text>
                 <ListRecipe recipes={recipes} />
               </>
@@ -343,7 +347,7 @@ const Profile = () => {
             liked: (
               <>
                 <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                  Liked ({likedRecipes.length || '0'})
+                  {t('liked')} ({likedRecipes.length || '0'})
                 </Text>
                 <ListRecipe recipes={likedRecipes} />
               </>
@@ -351,7 +355,7 @@ const Profile = () => {
             bookmark: (
               <>
                 <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                  Bookmarked ({bookmarkedRecipes.length || '0'})
+                  {t('bookmarked')} ({bookmarkedRecipes.length || '0'})
                 </Text>
                 <ListRecipe recipes={bookmarkedRecipes} />
               </>
@@ -361,7 +365,7 @@ const Profile = () => {
                 <View
                   className={`mx-7 mb-8 flex-row justify-between border-b-2 pb-3 pt-2 ${ifLight('border-outline-200', 'border-back')}`}>
                   <View className="relative flex-1 items-center">
-                    {draftTab === 'idle' ? (
+                    {draftTab === 'pending' ? (
                       <>
                         <Ionicons
                           name="hourglass"
@@ -373,7 +377,7 @@ const Profile = () => {
                           className="absolute -bottom-3.5 w-1/2 bg-success-500"></View>
                       </>
                     ) : (
-                      <TouchableOpacity onPress={() => setDraftTab('idle')}>
+                      <TouchableOpacity onPress={() => setDraftTab('pending')}>
                         <Ionicons
                           name="hourglass-outline"
                           size={24}
@@ -429,18 +433,18 @@ const Profile = () => {
                 </View>
                 {
                   {
-                    idle: (
+                    pending: (
                       <>
                         <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                          Idle ({idleRecipes.length || '0'})
+                          {t('pending')} ({pendingRecipes.length || '0'})
                         </Text>
-                        <ListRecipe recipes={idleRecipes} />
+                        <ListRecipe recipes={pendingRecipes} />
                       </>
                     ),
                     rejected: (
                       <>
                         <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                          Rejected ({rejectedRecipes.length || '0'})
+                          {t('rejected')} ({rejectedRecipes.length || '0'})
                         </Text>
                         <ListRecipe recipes={rejectedRecipes} />
                       </>
@@ -448,7 +452,7 @@ const Profile = () => {
                     alternative: (
                       <>
                         <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                          Alternatives ({alternatives.length || '0'})
+                          {t('alternatives')} ({alternatives.length || '0'})
                         </Text>
                         <ListRecipe recipes={alternatives} />
                       </>

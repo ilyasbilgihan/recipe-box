@@ -12,10 +12,12 @@ import { useGlobalContext } from '~/context/GlobalProvider';
 import { editorCSS } from '~/utils/editorCSS';
 import Comments from '~/components/Comments';
 import LazyImage from '~/components/LazyImage';
+import { useTranslation } from 'react-i18next';
 
 const windowWidth = Dimensions.get('window').width;
 
 const RecipeDetail = () => {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams();
   const [recipe, setRecipe] = useState<any>({});
   const [alternatives, setAlternatives] = useState<any>([]);
@@ -293,7 +295,7 @@ const RecipeDetail = () => {
                   <Text
                     style={{ color: ifLight('rgb(250 249 251)', 'rgb(238 240 255)') }}
                     className="font-qs-medium">
-                    min
+                    {t('minute_short')}
                   </Text>
                 </View>
               </View>

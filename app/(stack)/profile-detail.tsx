@@ -21,8 +21,10 @@ import LazyImage from '~/components/LazyImage';
 import useCustomToast from '~/components/useCustomToast';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 const ProfileDetail = () => {
+  const { t } = useTranslation();
   const { session, ifLight } = useGlobalContext();
   const [formData, setFormData] = useState({
     name: '',
@@ -141,7 +143,7 @@ const ProfileDetail = () => {
                 color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
               />
             </TouchableOpacity>
-            <Text className="font-qs-bold text-2xl text-dark">Settings</Text>
+            <Text className="font-qs-bold text-2xl text-dark">{t('settings')}</Text>
             <View className="h-6 w-6"></View>
           </View>
           <View className="my-12 flex flex-col items-center gap-3">
@@ -163,21 +165,23 @@ const ProfileDetail = () => {
                   setField('profile_image', '');
                   setImage(undefined);
                 }}>
-                <Text className="font-qs-medium font-semibold text-error-500">Remove Image</Text>
+                <Text className="font-qs-medium font-semibold text-error-500">
+                  {t('remove_image')}
+                </Text>
               </TouchableOpacity>
             ) : null}
           </View>
           <Box className="flex w-full gap-3 pb-12">
             <FormControl>
               <FormControlLabel className="mb-1">
-                <FormControlLabelText>Name</FormControlLabelText>
+                <FormControlLabelText>{t('profile_name')}</FormControlLabelText>
               </FormControlLabel>
               <Input>
                 <InputField
                   type="text"
                   defaultValue={formData.name}
                   onChange={(e) => setField('name', e.nativeEvent.text)}
-                  placeholder="Jane Doe"
+                  placeholder={t('name_placeholder')}
                 />
               </Input>
               <FormControlError>
@@ -186,14 +190,14 @@ const ProfileDetail = () => {
             </FormControl>
             <FormControl>
               <FormControlLabel className="mb-1">
-                <FormControlLabelText>Location</FormControlLabelText>
+                <FormControlLabelText>{t('location')}</FormControlLabelText>
               </FormControlLabel>
               <Input>
                 <InputField
                   type="text"
                   defaultValue={formData.location}
                   onChange={(e) => setField('location', e.nativeEvent.text)}
-                  placeholder="İstanbul, Türkiye"
+                  placeholder={t('location_placeholder')}
                 />
               </Input>
               <FormControlError>
@@ -202,14 +206,14 @@ const ProfileDetail = () => {
             </FormControl>
             <FormControl>
               <FormControlLabel className="mb-1">
-                <FormControlLabelText>Profession</FormControlLabelText>
+                <FormControlLabelText>{t('profession')}</FormControlLabelText>
               </FormControlLabel>
               <Input>
                 <InputField
                   type="text"
                   defaultValue={formData.profession}
                   onChange={(e) => setField('profession', e.nativeEvent.text)}
-                  placeholder="Cook"
+                  placeholder={t('profession_placeholder')}
                 />
               </Input>
               <FormControlError>
@@ -218,7 +222,7 @@ const ProfileDetail = () => {
             </FormControl>
             <FormControl>
               <FormControlLabel>
-                <FormControlLabelText>Bio</FormControlLabelText>
+                <FormControlLabelText>{t('bio')}</FormControlLabelText>
               </FormControlLabel>
               <Textarea>
                 <TextareaInput
@@ -226,7 +230,7 @@ const ProfileDetail = () => {
                   defaultValue={formData.bio}
                   onChange={(e) => setField('bio', e.nativeEvent.text)}
                   textAlignVertical="top"
-                  placeholder="Once upon a time..."
+                  placeholder={t('bio_placeholder')}
                   className="p-3"
                 />
               </Textarea>
@@ -235,10 +239,10 @@ const ProfileDetail = () => {
               disabled={loading}
               className="mt-4 h-11 rounded-xl bg-warning-400"
               onPress={handleProfileUpdate}>
-              {loading ? (
-                <ButtonSpinner color={ifLight('rgb(250 249 251)', 'rgb(108 56 19)')} />
-              ) : null}
-              <ButtonText className="text-md ml-4 font-medium">Save</ButtonText>
+              {loading ? <ButtonSpinner color={'rgb(255 249 245)'} /> : null}
+              <ButtonText className="text-md ml-4 font-medium text-warning-50">
+                {t('save')}
+              </ButtonText>
             </Button>
           </Box>
         </View>

@@ -21,6 +21,7 @@ import {
   FormControlLabel,
   FormControlLabelText,
 } from '~/components/ui/form-control';
+import { useTranslation } from 'react-i18next';
 
 type Category = {
   id: number;
@@ -38,12 +39,13 @@ const CategoryPicker = ({
   setSelectedCategories: React.Dispatch<React.SetStateAction<Category[]>>;
   disabled?: boolean;
 }) => {
+  const { t } = useTranslation();
   const { ifLight } = useGlobalContext();
 
   return (
     <FormControl style={disabled ? { opacity: 0.4 } : {}}>
       <FormControlLabel className="mb-1">
-        <FormControlLabelText>Category</FormControlLabelText>
+        <FormControlLabelText>{t('category')}</FormControlLabelText>
       </FormControlLabel>
       <Select
         isDisabled={disabled}
@@ -76,7 +78,7 @@ const CategoryPicker = ({
                 </TouchableOpacity>
               ))
             ) : (
-              <Text className="text-sm text-typography-500">No Category</Text>
+              <Text className="text-sm text-typography-500">{t('no_category')}</Text>
             )}
           </View>
           <SelectTrigger className="h-10 w-10 items-center justify-center border-0 " size="md">

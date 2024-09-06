@@ -16,8 +16,10 @@ import useCustomToast from '~/components/useCustomToast';
 import { Modal, ModalBackdrop, ModalBody, ModalContent, ModalFooter } from '~/components/ui/modal';
 import ImagePickerInput from '~/components/ImagePickerInput';
 import useImagePicker from '~/utils/useImagePicker';
+import { useTranslation } from 'react-i18next';
 
 const ManageIngredients = () => {
+  const { t } = useTranslation();
   const toast = useCustomToast();
   const [loading, setLoading] = useState(false);
   const [ingredients, setIngredients] = useState<any>([]);
@@ -175,7 +177,7 @@ const ManageIngredients = () => {
                 color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
               />
             </TouchableOpacity>
-            <Text className="font-qs-bold text-2xl text-dark">Ingredients</Text>
+            <Text className="font-qs-bold text-2xl text-dark">{t('ingredients')}</Text>
             <TouchableOpacity
               onPress={() => {
                 setIngredientName('');
@@ -225,10 +227,10 @@ const ManageIngredients = () => {
         <ModalContent className="max-w-[375px] bg-light">
           <ModalBody className="mb-5 " contentContainerClassName="">
             <Text className="font-qs-medium text-xl text-dark">
-              {ingredient ? 'Update Ingredient' : 'Create Ingredient'}
+              {ingredient ? t('update_ingredient') : t('new_ingredient')}
             </Text>
             <Text className="text text-left font-qs text-typography-500">
-              Please provide name and image.
+              {t('provide_ingredient_create_data')}
             </Text>
             <View className="mt-4 flex flex-col gap-2">
               <FormControl>
@@ -243,13 +245,13 @@ const ManageIngredients = () => {
                         setIngredientName(e.nativeEvent.text);
                       }
                     }}
-                    placeholder="Name"
+                    placeholder={t('ingredient_placeholder')}
                   />
                 </Input>
               </FormControl>
               <FormControl>
                 <FormControlLabel className="mb-1">
-                  <FormControlLabelText>Ingredient Image</FormControlLabelText>
+                  <FormControlLabelText>{t('ingredient_image')}</FormControlLabelText>
                 </FormControlLabel>
                 <View className="w-1/3">
                   <ImagePickerInput
@@ -270,7 +272,7 @@ const ManageIngredients = () => {
                 resetIngredientModal();
               }}
               className="flex-1">
-              <ButtonText>Cancel</ButtonText>
+              <ButtonText>{t('cancel')}</ButtonText>
             </Button>
             <Button
               disabled={loading}
@@ -286,7 +288,7 @@ const ManageIngredients = () => {
               {loading ? (
                 <ButtonSpinner size={16} className="mr-2" color={'rgb(199 235 252)'} />
               ) : null}
-              <ButtonText className="text-md font-medium text-info-50">Confirm</ButtonText>
+              <ButtonText className="text-md font-medium text-info-50">{t('confirm')}</ButtonText>
             </Button>
           </ModalFooter>
         </ModalContent>

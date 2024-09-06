@@ -33,6 +33,7 @@ import ImagePickerInput from './ImagePickerInput';
 import { ImagePickerAsset } from 'expo-image-picker';
 import useCustomToast from './useCustomToast';
 import { useGlobalContext } from '~/context/GlobalProvider';
+import { useTranslation } from 'react-i18next';
 
 type RecipeIngredient = {
   ingredient_id: string | undefined;
@@ -121,11 +122,12 @@ const IngredientPicker = ({
     return () => backHandler.remove();
   }, []);
 
+  const { t } = useTranslation();
   return (
     <>
       <FormControl>
         <FormControlLabel className="mb-1">
-          <FormControlLabelText>Ingredients</FormControlLabelText>
+          <FormControlLabelText>{t('ingredients')}</FormControlLabelText>
         </FormControlLabel>
         <Input className="flex h-fit w-full flex-col gap-2 bg-back p-2">
           <View className="p-2">
@@ -154,12 +156,14 @@ const IngredientPicker = ({
               ))
             ) : (
               <Text className="mb-8 pb-8 pt-2 text-center font-qs-medium text-sm text-typography-600">
-                No Ingredients
+                {t('no_ingredients')}
               </Text>
             )}
           </View>
           <Button className="w-full rounded-md bg-info-500" onPress={handlePresentModalPress}>
-            <ButtonText className="text-md font-medium text-info-50">Add Ingredient</ButtonText>
+            <ButtonText className="text-md font-medium text-info-50">
+              {t('add_ingredient')}
+            </ButtonText>
           </Button>
         </Input>
         <FormControlError>
@@ -177,21 +181,25 @@ const IngredientPicker = ({
                 bottomSheetModalRef.current?.dismiss();
                 setNewIngredientModal(true);
               }}>
-              <ButtonText className="text-md font-medium text-info-50">New Ingredient</ButtonText>
+              <ButtonText className="text-md font-medium text-info-50">
+                {t('new_ingredient')}
+              </ButtonText>
             </Button>
           </BottomSheetFooter>
         )}>
         <View className="flex flex-col ">
           <FormControl className="px-7 pt-4">
             <FormControlLabel className="mb-1">
-              <FormControlLabelText className="text-dark">Search Ingredient</FormControlLabelText>
+              <FormControlLabelText className="text-dark">
+                {t('search_ingredient')}
+              </FormControlLabelText>
             </FormControlLabel>
             <Input className="flex h-10 flex-row items-center justify-between rounded">
               <InputField
                 className="flex-1"
                 defaultValue={searchTerm}
                 onChange={(e) => setSearchTerm(e.nativeEvent.text)}
-                placeholder="Flour"
+                placeholder={t('ingredient_placeholder')}
               />
               <View className="flex h-10 w-10 items-center justify-center">
                 <Ionicons
@@ -239,11 +247,12 @@ const IngredientPicker = ({
         <ModalContent className="max-w-[375px] bg-light">
           <ModalBody className="mb-5 " contentContainerClassName="">
             <Text className="font-qs-medium text-xl text-typography-600">
-              You're going to add{' '}
-              <Text className="font-qs-bold text-dark">{selectedIngredient?.name}</Text>
+              {t('dynamic_ingredient_add', {
+                item: selectedIngredient?.name,
+              })}
             </Text>
             <Text className="text text-left font-qs text-typography-500">
-              Please provide unit and amount.
+              {t('provide_ingredient_add_data')}
             </Text>
             <View className="mt-4 flex flex-col gap-2">
               <Select
@@ -277,7 +286,7 @@ const IngredientPicker = ({
                   keyboardType="numeric"
                   defaultValue={amount}
                   onChange={(e) => setAmount(e.nativeEvent.text)}
-                  placeholder="Amount"
+                  placeholder={t('amount')}
                 />
               </Input>
             </View>
@@ -291,7 +300,7 @@ const IngredientPicker = ({
                 resetModal();
               }}
               className="flex-grow">
-              <ButtonText>Cancel</ButtonText>
+              <ButtonText>{t('cancel')}</ButtonText>
             </Button>
             <Button
               onPress={() => {
@@ -317,12 +326,12 @@ const IngredientPicker = ({
 
                   resetModal();
                 } else {
-                  toast.warning('Please fill all fields');
+                  toast.warning(t('fill_all_fields'));
                 }
               }}
               size="sm"
               className="flex-grow">
-              <ButtonText>Confirm</ButtonText>
+              <ButtonText>{t('confirm')}</ButtonText>
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -336,10 +345,10 @@ const IngredientPicker = ({
         <ModalContent className="max-w-[375px] bg-light">
           <ModalBody className="mb-5 " contentContainerClassName="">
             <Text className="font-qs-medium text-xl text-typography-600">
-              You choose to create a new ingredient
+              {t('ingredient_create')}
             </Text>
             <Text className="text text-left font-qs text-typography-500">
-              Please provide name and image.
+              {t('provide_ingredient_create_data')}
             </Text>
             <View className="mt-4 flex flex-col gap-2">
               <FormControl>
@@ -348,7 +357,7 @@ const IngredientPicker = ({
                     className="flex-1"
                     defaultValue={ingredientName}
                     onChange={(e) => setIngredientName(e.nativeEvent.text)}
-                    placeholder="Name"
+                    placeholder={t('ingredient_placeholder')}
                   />
                 </Input>
                 <FormControlError>
@@ -357,7 +366,7 @@ const IngredientPicker = ({
               </FormControl>
               <FormControl>
                 <FormControlLabel className="mb-1">
-                  <FormControlLabelText>Ingredient Image</FormControlLabelText>
+                  <FormControlLabelText>{t('ingredient_image')}</FormControlLabelText>
                 </FormControlLabel>
                 <View className="w-1/3">
                   <ImagePickerInput
@@ -381,7 +390,7 @@ const IngredientPicker = ({
                 resetIngredientModal();
               }}
               className="flex-grow">
-              <ButtonText>Cancel</ButtonText>
+              <ButtonText>{t('cancel')}</ButtonText>
             </Button>
             <Button
               onPress={() => {
@@ -417,12 +426,12 @@ const IngredientPicker = ({
 
                   resetIngredientModal();
                 } else {
-                  toast.warning('Please fill in all fields');
+                  toast.warning(t('fill_all_fields'));
                 }
               }}
               size="sm"
               className="flex-grow">
-              <ButtonText>Confirm</ButtonText>
+              <ButtonText>{t('confirm')}</ButtonText>
             </Button>
           </ModalFooter>
         </ModalContent>
