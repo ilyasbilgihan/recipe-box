@@ -39,7 +39,7 @@ const SignIn = () => {
 
   async function signInWithEmail() {
     if (formData.email === '' || formData.password === '') {
-      toast.warning('Please fill in all fields');
+      toast.warning(t('fill_all_fields'));
       return;
     }
     setLoading(true);
@@ -59,7 +59,7 @@ const SignIn = () => {
       .eq('username', formData.username);
 
     if (error) {
-      toast.error('Something went wrong. ' + error.message);
+      toast.error(t('something_went_wrong') + error.message);
       setLoading(false);
       return;
     }
@@ -76,19 +76,19 @@ const SignIn = () => {
     const usernameExists = await checkUsername();
 
     if (usernameExists) {
-      toast.error('Username already exists');
+      toast.warning(t('username_exists'));
       setLoading(false);
       return;
     }
 
     if (formData.email === '' || formData.password === '') {
-      toast.warning('Please fill in all fields');
+      toast.warning(t('fill_all_fields'));
       setLoading(false);
       return;
     }
 
     if (formData.password !== formData.confirm_password) {
-      toast.error('Passwords do not match');
+      toast.warning(t('passwords_do_not_match'));
       setLoading(false);
       return;
     }
@@ -101,7 +101,7 @@ const SignIn = () => {
       password: formData.password,
     });
     if (signUpError) {
-      toast.error('Something went wrong. ' + signUpError.message);
+      toast.error(t('something_went_wrong') + signUpError.message);
       setLoading(false);
       return;
     }
@@ -115,7 +115,7 @@ const SignIn = () => {
     if (profileError) {
       console.log(session?.user.email);
       console.log(profileError);
-      toast.error('Something went wrong. ' + profileError);
+      toast.error(t('something_went_wrong') + profileError);
       setLoading(false);
       return;
     }

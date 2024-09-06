@@ -10,6 +10,7 @@ import { Button, ButtonSpinner, ButtonText } from './ui/button';
 import { Textarea, TextareaInput } from './ui/textarea';
 import CommentItem from './CommentItem';
 import useCustomToast from './useCustomToast';
+import { useTranslation } from 'react-i18next';
 
 const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) => {
   const [comments, setComments] = useState<any[]>([]);
@@ -17,6 +18,7 @@ const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) 
   const [loading, setLoading] = useState(false);
 
   const { session, ifLight } = useGlobalContext();
+  const { t } = useTranslation();
 
   const toast = useCustomToast();
 
@@ -94,7 +96,7 @@ const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) 
         setContent('');
         return true;
       } else {
-        toast.warning('Comment cannot be empty');
+        toast.warning(t('comment_empty_warning'));
         setLoading(false);
         return false;
       }

@@ -20,6 +20,7 @@ import {
 } from './ui/select';
 import { router } from 'expo-router';
 import useCustomToast from './useCustomToast';
+import { useTranslation } from 'react-i18next';
 
 const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
   const [repliesExpanded, setRepliesExpanded] = useState(false);
@@ -30,6 +31,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
   const [editMode, setEditMode] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
 
+  const { t } = useTranslation();
   const { session, ifLight } = useGlobalContext();
 
   const toast = useCustomToast();
@@ -116,7 +118,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
       .eq('id', comment.id);
 
     if (error) {
-      toast.error('Edit Comment Error. ' + error.message);
+      toast.error(t('comment_edit_error') + error.message);
     } else {
       setEditMode(false);
       refreshComments();
@@ -170,7 +172,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                 setEditMode(!editMode);
               } else if (value == 'delete') {
                 toast.confirm({
-                  title: 'Are you sure you want to delete this comment?',
+                  title: t('dynamic_delete_confirm', { item: 'comment' }),
                   message: comment?.content,
                   icon: <Ionicons name="trash-outline" size={20} />,
                   handler: async () => {

@@ -60,7 +60,7 @@ const ManageCategories = () => {
 
   const handleUpdateCategory = async () => {
     if (!category?.name) {
-      toast.error('Category name is required');
+      toast.warning(t('category_name_required'));
       return;
     }
     if (!loading) {
@@ -86,11 +86,11 @@ const ManageCategories = () => {
 
       if (!err) {
         fetchCategories();
-        toast.success('Category updated successfully');
+        toast.success(t('category_update_success'));
         bottomSheetModalRef.current?.close();
       } else {
         console.log(err);
-        toast.error('Something went wrong');
+        toast.error(t('something_went_wrong'));
       }
 
       setLoading(false);
@@ -106,10 +106,10 @@ const ManageCategories = () => {
         const { error } = await supabase.from('category').delete().eq('id', category?.id);
         if (!error) {
           fetchCategories();
-          toast.success('Category deleted successfully');
+          toast.success(t('category_delete_success'));
           bottomSheetModalRef.current?.close();
         } else {
-          toast.error('Something went wrong');
+          toast.error(t('something_went_wrong'));
         }
       },
     });
@@ -118,7 +118,7 @@ const ManageCategories = () => {
   const handleCategoryCreate = async () => {
     let catToAdd = categoryName.trim();
     if (!catToAdd) {
-      toast.error('Category name is required');
+      toast.warning(t('category_name_required'));
       return;
     }
     if (!loading) {
@@ -127,10 +127,10 @@ const ManageCategories = () => {
 
       if (!error) {
         fetchCategories();
-        toast.success('Category created successfully');
+        toast.success(t('category_create_success'));
         setModal(false);
       } else {
-        toast.error('Something went wrong. ' + error.message);
+        toast.error(t('something_went_wrong') + error.message);
       }
 
       setLoading(false);

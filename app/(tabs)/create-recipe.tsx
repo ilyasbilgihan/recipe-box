@@ -116,7 +116,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
   const fetchIngredients = async () => {
     const { data, error } = await supabase.from('ingredient').select('*');
     if (error) {
-      toast.error('Something went wrong. ' + error.message);
+      toast.error(t('something_went_wrong') + error.message);
       return;
     }
     if (data) {
@@ -230,12 +230,12 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
           'recipe_images/' + formData.thumbnail.split('recipe_images/')[1]
         );
         if (error) {
-          toast.error('Delete image error ' + error.message);
+          toast.error(t('image_delete_error') + error.message);
         }
       }
       const { url, error } = await uploadImageToSupabaseBucket('recipe_images', image);
       if (error) {
-        toast.error('Image upload error ' + error.message);
+        toast.error(t('image_upload_error') + error.message);
       } else {
         uploadedImageUrl = url;
       }
@@ -258,7 +258,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
       .single();
 
     if (error) {
-      toast.error('Create Recipe Error. ' + error.message);
+      toast.error(t('recipe_create_error') + error.message);
       setLoading(false);
       return;
     }
@@ -279,7 +279,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
       .single();
 
     if (error) {
-      toast.error('Update Recipe Error. ' + error.message);
+      toast.error(t('recipe_update_error') + error.message);
       setLoading(false);
       return;
     }
@@ -309,7 +309,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
 
         const { url, error } = await uploadImageToSupabaseBucket('ingredient_images', newIngImage!);
         if (error) {
-          toast.error('Image upload error ' + error.message);
+          toast.error(t('image_upload_error') + error.message);
         } else {
           const { data: newIng, error: newIngErr } = await supabase
             .from('ingredient')
@@ -367,7 +367,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
       formData.instructions === '' ||
       selectedIngredients.length == 0
     ) {
-      toast.warning('Please fill in all the required fields.');
+      toast.warning(t('fill_all_fields'));
       setLoading(false);
       return;
     }
@@ -411,9 +411,9 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
       }
       resetFields();
       if (id) {
-        toast.success('Recipe Updated Successfully');
+        toast.success(t('recipe_update_success'));
       } else {
-        toast.success('Recipe Created Successfully');
+        toast.success(t('recipe_create_success'));
       }
       router.replace(`/recipe/${upserted_id}`);
     }

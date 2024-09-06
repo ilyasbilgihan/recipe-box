@@ -49,7 +49,7 @@ const ManageIngredients = () => {
   const handleUpdateIngredient = async () => {
     let ingToAdd = ingredient?.name?.trim();
     if (!ingToAdd) {
-      toast.warning('Ingredient name is required');
+      toast.warning(t('ingredient_name_required'));
       return;
     }
     if (!loading) {
@@ -62,14 +62,14 @@ const ManageIngredients = () => {
           ingredientImage
         );
         if (error) {
-          toast.error('Image upload error ' + error.message);
+          toast.error(t('image_upload_error') + error.message);
           return;
         } else {
           const { error: delImgError } = await deleteImage(
             'ingredient_images/' + ingredient.image.split('ingredient_images/')[1]
           );
           if (delImgError) {
-            toast.error('Delete ingredient image error ' + delImgError.message);
+            toast.error(t('image_delete_error') + delImgError.message);
             return;
           }
           ingredientImageUrl = url;
@@ -81,10 +81,10 @@ const ManageIngredients = () => {
         .eq('id', ingredient?.id);
       if (!ingError) {
         fetchIngredients();
-        toast.success('Ingredient created successfully');
+        toast.success(t('ingredient_create_success'));
         resetIngredientModal();
       } else {
-        toast.error('Something went wrong. ' + ingError.message);
+        toast.error(t('something_went_wrong') + ingError.message);
       }
 
       setLoading(false);
@@ -94,7 +94,7 @@ const ManageIngredients = () => {
   const handleDeleteIngredient = async (ingredient: any) => {
     toast.dismisAll();
     toast.confirm({
-      title: 'Are you sure you want to delete this ingredient?',
+      title: t('dynamic_delete_confirm', { item: 'ingredient' }),
       message: ingredient.name,
       icon: <Ionicons name="trash-outline" size={20} />,
       handler: async () => {
@@ -104,14 +104,14 @@ const ManageIngredients = () => {
             'ingredient_images/' + ingredient.image.split('ingredient_images/')[1]
           );
           if (delImgError) {
-            toast.error('Delete ingredient image error ' + delImgError.message);
+            toast.error(t('image_delete_error') + delImgError.message);
             return;
           }
           fetchIngredients();
-          toast.success('Ingredient deleted successfully');
+          toast.success(t('ingredient_delete_success'));
           resetIngredientModal();
         } else {
-          toast.error('Something went wrong ' + error.message);
+          toast.error(t('something_went_wrong') + error.message);
         }
       },
     });
@@ -120,12 +120,12 @@ const ManageIngredients = () => {
   const handleCreateIngredient = async () => {
     let ingToAdd = ingredientName.trim();
     if (!ingToAdd) {
-      toast.warning('Ingredient name is required');
+      toast.warning(t('ingredient_name_required'));
       return;
     }
 
     if (!ingredientImage) {
-      toast.warning('Ingredient image is required');
+      toast.warning(t('image_required'));
       return;
     }
 
@@ -137,17 +137,17 @@ const ManageIngredients = () => {
         ingredientImage
       );
       if (error) {
-        toast.error('Image upload error ' + error.message);
+        toast.error(t('image_upload_error') + error.message);
       } else {
         const { error: ingError } = await supabase
           .from('ingredient')
           .insert({ name: ingToAdd, image: url });
         if (!ingError) {
           fetchIngredients();
-          toast.success('Ingredient created successfully');
+          toast.success(t('ingredient_create_success'));
           resetIngredientModal();
         } else {
-          toast.error('Something went wrong. ' + ingError.message);
+          toast.error(t('something_went_wrong') + ingError.message);
         }
       }
 

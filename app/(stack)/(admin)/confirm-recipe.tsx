@@ -101,7 +101,7 @@ const SwipeableItem = ({ recipe, fetchUnconfirmedRecipes }: any) => {
     if (error) {
       console.log('error', error);
     } else {
-      toast.success('Recipe confirmed');
+      toast.success(t('recipe_confirmed'));
       fetchUnconfirmedRecipes();
     }
   };
@@ -109,7 +109,7 @@ const SwipeableItem = ({ recipe, fetchUnconfirmedRecipes }: any) => {
   const handleRejectRecipe = async (id: any) => {
     let rejectReason = reason.trim();
     if (!rejectReason) {
-      toast.warning('Reason is required');
+      toast.warning(t('reason_required'));
       return;
     }
 
@@ -123,7 +123,7 @@ const SwipeableItem = ({ recipe, fetchUnconfirmedRecipes }: any) => {
       if (error) {
         console.log('error', error);
       } else {
-        toast.success('Recipe rejected');
+        toast.success(t('recipe_rejected'));
         fetchUnconfirmedRecipes();
       }
       setLoading(false);

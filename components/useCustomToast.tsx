@@ -4,6 +4,7 @@ import { Toast, ToastDescription, ToastTitle, useToast } from './ui/toast';
 import { Ionicons } from '@expo/vector-icons';
 import { Button, ButtonGroup, ButtonText } from './ui/button';
 import { useGlobalContext } from '~/context/GlobalProvider';
+import { useTranslation } from 'react-i18next';
 
 const ToastContainer = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -23,7 +24,7 @@ const ToastContainer = ({ children }: { children: React.ReactNode }) => {
 };
 
 const useCustomToast = () => {
-  const { ifLight } = useGlobalContext();
+  const { t } = useTranslation();
   const toast = useToast();
   const success = (message: string, duration = 5000) => {
     toast.show({
@@ -174,7 +175,7 @@ const useCustomToast = () => {
                     onPress={() => {
                       toast.close(id);
                     }}>
-                    <ButtonText>Cancel</ButtonText>
+                    <ButtonText>{t('cancel')}</ButtonText>
                   </Button>
                   <Button
                     size="sm"
@@ -183,7 +184,7 @@ const useCustomToast = () => {
                       toast.close(id);
                       handler();
                     }}>
-                    <ButtonText>Confirm</ButtonText>
+                    <ButtonText>{t('confirm')}</ButtonText>
                   </Button>
                 </ButtonGroup>
               </View>

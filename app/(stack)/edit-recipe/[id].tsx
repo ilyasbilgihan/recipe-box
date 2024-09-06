@@ -4,6 +4,7 @@ import { useFocusEffect, useLocalSearchParams } from 'expo-router';
 import CreateRecipe from '~/app/(tabs)/create-recipe';
 import { supabase } from '~/utils/supabase';
 import useCustomToast from '~/components/useCustomToast';
+import { useTranslation } from 'react-i18next';
 
 type RecipeIngredient = {
   ingredient_id: string | undefined;
@@ -14,6 +15,7 @@ type RecipeIngredient = {
 };
 
 const EditRecipe = () => {
+  const { t } = useTranslation();
   const toast = useCustomToast();
 
   const { id } = useLocalSearchParams();
@@ -79,7 +81,7 @@ const EditRecipe = () => {
       });
 
       if (data.status === 'rejected') {
-        toast.error('This recipe offer is rejected', 3000);
+        toast.error(t('recipe_is_rejected'), 3000);
         setTimeout(() => {
           toast.warning(data.reject_reason, 10000);
         }, 3100);

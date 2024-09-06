@@ -89,7 +89,7 @@ const ProfileDetail = () => {
     if (image !== undefined) {
       const { url, error } = await uploadImageToSupabaseBucket('profile_images', image);
       if (error) {
-        toast.error('Image upload error ' + error.message);
+        toast.error(t('image_upload_error') + error.message);
       } else {
         uploadedImageUrl = url;
       }
@@ -101,7 +101,7 @@ const ProfileDetail = () => {
       if (tempImage) {
         const { error } = await deleteImage('profile_images/' + tempImage);
         if (error) {
-          toast.error('Delete image error ' + error.message);
+          toast.error(t('image_delete_error') + error.message);
         }
       }
     }
@@ -118,13 +118,13 @@ const ProfileDetail = () => {
       .eq('id', session?.user.id);
 
     if (error) {
-      toast.error('Something went wrong. ' + error.message);
+      toast.error(t('something_went_wrong') + error.message);
       setLoading(false);
       return;
     }
 
     setLoading(false);
-    toast.success('Profile updated successfully');
+    toast.success(t('profile_update_success'));
     router.push('/profile');
   };
 

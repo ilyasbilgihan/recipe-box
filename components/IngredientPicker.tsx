@@ -321,7 +321,7 @@ const IngredientPicker = ({
                       },
                     ]);
                   } else {
-                    toast.warning('Ingredient already added');
+                    toast.warning(t('ingredient_already_added'));
                   }
 
                   resetModal();
@@ -421,7 +421,7 @@ const IngredientPicker = ({
                     });
                     setModal(true);
                   } else {
-                    toast.error("You've already created an ingredient named " + ingredientName);
+                    toast.error(t('ingredient_already_created') + ingredientName);
                   }
 
                   resetIngredientModal();
