@@ -18,6 +18,7 @@ const windowWidth = Dimensions.get('window').width;
 const RecipeDetail = () => {
   const { id } = useLocalSearchParams();
   const [recipe, setRecipe] = useState<any>({});
+  const [alternatives, setAlternatives] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
 
@@ -32,12 +33,13 @@ const RecipeDetail = () => {
 
   useFocusEffect(
     useCallback(() => {
-      console.log('hey');
       // This will run when screen is `focused` or mounted.
       StatusBar.setHidden(true);
 
       fetchRecipe();
       checkBookmark();
+      fetchAlternatives();
+
       // This will run when screen is `blured` or unmounted.
       return () => {
         StatusBar.setHidden(false);
@@ -83,10 +85,21 @@ const RecipeDetail = () => {
     }
   };
 
+  const fetchAlternatives = async () => {
+    const { data, error } = await supabase
+      .from('recipe')
+      .select('*, profile(username), recipe_reaction(rating.avg())')
+      .eq('alternative_of', id)
+      .order('created_at', { ascending: true });
+
+    if (data) {
+      setAlternatives(data);
+    }
+  };
+
   const [height, setHeight] = useState<number>(0);
 
   const onWebViewMessage = (event: WebViewMessageEvent) => {
-    console.log(event.nativeEvent);
     setHeight(+event.nativeEvent.data);
   };
 
@@ -207,25 +220,27 @@ const RecipeDetail = () => {
             </TouchableOpacity>
             <View className="items-end gap-4">
               <View className="flex-row gap-4">
-                <TouchableOpacity
-                  activeOpacity={0.75}
-                  onPress={() => {
-                    router.push(`/edit-recipe/${recipe?.id}`);
-                  }}
-                  style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    width: 48,
-                    height: 48,
-                    borderRadius: 24,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  <Ionicons
-                    name={session?.user.id === recipe?.owner_id ? 'create' : 'git-branch-outline'}
-                    size={24}
-                    color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
-                  />
-                </TouchableOpacity>
+                {session?.user.id === recipe?.owner_id || !recipe?.alternative_of ? (
+                  <TouchableOpacity
+                    activeOpacity={0.75}
+                    onPress={() => {
+                      router.push(`/edit-recipe/${recipe?.id}`);
+                    }}
+                    style={{
+                      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                      width: 48,
+                      height: 48,
+                      borderRadius: 24,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                    }}>
+                    <Ionicons
+                      name={session?.user.id === recipe?.owner_id ? 'create' : 'git-branch-outline'}
+                      size={24}
+                      color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
+                    />
+                  </TouchableOpacity>
+                ) : null}
 
                 <TouchableOpacity
                   activeOpacity={0.75}
@@ -385,7 +400,7 @@ const RecipeDetail = () => {
             />
             <Text className="font-qs-semibold text-2xl text-dark">
               Ingredients{' '}
-              <Text className="font-qs text-lg">({recipe?.recipe_ingredient?.length})</Text>
+              <Text className="font-qs text-lg">({recipe?.recipe_ingredient?.length || 0})</Text>
             </Text>
           </View>
           <FlatList
@@ -441,6 +456,71 @@ const RecipeDetail = () => {
             />
           ) : null}
         </View>
+        {alternatives.length > 0 ? (
+          <>
+            <View className="mx-7 mt-8 flex-row items-center gap-2">
+              <Ionicons
+                name="git-branch-outline"
+                size={24}
+                color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
+              />
+              <Text className="font-qs-semibold text-2xl text-dark">
+                Alternative Recipes{' '}
+                <Text className="font-qs text-lg">({alternatives?.length || 0})</Text>
+              </Text>
+            </View>
+            <FlatList
+              horizontal
+              ItemSeparatorComponent={() => <View className="w-4" />}
+              contentContainerStyle={{ paddingHorizontal: 28, paddingTop: 12, paddingBottom: 24 }}
+              data={alternatives}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() => router.push(`/recipe/${item?.id}`)}
+                  activeOpacity={0.75}>
+                  <View
+                    style={{ width: windowWidth - 56 }}
+                    className="flex-row overflow-hidden rounded-xl bg-back shadow-soft-5">
+                    <Image source={{ uri: item?.thumbnail }} className="aspect-square w-28" />
+                    <View className="flex-1 justify-between px-4 py-2">
+                      <View>
+                        <Text
+                          numberOfLines={1}
+                          className="w-full font-qs-medium text-2xl text-dark">
+                          {recipe.name}
+                        </Text>
+                        <Text className="font-qs-medium text-lg text-dark">
+                          by <Text className="font-qs-bold">@{item.profile.username}</Text>
+                        </Text>
+                      </View>
+                      <View className="flex flex-row items-center justify-between">
+                        <View className="flex flex-row items-center gap-1 ">
+                          <Ionicons
+                            name="star"
+                            size={20}
+                            color={ifLight('#FB954B', 'rgb(231 120 40)')}
+                          />
+                          <Text className="font-qs-medium text-dark">
+                            {recipe?.rating
+                              ? recipe.rating.toFixed(1)
+                              : recipe?.recipe_reaction
+                                ? recipe.recipe_reaction[0]?.avg?.toFixed(1) || '-'
+                                : '-'}
+                          </Text>
+                        </View>
+                        <View className="flex flex-row items-center gap-1 ">
+                          <Ionicons name="time-outline" size={20} color={'rgb(159 161 175)'} />
+                          <Text className="font-qs-medium text-dark">{recipe?.duration} min</Text>
+                        </View>
+                      </View>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              )}
+              keyExtractor={(item) => 'alternative-' + item.id}
+            />
+          </>
+        ) : null}
         {recipe?.id ? (
           <View className="mt-4 gap-4 px-7 pb-24">
             <View className="flex-row items-center gap-2">
