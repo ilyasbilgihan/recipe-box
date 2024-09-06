@@ -491,17 +491,11 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
               </FormControlError>
             </FormControl>
             {/* Thumbnail */}
-            <FormControl
-              style={
-                recipe?.alternative_of !== null || session?.user.id !== recipe?.owner.id
-                  ? { opacity: 0.4 }
-                  : {}
-              }>
+            <FormControl>
               <FormControlLabel className="mb-1">
                 <FormControlLabelText>Thumbnail</FormControlLabelText>
               </FormControlLabel>
               <ImagePickerInput
-                disabled={recipe?.alternative_of !== null || session?.user.id !== recipe?.owner.id}
                 defaultImage={formData.thumbnail}
                 image={image}
                 pickImage={pickImage}
