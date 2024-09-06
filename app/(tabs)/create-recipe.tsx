@@ -4,7 +4,6 @@ import {
   ScrollView,
   RefreshControl,
   Text,
-  TextInput,
   KeyboardAvoidingView,
   Platform,
   BackHandler,
@@ -465,10 +464,10 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
         <View className="flex w-full flex-1 items-center justify-between px-8">
           <Box className="flex w-full gap-3 pb-7">
             {/* Recipe Name */}
-
             <FormControl
               style={
-                recipe?.alternative_of || session?.user.id !== recipe?.owner.id
+                id &&
+                (recipe?.alternative_of !== null || (id && session?.user.id !== recipe?.owner.id))
                   ? { opacity: 0.4 }
                   : {}
               }>
@@ -477,7 +476,8 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
               </FormControlLabel>
               <Input
                 isReadOnly={
-                  recipe?.alternative_of !== null || session?.user.id !== recipe?.owner.id
+                  id &&
+                  (recipe?.alternative_of !== null || (id && session?.user.id !== recipe?.owner.id))
                 }>
                 <InputField
                   type="text"
@@ -506,7 +506,10 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
             </FormControl>
             {/* Category */}
             <CategoryPicker
-              disabled={recipe?.alternative_of !== null || session?.user.id !== recipe?.owner.id}
+              disabled={
+                id &&
+                (recipe?.alternative_of !== null || (id && session?.user.id !== recipe?.owner.id))
+              }
               categories={categories}
               selectedCategories={selectedCategories}
               setSelectedCategories={setSelectedCategories}
