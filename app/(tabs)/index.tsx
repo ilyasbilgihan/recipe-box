@@ -81,10 +81,10 @@ export default function Home() {
 
   const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = useCallback(() => {
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
-    fetchUserDetails();
-    fetchRecipes();
+    await fetchUserDetails();
+    await fetchRecipes();
     setRefreshing(false);
   }, [selectedCategory]);
 

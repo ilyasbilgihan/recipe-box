@@ -14,18 +14,18 @@ const Bookmark = () => {
   const [recipes, setRecipes] = useState<any>([]);
   useFocusEffect(
     useCallback(() => {
-      fetchBookmarks();
+      fetchFeed();
     }, [])
   );
 
   const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-    fetchBookmarks();
+    await fetchFeed();
     setRefreshing(false);
   }, []);
 
-  const fetchBookmarks = async () => {
+  const fetchFeed = async () => {
     console.log('fetch ');
     const { data, error } = await supabase
       .from('follow')

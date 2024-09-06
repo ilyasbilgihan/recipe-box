@@ -178,11 +178,12 @@ const RecipeDetail = () => {
   };
 
   const [refreshing, setRefreshing] = React.useState(false);
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     setLoading(false);
-    fetchRecipe();
-    checkBookmark();
+    await fetchAlternatives();
+    await fetchRecipe();
+    await checkBookmark();
     setRefreshing(false);
   }, []);
   return (
@@ -400,7 +401,7 @@ const RecipeDetail = () => {
             />
             <Text className="font-qs-semibold text-2xl text-dark">
               Ingredients{' '}
-              <Text className="font-qs text-lg">({recipe?.recipe_ingredient?.length || 0})</Text>
+              <Text className="font-qs text-lg">({recipe?.recipe_ingredient?.length || '0'})</Text>
             </Text>
           </View>
           <FlatList
@@ -466,7 +467,7 @@ const RecipeDetail = () => {
               />
               <Text className="font-qs-semibold text-2xl text-dark">
                 Alternative Recipes{' '}
-                <Text className="font-qs text-lg">({alternatives?.length || 0})</Text>
+                <Text className="font-qs text-lg">({alternatives?.length || '0'})</Text>
               </Text>
             </View>
             <FlatList

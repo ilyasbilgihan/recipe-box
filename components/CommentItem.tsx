@@ -105,7 +105,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
     }
 
     setUserVote(data?.reaction);
-    return data?.reaction || 0;
+    return data?.reaction || '0';
   };
 
   const handleEditComment = async () => {
@@ -249,7 +249,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                 />
               </TouchableOpacity>
               <Text className="font-qs-semibold text-dark">
-                {comment?.comment_reaction[0]?.sum || 0}
+                {comment?.comment_reaction[0]?.sum || '0'}
               </Text>
               <TouchableOpacity
                 activeOpacity={0.75}

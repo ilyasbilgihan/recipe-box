@@ -590,8 +590,8 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
                 {id
                   ? session?.user.id == recipe?.owner.id
                     ? recipe?.alternative_of
-                      ? 'Edit Alternative'
-                      : 'Edit Recipe'
+                      ? 'Update Alternative'
+                      : 'Update Recipe'
                     : 'Add Alternative'
                   : 'Create Recipe'}
               </ButtonText>

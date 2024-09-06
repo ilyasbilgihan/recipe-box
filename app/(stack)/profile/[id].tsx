@@ -102,12 +102,13 @@ const Profile = () => {
   };
 
   const [refreshing, setRefreshing] = useState(false);
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-    fetchProfile();
-    fetchHighRatedRecipes();
+    setLoading(false);
+    await fetchProfile();
+    await fetchHighRatedRecipes();
+    await checkFollow();
     setRefreshing(false);
-    checkFollow();
   }, []);
 
   const checkFollow = async () => {
@@ -188,18 +189,22 @@ const Profile = () => {
             />
 
             <View className="flex-col items-center ">
-              <Text className="font-qs-bold text-lg text-dark">{recipes.length}</Text>
+              <Text className="font-qs-bold text-lg text-dark">{recipes.length || '0'}</Text>
               <Text className="font-qs-medium text-dark">recipes</Text>
             </View>
             <FollowListTrigger list={follow.followers} checkFollow={checkFollow} title="Followers">
               <View className="flex-col items-center ">
-                <Text className="font-qs-bold text-lg text-dark">{follow.followers?.length}</Text>
+                <Text className="font-qs-bold text-lg text-dark">
+                  {follow.followers?.length || '0'}
+                </Text>
                 <Text className="font-qs-medium text-dark">followers</Text>
               </View>
             </FollowListTrigger>
             <FollowListTrigger list={follow.following} checkFollow={checkFollow} title="Following">
               <View className="flex-col items-center ">
-                <Text className="font-qs-bold text-lg text-dark">{follow.following?.length}</Text>
+                <Text className="font-qs-bold text-lg text-dark">
+                  {follow.following?.length || '0'}
+                </Text>
                 <Text className="font-qs-medium text-dark">following</Text>
               </View>
             </FollowListTrigger>
@@ -330,7 +335,7 @@ const Profile = () => {
             recipe: (
               <>
                 <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                  Shared ({recipes.length})
+                  Shared ({recipes.length || '0'})
                 </Text>
                 <ListRecipe recipes={recipes} />
               </>
@@ -338,7 +343,7 @@ const Profile = () => {
             liked: (
               <>
                 <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                  Liked ({likedRecipes.length})
+                  Liked ({likedRecipes.length || '0'})
                 </Text>
                 <ListRecipe recipes={likedRecipes} />
               </>
@@ -346,7 +351,7 @@ const Profile = () => {
             bookmark: (
               <>
                 <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                  Bookmarked ({bookmarkedRecipes.length})
+                  Bookmarked ({bookmarkedRecipes.length || '0'})
                 </Text>
                 <ListRecipe recipes={bookmarkedRecipes} />
               </>
@@ -427,7 +432,7 @@ const Profile = () => {
                     idle: (
                       <>
                         <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                          Idle ({idleRecipes.length})
+                          Idle ({idleRecipes.length || '0'})
                         </Text>
                         <ListRecipe recipes={idleRecipes} />
                       </>
@@ -435,7 +440,7 @@ const Profile = () => {
                     rejected: (
                       <>
                         <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                          Rejected ({rejectedRecipes.length})
+                          Rejected ({rejectedRecipes.length || '0'})
                         </Text>
                         <ListRecipe recipes={rejectedRecipes} />
                       </>
@@ -443,7 +448,7 @@ const Profile = () => {
                     alternative: (
                       <>
                         <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                          Alternatives ({alternatives.length})
+                          Alternatives ({alternatives.length || '0'})
                         </Text>
                         <ListRecipe recipes={alternatives} />
                       </>

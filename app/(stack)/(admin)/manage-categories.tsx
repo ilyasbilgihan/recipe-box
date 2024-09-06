@@ -177,7 +177,9 @@ const ManageCategories = () => {
                     className="relative h-12 flex-row items-center justify-between rounded-xl bg-back pl-4 shadow-soft-5">
                     <Text className="font-qs-semibold text-dark">{category.name}</Text>
                     <View className="absolute right-1 flex h-10 min-w-10 flex-row items-center justify-center gap-2 rounded-lg bg-light px-3">
-                      <Text className="font-qs-medium text-dark">{category.recipes.length}</Text>
+                      <Text className="font-qs-medium text-dark">
+                        {category.recipes.length || '0'}
+                      </Text>
                     </View>
                   </TouchableOpacity>
                 ))

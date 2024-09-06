@@ -39,10 +39,10 @@ const ProfileDetail = () => {
 
   const [refreshing, setRefreshing] = React.useState(false);
 
-  const onRefresh = React.useCallback(() => {
+  const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
-    fetchProfile();
     setLoading(false);
+    await fetchProfile();
     setImage(undefined);
     setRefreshing(false);
   }, []);
