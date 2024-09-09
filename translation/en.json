@@ -153,5 +153,11 @@
   "edit_comment": "Edit Comment",
   "delete_comment": "Delete Comment",
   "preview": "Preview",
-  "edit": "Edit"
+  "edit": "Edit",
+
+  "search_recipe": "Search Recipe",
+  "filter_search": "Filtered Search",
+  "search_query": "Search Query",
+  "search": "Search",
+  "not_found_search": "No recipes found matching your preferences. Please try again from the top right corner."
 }

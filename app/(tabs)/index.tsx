@@ -90,18 +90,28 @@ export default function Home() {
   }, [selectedCategory]);
 
   const fetchRecipes = async () => {
-    const { data, error } = await supabase
+    /* const { data, error } = await supabase
       .from('sorted_recipe')
       .select('*')
       .eq('status', 'confirmed') // we already fetching confirmed recipes but not for the current authenticated user.
       .is('alternative_of', null)
       .eq('category_id', selectedCategory)
       .order('created_at', { ascending: false })
+      .limit(5); */
+
+    /* Figured out a way to fetch by category without using sorted_recipe view */
+    const { data, error } = await supabase
+      .from('recipe')
+      .select('*, recipe_category!inner(category_id), recipe_reaction!inner(rating.avg())')
+      .eq('status', 'confirmed')
+      .is('alternative_of', null)
+      .filter('recipe_category.category_id', 'in', '(' + selectedCategory + ')')
+      .order('created_at', { ascending: false })
       .limit(5);
 
     if (data) {
       let sorted = [...data]?.sort((a, b) => {
-        return b.rating - a.rating;
+        return b?.recipe_reaction[0]?.avg - a?.recipe_reaction[0]?.avg;
       });
       setRecipes(sorted);
     }

@@ -154,5 +154,11 @@
   "edit_comment": "Modifier le commentaire",
   "delete_comment": "Supprimer le commentaire",
   "preview": "Aperçu",
-  "edit": "Modifier"
+  "edit": "Modifier",
+
+  "search_recipe": "Rechercher une recette",
+  "filter_search": "Recherche par filtre",
+  "search_query": "Requête de recherche",
+  "search": "Rechercher",
+  "not_found_search": "Aucune recette trouvée correspondant à vos préférences. Veuillez réessayer depuis le coin supérieur droit."
 }

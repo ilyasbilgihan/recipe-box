@@ -62,8 +62,8 @@ const IngredientPicker = ({
   setSelectedIngredients,
 }: {
   ingredients: Ingredient[];
-  newIngredients: newIngredient[];
-  setNewIngredients: React.Dispatch<React.SetStateAction<newIngredient[]>>;
+  newIngredients?: newIngredient[];
+  setNewIngredients?: React.Dispatch<React.SetStateAction<newIngredient[]>>;
   setIngredients: React.Dispatch<React.SetStateAction<Ingredient[]>>;
   selectedIngredients: RecipeIngredient[];
   setSelectedIngredients: React.Dispatch<React.SetStateAction<RecipeIngredient[]>>;
@@ -175,16 +175,18 @@ const IngredientPicker = ({
         snapPoints={['30%', '60%']}
         footerComponent={(props) => (
           <BottomSheetFooter {...props} bottomInset={20} style={{ paddingHorizontal: 28 }}>
-            <Button
-              className="rounded-lg bg-info-500"
-              onPress={() => {
-                bottomSheetModalRef.current?.dismiss();
-                setNewIngredientModal(true);
-              }}>
-              <ButtonText className="text-md font-medium text-info-50">
-                {t('new_ingredient')}
-              </ButtonText>
-            </Button>
+            {newIngredients ? (
+              <Button
+                className="rounded-lg bg-info-500"
+                onPress={() => {
+                  bottomSheetModalRef.current?.dismiss();
+                  setNewIngredientModal(true);
+                }}>
+                <ButtonText className="text-md font-medium text-info-50">
+                  {t('new_ingredient')}
+                </ButtonText>
+              </Button>
+            ) : null}
           </BottomSheetFooter>
         )}>
         <View className="flex flex-col ">
@@ -394,6 +396,9 @@ const IngredientPicker = ({
             </Button>
             <Button
               onPress={() => {
+                if (!newIngredients || !setNewIngredients) {
+                  return;
+                }
                 if (ingredientName && ingredientImage) {
                   let isExistInNewOnes = newIngredients.find(
                     (item) => item.name.toLowerCase() === ingredientName.toLowerCase()

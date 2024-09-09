@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import RecipeItem from './RecipeItem';
 import { useTranslation } from 'react-i18next';
 
-const ListRecipe = ({ recipes }: { recipes: any[] }) => {
+const ListRecipe = ({ recipes, notFoundText }: { recipes: any[]; notFoundText?: string }) => {
   const { t } = useTranslation();
 
   return (
@@ -18,8 +18,8 @@ const ListRecipe = ({ recipes }: { recipes: any[] }) => {
           <Ionicons name="receipt-outline" size={80} color={'rgb(159 161 175)'} />
           <Text
             style={{ color: 'rgb(159 161 175)' }}
-            className="font-qs-medium text-2xl text-outline-400">
-            {t('no_recipes')}
+            className="mt-6 px-7 text-center font-qs-medium text-xl text-outline-400">
+            {notFoundText || t('no_recipes')}
           </Text>
         </View>
       )}

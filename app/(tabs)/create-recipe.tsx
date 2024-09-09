@@ -34,7 +34,7 @@ import { Box } from '~/components/ui/box';
 import { ButtonSpinner, ButtonText, Button } from '~/components/ui/button';
 import ImagePickerInput from '~/components/ImagePickerInput';
 import IngredientPicker from '~/components/IngredientPicker';
-import CategoryPicker from '~/components/CategoryPicker';
+import CategoryPicker from '~/components/Picker';
 import useCustomToast from '~/components/useCustomToast';
 import { useTranslation } from 'react-i18next';
 
@@ -509,9 +509,11 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
                 id &&
                 (recipe?.alternative_of !== null || (id && session?.user.id !== recipe?.owner.id))
               }
-              categories={categories}
-              selectedCategories={selectedCategories}
-              setSelectedCategories={setSelectedCategories}
+              items={categories}
+              label={t('category')}
+              noItemText={t('no_category')}
+              selectedItems={selectedCategories}
+              setSelectedItems={setSelectedCategories}
             />
             {/* Duration */}
             <FormControl>

@@ -150,5 +150,11 @@
   "edit_comment": "Yorumu Düzenle",
   "delete_comment": "Yorumu Sil",
   "preview": "Önizleme",
-  "edit": "Düzenle"
+  "edit": "Düzenle",
+
+  "search_recipe": "Tarif Ara",
+  "filter_search": "Aramayı Filtrele",
+  "search_query": "Arama İfadesi",
+  "search": "Ara",
+  "not_found_search": "Tercihlerinize uygun tarif bulunamadı. Lütfen sağ üst köşeden tekrar deneyin"
 }

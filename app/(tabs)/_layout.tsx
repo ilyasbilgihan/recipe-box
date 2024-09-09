@@ -72,6 +72,19 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="search"
+        options={{
+          title: t('search'),
+          tabBarIcon: ({ color, focused }) =>
+            !focused ? (
+              <Ionicons size={22} name="search-outline" color={color} />
+            ) : (
+              <Ionicons size={22} name="search" color={color} />
+            ),
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
         name="profile/index"
         options={{
           title: t('profile'),

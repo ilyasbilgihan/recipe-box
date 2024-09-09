@@ -14,30 +14,23 @@ import {
   SelectPortal,
   SelectTrigger,
 } from './ui/select';
-import {
-  FormControl,
-  FormControlError,
-  FormControlErrorText,
-  FormControlLabel,
-  FormControlLabelText,
-} from '~/components/ui/form-control';
+import { FormControl, FormControlLabel, FormControlLabelText } from '~/components/ui/form-control';
 import { useTranslation } from 'react-i18next';
 
-type Category = {
-  id: number;
-  name: string;
-};
-
-const CategoryPicker = ({
-  categories,
-  selectedCategories,
-  setSelectedCategories,
+const Picker = ({
+  items,
+  selectedItems,
+  setSelectedItems,
   disabled,
+  noItemText,
+  label,
 }: {
-  categories: Category[];
-  selectedCategories: Category[];
-  setSelectedCategories: React.Dispatch<React.SetStateAction<Category[]>>;
+  items: any[];
+  selectedItems: any[];
+  setSelectedItems: React.Dispatch<React.SetStateAction<any[]>>;
   disabled?: boolean;
+  noItemText: string;
+  label: string;
 }) => {
   const { t } = useTranslation();
   const { ifLight } = useGlobalContext();
@@ -45,31 +38,31 @@ const CategoryPicker = ({
   return (
     <FormControl style={disabled ? { opacity: 0.4 } : {}}>
       <FormControlLabel className="mb-1">
-        <FormControlLabelText>{t('category')}</FormControlLabelText>
+        <FormControlLabelText>{label}</FormControlLabelText>
       </FormControlLabel>
       <Select
         isDisabled={disabled}
         onValueChange={(value) => {
-          let isExist = selectedCategories.find(({ id }) => id === +value);
+          let isExist = selectedItems.find(({ id }) => id === +value);
           if (!isExist) {
-            setSelectedCategories([
-              ...selectedCategories,
-              { id: +value, name: categories.find(({ id }) => id === +value)!?.name },
+            setSelectedItems([
+              ...selectedItems,
+              { id: +value, name: items.find(({ id }) => id === +value)!?.name },
             ]);
           }
           console.log('category changed -> ', value);
         }}>
         <View className="flex flex-row items-center rounded-md border border-outline-200 bg-back dark:border-transparent dark:focus:border-stone-800">
           <View className="flex flex-1 flex-row flex-wrap gap-2  p-3 text-typography-600">
-            {selectedCategories.length > 0 ? (
-              selectedCategories.map(({ id, name }) => (
+            {selectedItems.length > 0 ? (
+              selectedItems.map(({ id, name }) => (
                 <TouchableOpacity
                   style={{ zIndex: 10 }}
                   activeOpacity={disabled ? 1 : 0.75}
                   onPress={(e) => {
                     if (disabled) return;
-                    let filtered = selectedCategories.filter((item) => item.id !== id);
-                    setSelectedCategories(filtered);
+                    let filtered = selectedItems.filter((item) => item.id !== id);
+                    setSelectedItems(filtered);
                   }}
                   key={id}>
                   <Text className="rounded-md border border-dashed border-outline-200 px-3 py-2 text-typography-600">
@@ -78,7 +71,7 @@ const CategoryPicker = ({
                 </TouchableOpacity>
               ))
             ) : (
-              <Text className="text-sm text-typography-500">{t('no_category')}</Text>
+              <Text className="text-sm text-typography-500">{noItemText}</Text>
             )}
           </View>
           <SelectTrigger className="h-10 w-10 items-center justify-center border-0 " size="md">
@@ -97,17 +90,14 @@ const CategoryPicker = ({
             <SelectDragIndicatorWrapper>
               <SelectDragIndicator />
             </SelectDragIndicatorWrapper>
-            {categories.map(({ id, name }) => (
+            {items.map(({ id, name }) => (
               <SelectItem key={id} label={name} value={'' + id} />
             ))}
           </SelectContent>
         </SelectPortal>
       </Select>
-      <FormControlError>
-        <FormControlErrorText>At least 6 characters are required.</FormControlErrorText>
-      </FormControlError>
     </FormControl>
   );
 };
 
-export default CategoryPicker;
+export default Picker;
