@@ -402,7 +402,7 @@ const RecipeDetail = () => {
               color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
             />
             <Text className="font-qs-semibold text-2xl text-dark">
-              Ingredients{' '}
+              {t('ingredients')}{' '}
               <Text className="font-qs text-lg">({recipe?.recipe_ingredient?.length || '0'})</Text>
             </Text>
           </View>
@@ -440,7 +440,7 @@ const RecipeDetail = () => {
             size={24}
             color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
           />
-          <Text className="font-qs-semibold text-2xl text-dark">Instructions</Text>
+          <Text className="font-qs-semibold text-2xl text-dark">{t('instructions')}</Text>
         </View>
         <View>
           {recipe.instructions ? (
@@ -468,7 +468,7 @@ const RecipeDetail = () => {
                 color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
               />
               <Text className="font-qs-semibold text-2xl text-dark">
-                Alternative Recipes{' '}
+                {t('alternatives')}{' '}
                 <Text className="font-qs text-lg">({alternatives?.length || '0'})</Text>
               </Text>
             </View>
@@ -513,7 +513,9 @@ const RecipeDetail = () => {
                         </View>
                         <View className="flex flex-row items-center gap-1 ">
                           <Ionicons name="time-outline" size={20} color={'rgb(159 161 175)'} />
-                          <Text className="font-qs-medium text-dark">{recipe?.duration} min</Text>
+                          <Text className="font-qs-medium text-dark">
+                            {recipe?.duration} {t('minute_short')}
+                          </Text>
                         </View>
                       </View>
                     </View>
@@ -532,7 +534,7 @@ const RecipeDetail = () => {
                 size={24}
                 color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
               />
-              <Text className="font-qs-semibold text-2xl text-dark">Comments</Text>
+              <Text className="font-qs-semibold text-2xl text-dark">{t('comments')}</Text>
             </View>
             <Comments recipeId={recipe?.id} />
           </View>

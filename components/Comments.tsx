@@ -115,7 +115,7 @@ const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) 
                 setContent(e.nativeEvent.text);
               }}
               textAlignVertical="top"
-              placeholder="What are your thoughts?"
+              placeholder={t('comment_placeholder')}
               className="p-3"
             />
           </Textarea>
@@ -124,8 +124,8 @@ const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) 
             onPress={() => {
               handleAddComment({ content });
             }}>
-            {/* {loading ? <ButtonSpinner color={'white'} /> : null} */}
-            <ButtonText className="text-md font-medium text-info-50">Add Comment</ButtonText>
+            {loading ? <ButtonSpinner color={'rgb(199 235 252)'} /> : null}
+            <ButtonText className="text-md font-medium text-info-50">{t('add_comment')}</ButtonText>
           </Button>
         </View>
       ) : null}
@@ -147,7 +147,7 @@ const Comments = ({ recipeId, parentId = null, refreshParent = () => {} }: any) 
       ) : (
         <View className="items-center py-8">
           <Ionicons name="logo-snapchat" size={24} color={ifLight('#3d3d3d', 'rgb(122 124 149)')} />
-          <Text className="font-qs-medium text-lg text-dark">No comments yet.</Text>
+          <Text className="font-qs-medium text-lg text-dark">{t('no_comments_yet')}</Text>
         </View>
       )}
     </View>

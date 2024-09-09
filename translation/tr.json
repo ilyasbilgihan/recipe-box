@@ -136,5 +136,19 @@
   "special": "Özel",
   "recipes_with_this_category": "Bu kategoriye sahip tarifler",
   "no_recipes_with_this_category": "Bu kategoriye sahip tarif bulunmamaktadır.",
-  "delete_category": "Kategoriyi Sil"
+  "delete_category": "Kategoriyi Sil",
+
+  "comments": "Yorumlar",
+  "comment_placeholder": "Düşünceleriniz neler?",
+  "add_comment": "Yorum Ekle",
+  "no_comments_yet": "Henüz Yorum Yok",
+  "reply": "Cevapla",
+  "show_replies": "Cevapları Göster",
+  "hide_replies": "Cevapları Gizle",
+  "anonymous": "Anonim",
+  "deleted_content": "Silinmiş İçerik",
+  "edit_comment": "Yorumu Düzenle",
+  "delete_comment": "Yorumu Sil",
+  "preview": "Önizleme",
+  "edit": "Düzenle"
 }

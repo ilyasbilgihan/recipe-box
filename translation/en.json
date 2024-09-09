@@ -139,5 +139,19 @@
   "special": "Special",
   "recipes_with_this_category": "Recipes with this category",
   "no_recipes_with_this_category": "There are no recipes with this category.",
-  "delete_category": "Delete Category"
+  "delete_category": "Delete Category",
+
+  "comments": "Comments",
+  "comment_placeholder": "What are your thoughts?",
+  "add_comment": "Add Comment",
+  "no_comments_yet": "No Comments yet",
+  "reply": "Reply",
+  "show_replies": "Show Replies",
+  "hide_replies": "Hide Replies",
+  "anonymous": "Anonymous",
+  "deleted_content": "Deleted Content",
+  "edit_comment": "Edit Comment",
+  "delete_comment": "Delete Comment",
+  "preview": "Preview",
+  "edit": "Edit"
 }

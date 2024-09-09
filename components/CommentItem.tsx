@@ -160,7 +160,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
             />
             <Text className="font-qs-bold text-lg text-dark">
               {comment?.deleted
-                ? 'Anonymous'
+                ? t('anonymous')
                 : comment?.profile?.name || '@' + comment?.profile?.username}
             </Text>
           </View>
@@ -194,8 +194,8 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                 <SelectDragIndicatorWrapper>
                   <SelectDragIndicator />
                 </SelectDragIndicatorWrapper>
-                <SelectItem label={editMode ? 'Preview' : 'Edit Comment'} value={'edit'} />
-                <SelectItem label={'Delete Comment'} value={'delete'} />
+                <SelectItem label={editMode ? t('preview') : t('edit_comment')} value={'edit'} />
+                <SelectItem label={t('delete_comment')} value={'delete'} />
               </SelectContent>
             </SelectPortal>
           </Select>
@@ -219,7 +219,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                       setEditContent(e.nativeEvent.text);
                     }}
                     textAlignVertical="top"
-                    placeholder="What are your thoughts?"
+                    placeholder={t('comment_placeholder')}
                     className="p-3"
                   />
                 </Textarea>
@@ -227,11 +227,11 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                   className="h-10 w-1/2 rounded-lg bg-warning-400"
                   onPress={handleEditComment}>
                   {/* {loading ? <ButtonSpinner color={'white'} /> : null} */}
-                  <ButtonText className="text-md font-medium">Edit</ButtonText>
+                  <ButtonText className="text-md font-medium">{t('edit')}</ButtonText>
                 </Button>
               </View>
             ) : comment?.deleted ? (
-              <Text className="font-qs-medium  text-dark line-through">Deleted Content</Text>
+              <Text className="font-qs-medium  text-dark line-through">{t('deleted_content')}</Text>
             ) : (
               <Text className="font-qs-medium text-lg text-dark">{editContent}</Text>
             )}
@@ -273,7 +273,9 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                   onPress={() => {
                     setReplyFormExpanded(!replyFormExpanded);
                   }}>
-                  <Text className="font-qs-semibold tracking-tighter text-info-500">Reply</Text>
+                  <Text className="font-qs-semibold tracking-tighter text-info-500">
+                    {t('reply')}
+                  </Text>
                 </TouchableOpacity>
               </View>
             ) : null}
@@ -288,7 +290,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                     setContent(e.nativeEvent.text);
                   }}
                   textAlignVertical="top"
-                  placeholder="What are your thoughts?"
+                  placeholder={t('comment_placeholder')}
                   className="p-3"
                 />
               </Textarea>
@@ -306,7 +308,9 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                   }
                 }}>
                 {/* {loading ? <ButtonSpinner color={'white'} /> : null} */}
-                <ButtonText className="text-center text-sm font-medium">Add Reply</ButtonText>
+                <ButtonText className="text-center text-sm font-medium">
+                  {t('add_reply')}
+                </ButtonText>
               </Button>
             </View>
           </Collapsible>
@@ -319,7 +323,7 @@ const CommentItem = ({ comment, refreshComments, handleAddComment }: any) => {
                     setRepliesExpanded(!repliesExpanded);
                   }}>
                   <Text className="font-qs-semibold tracking-tighter text-warning-400">
-                    {repliesExpanded ? 'Hide' : 'Show'} Replies
+                    {repliesExpanded ? t('hide_replies') : t('show_replies')}
                   </Text>
                 </TouchableOpacity>
                 <Collapsible renderChildrenCollapsed={false} collapsed={!repliesExpanded}>

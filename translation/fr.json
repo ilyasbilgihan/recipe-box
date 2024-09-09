@@ -140,5 +140,19 @@
   "special": "Spécial",
   "recipes_with_this_category": "Recettes avec cette catégorie",
   "no_recipes_with_this_category": "Aucune recette avec cette catégorie.",
-  "delete_category": "Supprimer la Catégorie"
+  "delete_category": "Supprimer la Catégorie",
+
+  "comments": "Commentaires",
+  "comment_placeholder": "Quelles sont vos pensées?",
+  "add_comment": "Ajouter un commentaire",
+  "no_comments_yet": "Pas encore de commentaires",
+  "reply": "Répondre",
+  "show_replies": "Afficher les réponses",
+  "hide_replies": "Masquer les réponses",
+  "anonymous": "Anonyme",
+  "deleted_content": "Contenu supprimé",
+  "edit_comment": "Modifier le commentaire",
+  "delete_comment": "Supprimer le commentaire",
+  "preview": "Aperçu",
+  "edit": "Modifier"
 }
