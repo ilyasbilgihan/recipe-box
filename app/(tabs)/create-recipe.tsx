@@ -225,7 +225,7 @@ const CreateRecipe = ({ id = null, recipe }: any) => {
   const handleUploadImage = async () => {
     let uploadedImageUrl = null;
     if (image !== undefined) {
-      if (id) {
+      if (id && session?.user.id === recipe?.owner?.id) {
         const { error } = await deleteImage(
           'recipe_images/' + formData.thumbnail.split('recipe_images/')[1]
         );
