@@ -56,6 +56,18 @@ export default function StackLayout() {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="downloaded-recipes"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="downloaded-recipe/[id]"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
     </>
   );

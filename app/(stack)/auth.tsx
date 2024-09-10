@@ -251,6 +251,13 @@ const SignIn = () => {
                 {formState === 'login' ? t('no_account_yet') : t('already_have_an_account')}
               </Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => {
+                router.push('/downloaded-recipes');
+              }}>
+              <Text className="font-qs-medium text-dark">{t('see_downloaded')}</Text>
+            </TouchableOpacity>
           </Box>
         </View>
       </ScrollView>

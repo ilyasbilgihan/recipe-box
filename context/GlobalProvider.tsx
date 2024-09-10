@@ -12,6 +12,7 @@ export interface GlobalContextValue {
   ifLight: (a: any, b: any) => any;
   setColorMode: React.Dispatch<React.SetStateAction<Mode>>;
   session: Session | null;
+  setSession: React.Dispatch<React.SetStateAction<Session | null>>;
   toggleColorMode: () => void;
   setLanguage: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -26,10 +27,12 @@ export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('get session', session);
       setSession(session);
     });
 
     supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('auth change', session);
       setSession(session);
     });
     getColorMode();
@@ -42,6 +45,7 @@ export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
 
   const getLanguage = async () => {
     const item = await getItem('language');
+    console.log('get language', item);
     if (item) {
       i18n.changeLanguage(item as string);
     }
@@ -49,6 +53,7 @@ export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
 
   const getColorMode = async () => {
     const item = await getItem('colorMode');
+    console.log('get color mode', item);
     if (item) {
       setColorMode(item as Mode);
     }
@@ -66,7 +71,15 @@ export const GlobalProvider: React.FC<PropsWithChildren> = (props) => {
 
   return (
     <GlobalContext.Provider
-      value={{ colorMode, ifLight, setColorMode, session, toggleColorMode, setLanguage }}>
+      value={{
+        colorMode,
+        ifLight,
+        setColorMode,
+        session,
+        setSession,
+        toggleColorMode,
+        setLanguage,
+      }}>
       {props.children}
     </GlobalContext.Provider>
   );

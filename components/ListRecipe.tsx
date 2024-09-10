@@ -4,14 +4,24 @@ import { Ionicons } from '@expo/vector-icons';
 import RecipeItem from './RecipeItem';
 import { useTranslation } from 'react-i18next';
 
-const ListRecipe = ({ recipes, notFoundText }: { recipes: any[]; notFoundText?: string }) => {
+const ListRecipe = ({
+  recipes,
+  notFoundText,
+  downloaded,
+}: {
+  recipes: any[];
+  notFoundText?: string;
+  downloaded?: boolean;
+}) => {
   const { t } = useTranslation();
 
   return (
     <View>
       {recipes?.length > 0 ? (
         <View className="flex flex-row flex-wrap items-stretch gap-6 px-7 pb-7">
-          {recipes?.map((recipe) => <RecipeItem key={recipe.id} recipe={recipe} />)}
+          {recipes?.map((recipe) => (
+            <RecipeItem key={recipe.id} recipe={recipe} downloaded={downloaded} />
+          ))}
         </View>
       ) : (
         <View className="items-center py-12">

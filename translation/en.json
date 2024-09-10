@@ -159,5 +159,9 @@
   "filter_search": "Filtered Search",
   "search_query": "Search Query",
   "search": "Search",
-  "not_found_search": "No recipes found matching your preferences. Please try again from the top right corner."
+  "not_found_search": "No recipes found matching your preferences. Please try again from the top right corner.",
+
+  "see_downloaded": "See Downloaded Recipes",
+  "downloaded_recipes": "Downloaded Recipes",
+  "not_found_downloaded": "No downloaded recipes found."
 }

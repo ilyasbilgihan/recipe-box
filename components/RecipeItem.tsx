@@ -8,14 +8,14 @@ import { useGlobalContext } from '~/context/GlobalProvider';
 
 const windowWidth = Dimensions.get('window').width;
 
-const RecipeItem = ({ recipe }: any) => {
+const RecipeItem = ({ recipe, downloaded }: any) => {
   const { ifLight } = useGlobalContext();
 
   return (
     <TouchableOpacity
       onPress={() => {
         if (recipe?.id) {
-          router.push(`/recipe/${'' + recipe.id}`);
+          router.push(`/${downloaded ? 'downloaded-' : ''}recipe/${'' + recipe.id}`);
         }
       }}
       activeOpacity={0.75}

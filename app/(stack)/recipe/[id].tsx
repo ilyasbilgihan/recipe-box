@@ -16,10 +16,10 @@ import { useTranslation } from 'react-i18next';
 
 const windowWidth = Dimensions.get('window').width;
 
-const RecipeDetail = () => {
+const RecipeDetail = ({ downloadedRecipe }: any) => {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams();
-  const [recipe, setRecipe] = useState<any>({});
+  const [recipe, setRecipe] = useState<any>(downloadedRecipe || {});
   const [alternatives, setAlternatives] = useState<any>([]);
   const [loading, setLoading] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
@@ -38,9 +38,11 @@ const RecipeDetail = () => {
       // This will run when screen is `focused` or mounted.
       StatusBar.setHidden(true);
 
-      fetchRecipe();
-      checkBookmark();
-      fetchAlternatives();
+      if (!downloadedRecipe) {
+        fetchRecipe();
+        checkBookmark();
+        fetchAlternatives();
+      }
 
       // This will run when screen is `blured` or unmounted.
       return () => {
@@ -222,13 +224,35 @@ const RecipeDetail = () => {
               />
             </TouchableOpacity>
             <View className="items-end gap-4">
-              <View className="flex-row gap-4">
-                {session?.user.id === recipe?.owner_id || !recipe?.alternative_of ? (
+              {!downloadedRecipe ? (
+                <View className="flex-row gap-4">
+                  {session?.user.id === recipe?.owner_id || !recipe?.alternative_of ? (
+                    <TouchableOpacity
+                      activeOpacity={0.75}
+                      onPress={() => {
+                        router.push(`/edit-recipe/${recipe?.id}`);
+                      }}
+                      style={{
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        width: 48,
+                        height: 48,
+                        borderRadius: 24,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                      }}>
+                      <Ionicons
+                        name={
+                          session?.user.id === recipe?.owner_id ? 'create' : 'git-branch-outline'
+                        }
+                        size={24}
+                        color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
+                      />
+                    </TouchableOpacity>
+                  ) : null}
+
                   <TouchableOpacity
                     activeOpacity={0.75}
-                    onPress={() => {
-                      router.push(`/edit-recipe/${recipe?.id}`);
-                    }}
+                    onPress={handleBookmark}
                     style={{
                       backgroundColor: 'rgba(0, 0, 0, 0.5)',
                       width: 48,
@@ -237,40 +261,22 @@ const RecipeDetail = () => {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                    <Ionicons
-                      name={session?.user.id === recipe?.owner_id ? 'create' : 'git-branch-outline'}
-                      size={24}
-                      color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
-                    />
+                    {bookmarked ? (
+                      <Ionicons
+                        name="bookmark"
+                        size={24}
+                        color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
+                      />
+                    ) : (
+                      <Ionicons
+                        name="bookmark-outline"
+                        size={24}
+                        color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
+                      />
+                    )}
                   </TouchableOpacity>
-                ) : null}
-
-                <TouchableOpacity
-                  activeOpacity={0.75}
-                  onPress={handleBookmark}
-                  style={{
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                    width: 48,
-                    height: 48,
-                    borderRadius: 24,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}>
-                  {bookmarked ? (
-                    <Ionicons
-                      name="bookmark"
-                      size={24}
-                      color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
-                    />
-                  ) : (
-                    <Ionicons
-                      name="bookmark-outline"
-                      size={24}
-                      color={ifLight('rgb(250 249 251)', 'rgb(238 240 255)')}
-                    />
-                  )}
-                </TouchableOpacity>
-              </View>
+                </View>
+              ) : null}
               <View
                 style={{
                   backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -330,28 +336,31 @@ const RecipeDetail = () => {
           </View>
         </LazyImage>
         <View className=" gap-2 px-7 py-6">
-          <View className="ml-auto flex-row items-end gap-1">
-            <StarRating
-              starStyle={{ marginLeft: -8 }}
-              starSize={28}
-              onRatingStart={() => setInitialRating(rating)}
-              onRatingEnd={handleRating}
-              color={ifLight('#FB954B', 'rgb(231 120 40)')}
-              rating={rating}
-              onChange={setRating}
-            />
-            <Text className="font-qs-semibold text-lg text-dark">
-              {recipeRatings.length
-                ? (
-                    recipeRatings?.reduce(
-                      (acc: any, rating: { rating: any }) => acc + rating.rating,
-                      0
-                    ) / recipeRatings?.length
-                  ).toFixed(1)
-                : '-'}
-              <Text className="font-qs-medium text-sm"> ({recipeRatings?.length})</Text>
-            </Text>
-          </View>
+          {!downloadedRecipe ? (
+            <View className="ml-auto flex-row items-end gap-1">
+              <StarRating
+                starStyle={{ marginLeft: -8 }}
+                starSize={28}
+                enableHalfStar={false}
+                onRatingStart={() => setInitialRating(rating)}
+                onRatingEnd={handleRating}
+                color={ifLight('#FB954B', 'rgb(231 120 40)')}
+                rating={rating}
+                onChange={setRating}
+              />
+              <Text className="font-qs-semibold text-lg text-dark">
+                {recipeRatings.length
+                  ? (
+                      recipeRatings?.reduce(
+                        (acc: any, rating: { rating: any }) => acc + rating.rating,
+                        0
+                      ) / recipeRatings?.length
+                    ).toFixed(1)
+                  : '-'}
+                <Text className="font-qs-medium text-sm"> ({recipeRatings?.length})</Text>
+              </Text>
+            </View>
+          ) : null}
 
           {recipe.profile ? (
             <TouchableOpacity
@@ -459,7 +468,7 @@ const RecipeDetail = () => {
             />
           ) : null}
         </View>
-        {alternatives.length > 0 ? (
+        {alternatives.length > 0 && !downloadedRecipe ? (
           <>
             <View className="mx-7 mt-8 flex-row items-center gap-2">
               <Ionicons
@@ -526,7 +535,7 @@ const RecipeDetail = () => {
             />
           </>
         ) : null}
-        {recipe?.id ? (
+        {recipe?.id && !downloadedRecipe ? (
           <View className="mt-4 gap-4 px-7 pb-24">
             <View className="flex-row items-center gap-2">
               <Ionicons

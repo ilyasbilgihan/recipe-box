@@ -17,7 +17,7 @@ import { QueryData } from '@supabase/supabase-js';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import ListRecipe from '~/components/ListRecipe';
 const windowWidth = Dimensions.get('window').width;
-import { router, useFocusEffect } from 'expo-router';
+import { Redirect, router, useFocusEffect } from 'expo-router';
 import LazyImage from '~/components/LazyImage';
 import { useTranslation } from 'react-i18next';
 

@@ -160,5 +160,9 @@
   "filter_search": "Recherche par filtre",
   "search_query": "Requête de recherche",
   "search": "Rechercher",
-  "not_found_search": "Aucune recette trouvée correspondant à vos préférences. Veuillez réessayer depuis le coin supérieur droit."
+  "not_found_search": "Aucune recette trouvée correspondant à vos préférences. Veuillez réessayer depuis le coin supérieur droit.",
+
+  "see_downloaded": "Voir les recettes téléchargées",
+  "downloaded_recipes": "Recettes téléchargées",
+  "not_found_downloaded": "Aucune recette téléchargée n'a été trouvée."
 }

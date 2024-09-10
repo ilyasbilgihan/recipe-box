@@ -138,7 +138,7 @@ const Search = () => {
           </TouchableOpacity>
         </View>
         <View className="px-7">
-          {recipes!?.length > 0 ? (
+          {recipes!?.length > 0 && itemCount > recipes!?.length ? (
             <Pagination
               totalItems={itemCount}
               pageSize={LIMIT}
@@ -169,7 +169,7 @@ const Search = () => {
         </View>
         <ListRecipe recipes={recipes!} notFoundText={t('not_found_search')} />
         <View className="px-7">
-          {recipes!?.length >= 5 ? (
+          {recipes!?.length >= 5 && itemCount > recipes!?.length ? (
             <Pagination
               totalItems={itemCount}
               pageSize={LIMIT}

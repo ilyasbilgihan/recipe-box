@@ -10,10 +10,12 @@ import { supabase } from '~/utils/supabase';
 import { useGlobalContext } from '~/context/GlobalProvider';
 
 import ListRecipe from '~/components/ListRecipe';
-import { Button, ButtonText } from '~/components/ui/button';
+import { Button, ButtonSpinner, ButtonText } from '~/components/ui/button';
 import LazyImage from '~/components/LazyImage';
 import FollowListTrigger from '~/components/FollowList';
 import { useTranslation } from 'react-i18next';
+
+import { getItem, setItem } from '~/core/storage';
 
 type Follow =
   | {
@@ -81,7 +83,9 @@ const Profile = () => {
   const fetchBookmarks = async () => {
     const { data, error } = await supabase
       .from('bookmark')
-      .select('*, recipe(*, recipe_reaction(rating.avg()))')
+      .select(
+        '*, recipe(*, profile(*), recipe_category(category(name)), recipe_reaction(rating.avg()), recipe_ingredient(id, amount, unit, ingredient(*)))'
+      )
       .eq('user_id', session?.user.id)
       .order('created_at', { ascending: false });
 
@@ -159,6 +163,27 @@ const Profile = () => {
     }
 
     checkFollow();
+    setLoading(false);
+  };
+
+  const handleDownloadBookmarks = async () => {
+    if (loading) return;
+    setLoading(true);
+    let tmp = bookmarkedRecipes;
+
+    for (let i = 0; i < tmp.length; i++) {
+      if (tmp[i]?.alternative_of) {
+        const { data: alternative_of } = await supabase
+          .from('recipe')
+          .select('name')
+          .eq('id', tmp[i].alternative_of)
+          .single();
+        tmp[i].alternative_of = alternative_of?.name;
+        console.log('tmp', tmp[i]);
+      }
+      await setItem('recipe_' + tmp[i].id, tmp[i]);
+    }
+    await setItem('bookmarks', tmp);
     setLoading(false);
   };
 
@@ -354,9 +379,24 @@ const Profile = () => {
             ),
             bookmark: (
               <>
-                <Text className="mb-4 px-7 font-qs-bold text-2xl text-dark">
-                  {t('bookmarked')} ({bookmarkedRecipes.length || '0'})
-                </Text>
+                <View className="mb-4 flex-row items-center justify-between px-7">
+                  <Text className="font-qs-bold text-2xl text-dark">
+                    {t('bookmarked')} <Text>({bookmarkedRecipes?.length || 0})</Text>
+                  </Text>
+                  <TouchableOpacity activeOpacity={0.75} onPress={handleDownloadBookmarks}>
+                    <View className="h-12 w-12 items-center justify-center rounded-md bg-back shadow-soft-5">
+                      {loading ? (
+                        <ButtonSpinner color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')} />
+                      ) : (
+                        <Ionicons
+                          name="download-outline"
+                          size={24}
+                          color={ifLight('rgb(42 48 81)', 'rgb(238 240 255)')}
+                        />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                </View>
                 <ListRecipe recipes={bookmarkedRecipes} />
               </>
             ),
